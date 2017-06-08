@@ -1,0 +1,3 @@
+packages:
+- wolf
+resolver: lts-8.17
