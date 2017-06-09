@@ -12,9 +12,7 @@ import Wolf.NoteIndex
 import Wolf.Path
 import Wolf.Types
 
-note
-    :: MonadIO m
-    => String -> m ()
+note :: MonadIO m => String -> m ()
 note person = do
     origIndex <- getIndex
     (personUuid, index) <- lookupOrCreateNewPerson person origIndex

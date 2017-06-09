@@ -145,9 +145,10 @@ parseCommandAlias =
                 strArgument (mconcat [metavar "NEW", help "The alias"]) <*>
                 strArgument
                     (mconcat
-                         [metavar "OLD", help "What the alias will refer to"
+                         [ metavar "OLD"
+                         , help "What the alias will refer to"
                          , completer $ listCompleter $ peopleMap env
-                            ])
+                         ])
             modifier =
                 fullDesc <> progDesc "Perform a git command on the wolf data."
         in info parser modifier

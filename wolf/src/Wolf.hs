@@ -2,9 +2,9 @@ module Wolf where
 
 import Import
 
+import Wolf.Alias
 import Wolf.Entry
 import Wolf.Git
-import Wolf.Alias
 import Wolf.Note
 import Wolf.OptParse
 import Wolf.Summary
