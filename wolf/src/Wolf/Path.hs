@@ -59,3 +59,14 @@ personNoteFile
 personNoteFile personUuid personNoteUuid = do
     pnd <- personNotesDir personUuid
     liftIO $ resolveFile pnd $ personNoteUuidString personNoteUuid
+
+tmpPersonNoteFile
+    :: MonadIO m
+    => PersonUuid -> PersonNoteUuid -> m (Path Abs File)
+tmpPersonNoteFile personUuid personNoteUuid = do
+    tmpDir <- liftIO getTempDir
+    liftIO $
+        resolveFile tmpDir $
+        intercalate
+            "-"
+            [personUuidString personUuid, personNoteUuidString personNoteUuid]

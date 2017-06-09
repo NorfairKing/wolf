@@ -2,8 +2,6 @@ module Wolf.NoteIndex where
 
 import Import
 
-import qualified Data.Text.IO as T
-
 import Wolf.JSONUtils
 import Wolf.Path
 import Wolf.Types
@@ -43,8 +41,7 @@ readPersonNote
     => PersonUuid -> PersonNoteUuid -> m (Maybe PersonNote)
 readPersonNote personUuid personNoteUuid = do
     pnf <- personNoteFile personUuid personNoteUuid
-    contents <- liftIO (forgivingAbsence $ T.readFile $ toFilePath pnf)
-    pure $ PersonNote <$> contents
+    readJSONWithDefault Nothing pnf
 
 getPersonNoteUuids
     :: MonadIO m

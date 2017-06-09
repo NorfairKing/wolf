@@ -7,6 +7,7 @@ import Import
 import Data.Aeson as JSON
 import Data.Map
 import qualified Data.Map as M
+import Data.Time
 import Data.UUID as UUID
 import Data.UUID.V4 as UUID
 
@@ -87,9 +88,14 @@ nextRandomPersonNoteUuid = liftIO $ PersonNoteUuid <$> UUID.nextRandom
 personNoteUuidString :: PersonNoteUuid -> String
 personNoteUuidString (PersonNoteUuid uuid) = UUID.toString uuid
 
-newtype PersonNote = PersonNote
-    { unPersonNote :: Text
+data PersonNote = PersonNote
+    { personNoteContents :: Text
+    , personNoteTimestamp :: UTCTime
     } deriving (Show, Eq, Ord, Generic)
+
+instance FromJSON PersonNote
+
+instance ToJSON PersonNote
 
 data EditingResult
     = EditingSuccess

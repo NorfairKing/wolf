@@ -2,8 +2,12 @@ module Wolf.Note where
 
 import Import
 
+import qualified Data.Text.IO as T
+import Data.Time
+
 import Wolf.Editor
 import Wolf.Index
+import Wolf.JSONUtils
 import Wolf.NoteIndex
 import Wolf.Path
 import Wolf.Types
@@ -16,7 +20,8 @@ note person = do
     (personUuid, index) <- lookupOrCreateNewPerson person origIndex
     origNoteIndex <- getNoteIndex personUuid
     (noteUuid, noteIndex) <- createNewNote personUuid origNoteIndex
-    editingResult <- startNoteEditor personUuid noteUuid
+    tnf <- tmpPersonNoteFile personUuid noteUuid
+    editingResult <- startEditorOn tnf
     case editingResult of
         EditingFailure reason ->
             liftIO $
@@ -24,12 +29,12 @@ note person = do
             unwords
                 ["ERROR: failed to edit the note file:", reason, ",not saving."]
         EditingSuccess -> do
+            now <- liftIO getCurrentTime
+            contents <- liftIO $ T.readFile $ toFilePath tnf
+            let personNote =
+                    PersonNote
+                    {personNoteContents = contents, personNoteTimestamp = now}
+            nf <- personNoteFile personUuid noteUuid
+            writeJSON nf personNote
             putIndex index
             putNoteIndex personUuid noteIndex
-
-startNoteEditor
-    :: MonadIO m
-    => PersonUuid -> PersonNoteUuid -> m EditingResult
-startNoteEditor personUuid noteUuid = do
-    nf <- personNoteFile personUuid noteUuid
-    startEditorOn nf
