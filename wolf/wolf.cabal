@@ -13,10 +13,11 @@ author: Tom Sydney Kerckhove
 library
     exposed-modules:
         Wolf
-        Wolf.Index
         Wolf.Editor
+        Wolf.Index
         Wolf.JSONUtils
         Wolf.Note
+        Wolf.NoteIndex
         Wolf.OptParse
         Wolf.OptParse.Types
         Wolf.Path

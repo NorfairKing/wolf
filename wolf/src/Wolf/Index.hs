@@ -35,3 +35,9 @@ lookupOrCreateNewPerson person origIndex =
                 , origIndex
                   {indexMap = M.insert person uuid $ indexMap origIndex})
         Just i -> pure (i, origIndex)
+
+getPersonEntry
+    :: MonadIO m
+    => PersonUuid -> m (Maybe PersonEntry)
+getPersonEntry personUuid =
+    personEntryFile personUuid >>= readJSONWithDefault Nothing
