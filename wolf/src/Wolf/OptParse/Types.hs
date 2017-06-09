@@ -5,7 +5,7 @@ import Import
 type Arguments = (Command, Flags)
 type Instructions = (Dispatch, Settings)
 data Command
-    = Command
+    = CommandNote String
     deriving (Show, Eq)
 
 data Flags
@@ -17,7 +17,7 @@ data Configuration
     deriving (Show, Eq)
 
 data Dispatch
-    = Dispatch
+    = DispatchNote String
     deriving (Show, Eq)
 
 data Settings

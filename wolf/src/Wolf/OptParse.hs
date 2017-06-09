@@ -18,7 +18,11 @@ getInstructions = do
     combineToInstructions cmd flags config
 
 combineToInstructions :: Command -> Flags -> Configuration -> IO Instructions
-combineToInstructions Command Flags Configuration = pure (Dispatch, Settings)
+combineToInstructions cmd Flags Configuration = do
+    disp <-
+        case cmd of
+            CommandNote person -> pure $DispatchNote person
+    pure (disp, Settings)
 
 getConfiguration :: Command -> Flags -> IO Configuration
 getConfiguration _ _ = pure Configuration
@@ -32,14 +36,16 @@ getArguments = do
 runArgumentsParser :: [String] -> ParserResult Arguments
 runArgumentsParser = execParserPure prefs_ argParser
   where
-    prefs_ = ParserPrefs
-      { prefMultiSuffix = ""
-      , prefDisambiguate = True
-      , prefShowHelpOnError = True
-      , prefShowHelpOnEmpty = True
-      , prefBacktrack = True
-      , prefColumns = 80
-      }
+    prefs_ =
+        ParserPrefs
+        { prefMultiSuffix = ""
+        , prefDisambiguate = True
+        , prefShowHelpOnError = True
+        , prefShowHelpOnEmpty = True
+        , prefBacktrack = True
+        , prefColumns = 80
+        }
+
 argParser :: ParserInfo Arguments
 argParser = info (helper <*> parseArgs) help_
   where
@@ -50,16 +56,16 @@ parseArgs :: Parser Arguments
 parseArgs = (,) <$> parseCommand <*> parseFlags
 
 parseCommand :: Parser Command
-parseCommand = hsubparser $ mconcat
-    [ command "command" parseCommandCommand
-    ]
+parseCommand = hsubparser $ mconcat [command "note" parseCommandNote]
 
-parseCommandCommand :: ParserInfo Command
-parseCommandCommand = info parser modifier
+parseCommandNote :: ParserInfo Command
+parseCommandNote = info parser modifier
   where
-    parser = pure Command
-    modifier = fullDesc
-            <> progDesc "Command example."
+    parser =
+        CommandNote <$>
+        strArgument
+            (mconcat [metavar "PERSON", help "The person to make a note about."])
+    modifier = fullDesc <> progDesc "Make a note."
 
 parseFlags :: Parser Flags
 parseFlags = pure Flags
