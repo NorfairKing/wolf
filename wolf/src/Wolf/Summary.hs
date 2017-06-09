@@ -5,6 +5,7 @@ import Import
 import qualified Data.Map as M
 import qualified Data.Text as T
 import Data.Time
+import System.Console.ANSI as ANSI
 
 import Wolf.Index
 import Wolf.NoteIndex
@@ -19,23 +20,23 @@ summary person = do
             now <- getCurrentTime
             mpe <- getPersonEntry personUuid
             pns <- getPersonNotes personUuid
-            putStr $ summaryReport now mpe pns
+            putStr $ renderReport $ summaryReport now mpe pns
 
-summaryReport :: UTCTime -> Maybe PersonEntry -> [PersonNote] -> String
+summaryReport :: UTCTime -> Maybe PersonEntry -> [PersonNote] -> Report
 summaryReport now mpe pns =
-    unlines $
-    [ case mpe of
-          Nothing -> "No person entry."
-          Just pe ->
-              unlines $
-              flip map (M.toList $ personEntryProperties pe) $ \(prop, val) ->
-                  unwords [prop ++ ":", val]
-    , ""
-    ] ++
+    Report $
+    unlinesSGR $
+    (case mpe of
+         Nothing -> [str "No person entry."]
+         Just pe ->
+             flip map (M.toList $ personEntryProperties pe) $ \(prop, val) ->
+                 str $ unwords [prop ++ ":", val]) ++
+    [str ""] ++
     concat
         (flip map pns $ \pn ->
-             [ formatTimeStr $ personNoteTimestamp pn
-             , T.unpack $ personNoteContents pn
+             [ ( [SetColor Foreground Dull Blue]
+               , formatTimeStr (personNoteTimestamp pn) ++ ":")
+             , str $ T.unpack $ personNoteContents pn
              ])
   where
     formatTimeStr t =
@@ -49,3 +50,12 @@ summaryReport now mpe pns =
         hoursAgo = round $ dt / (60 * 60) :: Int
         daysAgo = round $ dt / (24 * 60 * 60) :: Int
         dt = diffUTCTime now t
+    str :: String -> ([ANSI.SGR], String)
+    str s = ([], s)
+    unlinesSGR :: [([ANSI.SGR], String)] -> [([ANSI.SGR], String)]
+    unlinesSGR tups =
+        flip map tups $ \(cmds, content) -> (cmds, content ++ "\n")
+
+renderReport :: Report -> String
+renderReport (Report tups) =
+    concatMap (\(cmds, content) -> ANSI.setSGRCode cmds <> content) tups

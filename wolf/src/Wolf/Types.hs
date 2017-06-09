@@ -10,6 +10,7 @@ import qualified Data.Map as M
 import Data.Time
 import Data.UUID as UUID
 import Data.UUID.V4 as UUID
+import System.Console.ANSI as ANSI
 
 newtype Index = Index
     { indexMap :: Map String PersonUuid
@@ -101,3 +102,7 @@ data EditingResult
     = EditingSuccess
     | EditingFailure String
     deriving (Show, Eq, Generic)
+
+newtype Report = Report
+    { unReport :: [([ANSI.SGR], String)]
+    } deriving (Show, Eq, Generic)
