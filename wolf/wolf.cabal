@@ -7,16 +7,18 @@ license-file: LICENSE
 copyright: Copyright: (c) 2017 Tom Sydney Kerckhove
 maintainer: syd.kerckhove@gmail.com
 homepage: http://cs-syd.eu
-category: CsSyd
+category: People
 author: Tom Sydney Kerckhove
 
 library
     exposed-modules:
         Wolf
-        Wolf.Types
-        Import
+        Wolf.Note
         Wolf.OptParse
         Wolf.OptParse.Types
+        Wolf.Types
+    other-modules:
+        Import
     build-depends:
         base >=4.9 && <=5,
         aeson >= 1.0 && < 1.1,
