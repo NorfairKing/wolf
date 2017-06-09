@@ -39,6 +39,13 @@ personEntryFile personUuid = do
     pd <- personDir personUuid
     liftIO $ resolveFile pd "entry.json"
 
+tmpPersonEntryFile
+    :: MonadIO m
+    => PersonUuid -> m (Path Abs File)
+tmpPersonEntryFile personUuid = do
+    td <- liftIO getTempDir
+    liftIO $ resolveFile td $ personUuidString personUuid ++ "-entry.wolf"
+
 noteIndexFile
     :: MonadIO m
     => PersonUuid -> m (Path Abs File)

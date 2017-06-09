@@ -41,3 +41,16 @@ getPersonEntry
     => PersonUuid -> m (Maybe PersonEntry)
 getPersonEntry personUuid =
     personEntryFile personUuid >>= readJSONWithDefault Nothing
+
+getPersonEntryOrNew
+    :: MonadIO m
+    => PersonUuid -> m PersonEntry
+getPersonEntryOrNew personUuid =
+    personEntryFile personUuid >>= readJSONWithDefault newPersonEntry
+
+putPersonEntry
+    :: MonadIO m
+    => PersonUuid -> PersonEntry -> m ()
+putPersonEntry personUuid personEntry = do
+    pef <- personEntryFile personUuid
+    writeJSON pef personEntry

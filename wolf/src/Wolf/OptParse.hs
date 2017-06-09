@@ -27,6 +27,7 @@ combineToInstructions cmd Flags Configuration = do
         case cmd of
             CommandNote person -> pure $ DispatchNote person
             CommandSummary person -> pure $ DispatchSummary person
+            CommandEntry person -> pure $ DispatchEntry person
     pure (disp, Settings)
 
 getConfiguration :: Command -> Flags -> IO Configuration
@@ -72,6 +73,7 @@ parseCommand =
         mconcat
             [ command "note" $ runReaderT parseCommandNote env
             , command "summary" $ runReaderT parseCommandSummary env
+            , command "entry" $ runReaderT parseCommandEntry env
             ]
 
 parseCommandNote :: ReaderT ParserEnv ParserInfo Command
@@ -99,7 +101,21 @@ parseCommandSummary =
                          , help "The person to show a summary for."
                          , completer $ listCompleter $ peopleMap env
                          ])
-            modifier = fullDesc <> progDesc "Show a summary"
+            modifier = fullDesc <> progDesc "Show the summary for a person."
+        in info parser modifier
+
+parseCommandEntry :: ReaderT ParserEnv ParserInfo Command
+parseCommandEntry =
+    ReaderT $ \env ->
+        let parser =
+                CommandEntry <$>
+                strArgument
+                    (mconcat
+                         [ metavar "PERSON"
+                         , help "The person to edit the entry for."
+                         , completer $ listCompleter $ peopleMap env
+                         ])
+            modifier = fullDesc <> progDesc "Edit a person's entry"
         in info parser modifier
 
 peopleMap :: ParserEnv -> [String]

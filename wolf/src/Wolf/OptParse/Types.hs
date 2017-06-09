@@ -11,6 +11,7 @@ type Instructions = (Dispatch, Settings)
 data Command
     = CommandNote String
     | CommandSummary String
+    | CommandEntry String
     deriving (Show, Eq)
 
 data Flags =
@@ -24,6 +25,7 @@ data Configuration =
 data Dispatch
     = DispatchNote String
     | DispatchSummary String
+    | DispatchEntry String
     deriving (Show, Eq)
 
 data Settings =

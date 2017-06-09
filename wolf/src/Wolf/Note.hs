@@ -27,7 +27,10 @@ note person = do
             liftIO $
             putStrLn $
             unwords
-                ["ERROR: failed to edit the note file:", reason, ",not saving."]
+                [ "ERROR: failed to edit the note file:"
+                , show reason
+                , ",not saving."
+                ]
         EditingSuccess -> do
             now <- liftIO getCurrentTime
             contents <- liftIO $ T.readFile $ toFilePath tnf

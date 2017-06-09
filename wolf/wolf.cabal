@@ -14,6 +14,7 @@ library
     exposed-modules:
         Wolf
         Wolf.Editor
+        Wolf.Entry
         Wolf.Index
         Wolf.JSONUtils
         Wolf.Note
