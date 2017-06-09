@@ -1,3 +1,6 @@
 packages:
 - wolf
+extra-deps:
+- validity-0.3.3.0
+- validity-path-0.1.0.1
 resolver: lts-8.17

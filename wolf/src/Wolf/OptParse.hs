@@ -21,7 +21,7 @@ combineToInstructions :: Command -> Flags -> Configuration -> IO Instructions
 combineToInstructions cmd Flags Configuration = do
     disp <-
         case cmd of
-            CommandNote person -> pure $DispatchNote person
+            CommandNote person -> pure $ DispatchNote person
     pure (disp, Settings)
 
 getConfiguration :: Command -> Flags -> IO Configuration

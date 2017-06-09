@@ -1,11 +1,9 @@
-{-# LANGUAGE TemplateHaskell #-}
-
 module Wolf where
 
 import Import
 
-import Wolf.OptParse
 import Wolf.Note
+import Wolf.OptParse
 
 wolf :: IO ()
 wolf = do

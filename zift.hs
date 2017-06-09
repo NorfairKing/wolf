@@ -12,7 +12,6 @@
 import Zifter
 import Zifter.Cabal
 import Zifter.Git
-import Zifter.GoogleJavaFormat
 import Zifter.Hindent
 import Zifter.Hlint
 import Zifter.Stack
@@ -21,8 +20,7 @@ main :: IO ()
 main =
     ziftWith $ do
         recursiveZift
-        preprocessor $
-            ziftP [hindentZift, cabalFormatZift]
+        preprocessor $ ziftP [hindentZift, cabalFormatZift]
         prechecker gitAddAllZift
         checker $ do
             hlintZift

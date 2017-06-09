@@ -80,7 +80,7 @@ lookupOrCreateNewPerson person origIndex =
     case lookupInIndex person origIndex of
         Nothing -> do
             uuid <- nextRandomPersonUuid
-            pure $
+            pure
                 ( uuid
                 , origIndex
                   {indexMap = M.insert person uuid $ indexMap origIndex})
@@ -143,8 +143,8 @@ createNewNote
 createNewNote person noteIndex = do
     noteUuid <- nextRandomPersonNoteUuid
     case lookupInNoteIndex noteUuid noteIndex of
-        Nothing -> do
-            pure $
+        Nothing ->
+            pure
                 ( noteUuid
                 , noteIndex
                   {noteIndexList = sort $ noteUuid : noteIndexList noteIndex})
@@ -181,14 +181,11 @@ note person = do
     liftIO $ print noteIndex
     editingResult <- startNoteEditor personUuid noteUuid
     case editingResult of
-        EditingFailure reason -> do
+        EditingFailure reason ->
             liftIO $
-                putStrLn $
-                unwords
-                    [ "ERROR: failed to edit the note file:"
-                    , reason
-                    , ",not saving."
-                    ]
+            putStrLn $
+            unwords
+                ["ERROR: failed to edit the note file:", reason, ",not saving."]
         EditingSuccess -> do
             putIndex index
             putNoteIndex personUuid noteIndex
@@ -234,10 +231,10 @@ startEditorOn path = do
             pure $
             if contentsBefore == contentsAfter
                 then EditingFailure $
-                     unwords $
-                     [ "Nothing was changed in file"
-                     , toFilePath path
-                     , "after editing it with"
-                     , editor
-                     ]
+                     unwords
+                         [ "Nothing was changed in file"
+                         , toFilePath path
+                         , "after editing it with"
+                         , editor
+                         ]
                 else EditingSuccess
