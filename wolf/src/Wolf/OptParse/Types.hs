@@ -6,8 +6,9 @@ type Arguments = (Command, Flags)
 
 type Instructions = (Dispatch, Settings)
 
-newtype Command =
-    CommandNote String
+data Command
+    = CommandNote String
+    | CommandSummary String
     deriving (Show, Eq)
 
 data Flags =
@@ -18,8 +19,9 @@ data Configuration =
     Configuration
     deriving (Show, Eq)
 
-newtype Dispatch =
-    DispatchNote String
+data Dispatch
+    = DispatchNote String
+    | DispatchSummary String
     deriving (Show, Eq)
 
 data Settings =

@@ -13,9 +13,14 @@ author: Tom Sydney Kerckhove
 library
     exposed-modules:
         Wolf
+        Wolf.Index
+        Wolf.Editor
+        Wolf.JSONUtils
         Wolf.Note
         Wolf.OptParse
         Wolf.OptParse.Types
+        Wolf.Path
+        Wolf.Summary
         Wolf.Types
     build-depends:
         base >=4.9 && <=5,

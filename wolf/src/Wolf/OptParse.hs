@@ -22,6 +22,7 @@ combineToInstructions cmd Flags Configuration = do
     disp <-
         case cmd of
             CommandNote person -> pure $ DispatchNote person
+            CommandSummary person -> pure $ DispatchSummary person
     pure (disp, Settings)
 
 getConfiguration :: Command -> Flags -> IO Configuration
@@ -56,7 +57,10 @@ parseArgs :: Parser Arguments
 parseArgs = (,) <$> parseCommand <*> parseFlags
 
 parseCommand :: Parser Command
-parseCommand = hsubparser $ mconcat [command "note" parseCommandNote]
+parseCommand =
+    hsubparser $
+    mconcat
+        [command "note" parseCommandNote, command "summary" parseCommandSummary]
 
 parseCommandNote :: ParserInfo Command
 parseCommandNote = info parser modifier
@@ -66,6 +70,16 @@ parseCommandNote = info parser modifier
         strArgument
             (mconcat [metavar "PERSON", help "The person to make a note about."])
     modifier = fullDesc <> progDesc "Make a note."
+
+parseCommandSummary :: ParserInfo Command
+parseCommandSummary = info parser modifier
+  where
+    parser =
+        CommandSummary <$>
+        strArgument
+            (mconcat
+                 [metavar "PERSON", help "The person to show a summary for."])
+    modifier = fullDesc <> progDesc "Show a summary"
 
 parseFlags :: Parser Flags
 parseFlags = pure Flags
