@@ -15,6 +15,7 @@ library
         Wolf
         Wolf.Editor
         Wolf.Entry
+        Wolf.Git
         Wolf.Index
         Wolf.JSONUtils
         Wolf.Note

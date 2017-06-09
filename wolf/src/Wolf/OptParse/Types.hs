@@ -12,6 +12,7 @@ data Command
     = CommandNote String
     | CommandSummary String
     | CommandEntry String
+    | CommandGit [String]
     deriving (Show, Eq)
 
 data Flags =
@@ -26,6 +27,7 @@ data Dispatch
     = DispatchNote String
     | DispatchSummary String
     | DispatchEntry String
+    | DispatchGit [String]
     deriving (Show, Eq)
 
 data Settings =

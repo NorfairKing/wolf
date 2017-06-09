@@ -28,6 +28,7 @@ combineToInstructions cmd Flags Configuration = do
             CommandNote person -> pure $ DispatchNote person
             CommandSummary person -> pure $ DispatchSummary person
             CommandEntry person -> pure $ DispatchEntry person
+            CommandGit args -> pure $ DispatchGit args
     pure (disp, Settings)
 
 getConfiguration :: Command -> Flags -> IO Configuration
@@ -74,6 +75,7 @@ parseCommand =
             [ command "note" $ runReaderT parseCommandNote env
             , command "summary" $ runReaderT parseCommandSummary env
             , command "entry" $ runReaderT parseCommandEntry env
+            , command "git" parseCommandGit
             ]
 
 parseCommandNote :: ReaderT ParserEnv ParserInfo Command
@@ -117,6 +119,21 @@ parseCommandEntry =
                          ])
             modifier = fullDesc <> progDesc "Edit a person's entry"
         in info parser modifier
+
+parseCommandGit :: ParserInfo Command
+parseCommandGit =
+    let parser =
+            CommandGit <$>
+            many
+                (strArgument
+                     (mconcat
+                          [ metavar "ARG"
+                          , help "Arguments to git"
+                          , completer $ listCompleter ["status", "pull", "push"]
+                          ]))
+        modifier =
+            fullDesc <> progDesc "Perform a git command on the wolf data."
+    in info parser modifier
 
 peopleMap :: ParserEnv -> [String]
 peopleMap = map (escapeSpaces . fst) . M.toList . indexMap . parserEnvIndex

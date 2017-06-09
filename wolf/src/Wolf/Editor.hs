@@ -22,8 +22,8 @@ startEditorOn path = do
     let cp = proc editor [toFilePath path]
     ec <-
         liftIO $ do
-            (_, _, _, ph) <- liftIO $ createProcess cp
-            liftIO $ waitForProcess ph
+            (_, _, _, ph) <- createProcess cp
+            waitForProcess ph
     contentsAfter <- getContentsOfFile
     case ec of
         ExitFailure code ->
