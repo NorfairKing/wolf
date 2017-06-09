@@ -13,6 +13,7 @@ author: Tom Sydney Kerckhove
 library
     exposed-modules:
         Wolf
+        Wolf.Alias
         Wolf.Editor
         Wolf.Entry
         Wolf.Git

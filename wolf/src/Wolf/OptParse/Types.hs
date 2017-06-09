@@ -13,6 +13,7 @@ data Command
     | CommandSummary String
     | CommandEntry String
     | CommandGit [String]
+    | CommandAlias String String
     deriving (Show, Eq)
 
 data Flags =
@@ -28,6 +29,7 @@ data Dispatch
     | DispatchSummary String
     | DispatchEntry String
     | DispatchGit [String]
+    | DispatchAlias String String
     deriving (Show, Eq)
 
 data Settings =

@@ -4,6 +4,7 @@ import Import
 
 import Wolf.Entry
 import Wolf.Git
+import Wolf.Alias
 import Wolf.Note
 import Wolf.OptParse
 import Wolf.Summary
@@ -15,6 +16,7 @@ wolf = do
 
 dispatch :: Dispatch -> IO ()
 dispatch (DispatchNote person) = note person
+dispatch (DispatchAlias new old) = alias new old
 dispatch (DispatchSummary person) = summary person
 dispatch (DispatchEntry person) = entry person
 dispatch (DispatchGit cmds) = git cmds
