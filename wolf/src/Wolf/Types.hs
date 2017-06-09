@@ -12,7 +12,7 @@ import Data.UUID.V4 as UUID
 
 newtype Index = Index
     { indexMap :: Map String PersonUuid
-    } deriving (Show, Eq, Generic)
+    } deriving (Show, Eq, Ord, Generic)
 
 instance FromJSON Index
 
@@ -23,7 +23,7 @@ newIndex = Index {indexMap = M.empty}
 
 newtype PersonUuid = PersonUuid
     { unPersonUuid :: UUID
-    } deriving (Show, Eq, Generic)
+    } deriving (Show, Eq, Ord, Generic)
 
 instance FromJSON PersonUuid where
     parseJSON =
@@ -45,7 +45,7 @@ personUuidString (PersonUuid uuid) = UUID.toString uuid
 
 newtype PersonEntry = PersonEntry
     { personEntryProperties :: Map String String
-    } deriving (Show, Eq, Generic)
+    } deriving (Show, Eq, Ord, Generic)
 
 instance FromJSON PersonEntry
 
@@ -55,19 +55,19 @@ newPersonEntry :: PersonEntry
 newPersonEntry = PersonEntry {personEntryProperties = M.empty}
 
 newtype NoteIndex = NoteIndex
-    { noteIndexMap :: Map String PersonNoteUuid
-    } deriving (Show, Eq, Generic)
+    { noteIndexList :: [PersonNoteUuid]
+    } deriving (Show, Eq, Ord, Generic)
 
 instance FromJSON NoteIndex
 
 instance ToJSON NoteIndex
 
 newNoteIndex :: NoteIndex
-newNoteIndex = NoteIndex {noteIndexMap = M.empty}
+newNoteIndex = NoteIndex {noteIndexList = []}
 
 newtype PersonNoteUuid = PersonNoteUuid
     { unPersonNoteUuid :: UUID
-    } deriving (Show, Eq, Generic)
+    } deriving (Show, Eq, Ord, Generic)
 
 instance FromJSON PersonNoteUuid where
     parseJSON =
@@ -89,4 +89,9 @@ personNoteUuidString (PersonNoteUuid uuid) = UUID.toString uuid
 
 newtype PersonNote = PersonNote
     { unPersonNote :: Text
-    } deriving (Show, Eq, Generic)
+    } deriving (Show, Eq, Ord, Generic)
+
+data EditingResult
+    = EditingSuccess
+    | EditingFailure String
+    deriving (Show, Eq, Generic)

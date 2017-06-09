@@ -6,8 +6,12 @@ import Import
 
 import Data.Aeson as JSON
 import Data.Aeson.Encode.Pretty as JSON
+import qualified Data.ByteString as SB
 import qualified Data.ByteString.Lazy as LB
 import qualified Data.Map as M
+
+import System.Environment
+import System.Process
 
 import Wolf.Types
 
@@ -76,10 +80,10 @@ putIndex index = do
 lookupInIndex :: String -> Index -> Maybe PersonUuid
 lookupInIndex person index = M.lookup person (indexMap index)
 
-lookupOrCreateNew
+lookupOrCreateNewPerson
     :: MonadIO m
     => String -> Index -> m (PersonUuid, Index)
-lookupOrCreateNew person origIndex =
+lookupOrCreateNewPerson person origIndex =
     case lookupInIndex person origIndex of
         Nothing -> do
             uuid <- nextRandomPersonUuid
@@ -115,6 +119,44 @@ getPersonEntry
     => PersonUuid -> m PersonEntry
 getPersonEntry personUuid =
     personEntryFile personUuid >>= readJSONWithDefault newPersonEntry
+
+noteIndexFile
+    :: MonadIO m
+    => PersonUuid -> m (Path Abs File)
+noteIndexFile personUuid = do
+    wd <- personDir personUuid
+    liftIO $ resolveFile wd "notes-index.json"
+
+getNoteIndex
+    :: MonadIO m
+    => PersonUuid -> m NoteIndex
+getNoteIndex personUuid =
+    noteIndexFile personUuid >>= readJSONWithDefault newNoteIndex
+
+putNoteIndex
+    :: MonadIO m
+    => PersonUuid -> NoteIndex -> m ()
+putNoteIndex personUuid noteIndex = do
+    i <- noteIndexFile personUuid
+    writeJSON i noteIndex
+
+lookupInNoteIndex :: PersonNoteUuid -> NoteIndex -> Maybe PersonNoteUuid
+lookupInNoteIndex noteUuid noteIndex =
+    find (== noteUuid) $ noteIndexList noteIndex
+
+createNewNote
+    :: MonadIO m
+    => PersonUuid -> NoteIndex -> m (PersonNoteUuid, NoteIndex)
+createNewNote person noteIndex = do
+    noteUuid <- nextRandomPersonNoteUuid
+    case lookupInNoteIndex noteUuid noteIndex of
+        Nothing -> do
+            pure $
+                ( noteUuid
+                , noteIndex
+                  {noteIndexList = sort $ noteUuid : noteIndexList noteIndex})
+        Just _ -> createNewNote person noteIndex -- Just try again
+
 personNotesDir
     :: MonadIO m
     => PersonUuid -> m (Path Abs Dir)
@@ -122,13 +164,12 @@ personNotesDir personUuid = do
     pd <- personDir personUuid
     liftIO $ resolveDir pd "notes"
 
-personNoteFile :: MonadIO m => PersonUuid -> PersonNoteUuid -> m (Path Abs File)
+personNoteFile
+    :: MonadIO m
+    => PersonUuid -> PersonNoteUuid -> m (Path Abs File)
 personNoteFile personUuid personNoteUuid = do
     pnd <- personNotesDir personUuid
     liftIO $ resolveFile pnd $ personNoteUuidString personNoteUuid
-
--- personNotes :: PersonUuid -> m [PersonNote]
--- personNotes personUuid =
 
 note
     :: MonadIO m
@@ -136,7 +177,59 @@ note
 note person = do
     origIndex <- getIndex
     liftIO $ print origIndex
-    (personUuid, index) <- lookupOrCreateNew person origIndex
+    (personUuid, index) <- lookupOrCreateNewPerson person origIndex
+    liftIO $ print personUuid
     liftIO $ print index
     personEntry <- getPersonEntry personUuid
     liftIO $ print personEntry
+    origNoteIndex <- getNoteIndex personUuid
+    (noteUuid, noteIndex) <- createNewNote personUuid origNoteIndex
+    liftIO $ print noteUuid
+    liftIO $ print noteIndex
+    editingResult <- startNoteEditor personUuid noteUuid
+    case editingResult of
+        EditingFailure reason -> do
+            liftIO $
+                putStrLn $
+                unwords
+                    [ "ERROR: failed to edit the note file:"
+                    , reason
+                    , ",not saving."
+                    ]
+        EditingSuccess -> do
+            putIndex index
+            putNoteIndex personUuid noteIndex
+
+startNoteEditor
+    :: MonadIO m
+    => PersonUuid -> PersonNoteUuid -> m EditingResult
+startNoteEditor personUuid noteUuid = do
+    liftIO $ print ("Starting note editor for:", personUuid, noteUuid)
+    meditor <- liftIO $ lookupEnv "EDITOR"
+    let editor = fromMaybe "vim" meditor
+    nf <- personNoteFile personUuid noteUuid
+    ensureDir $ parent nf
+    contentsBefore <- liftIO $ forgivingAbsence $ SB.readFile $ toFilePath nf
+    let cp = proc editor [toFilePath nf]
+    liftIO $ print $ unwords [editor, toFilePath nf]
+    (_, _, _, ph) <- liftIO $ createProcess cp
+    ec <- liftIO $ waitForProcess ph
+    contentsAfter <- liftIO $ forgivingAbsence $ SB.readFile $ toFilePath nf
+    case ec of
+        ExitFailure code ->
+            pure $
+            EditingFailure $
+            unwords
+                [ "Invoking"
+                , editor
+                , "on"
+                , toFilePath nf
+                , "failed with exit code"
+                , show code
+                ]
+        ExitSuccess ->
+            pure $
+            if contentsBefore == contentsAfter
+                then EditingFailure $
+                     unwords $ ["Nothing was changed in file", toFilePath nf]
+                else EditingSuccess
