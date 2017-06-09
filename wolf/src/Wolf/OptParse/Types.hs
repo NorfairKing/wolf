@@ -2,6 +2,8 @@ module Wolf.OptParse.Types where
 
 import Import
 
+import Wolf.Types
+
 type Arguments = (Command, Flags)
 
 type Instructions = (Dispatch, Settings)
@@ -27,3 +29,7 @@ data Dispatch
 data Settings =
     Settings
     deriving (Show, Eq)
+
+newtype ParserEnv = ParserEnv
+    { parserEnvIndex :: Index
+    } deriving (Show, Eq)

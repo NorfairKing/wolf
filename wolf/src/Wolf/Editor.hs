@@ -20,7 +20,6 @@ startEditorOn path = do
     meditor <- liftIO $ lookupEnv "EDITOR"
     let editor = fromMaybe "vim" meditor
     let cp = proc editor [toFilePath path]
-    liftIO $ print $ unwords [editor, toFilePath path]
     ec <-
         liftIO $ do
             (_, _, _, ph) <- liftIO $ createProcess cp

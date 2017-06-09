@@ -5,11 +5,15 @@ module Wolf.OptParse
 
 import Import
 
+import Control.Monad.Reader
+import qualified Data.Map as M
 import System.Environment (getArgs)
 
 import Options.Applicative
 
+import Wolf.Index
 import Wolf.OptParse.Types
+import Wolf.Types
 
 getInstructions :: IO Instructions
 getInstructions = do
@@ -31,11 +35,15 @@ getConfiguration _ _ = pure Configuration
 getArguments :: IO Arguments
 getArguments = do
     args <- getArgs
-    let result = runArgumentsParser args
+    env <- getParserEnv
+    let result = runArgumentsParser env args
     handleParseResult result
 
-runArgumentsParser :: [String] -> ParserResult Arguments
-runArgumentsParser = execParserPure prefs_ argParser
+getParserEnv :: IO ParserEnv
+getParserEnv = ParserEnv <$> getIndex
+
+runArgumentsParser :: ParserEnv -> [String] -> ParserResult Arguments
+runArgumentsParser env = execParserPure prefs_ $ runReaderT argParser env
   where
     prefs_ =
         ParserPrefs
@@ -47,39 +55,55 @@ runArgumentsParser = execParserPure prefs_ argParser
         , prefColumns = 80
         }
 
-argParser :: ParserInfo Arguments
-argParser = info (helper <*> parseArgs) help_
-  where
-    help_ = fullDesc <> progDesc description
-    description = "Wolf"
+argParser :: ReaderT ParserEnv ParserInfo Arguments
+argParser =
+    ReaderT $ \env ->
+        info (helper <*> runReaderT parseArgs env) (fullDesc <> progDesc "Wolf")
 
-parseArgs :: Parser Arguments
+-- info :: Parser a -> InfoMod a -> ParserInfo a
+-- f :: ReaderT ParserEnv Parser a -> InfoMod a -> ReaderT ParserEnv ParserInfo a
+parseArgs :: ReaderT ParserEnv Parser Arguments
 parseArgs = (,) <$> parseCommand <*> parseFlags
 
-parseCommand :: Parser Command
+parseCommand :: ReaderT ParserEnv Parser Command
 parseCommand =
-    hsubparser $
-    mconcat
-        [command "note" parseCommandNote, command "summary" parseCommandSummary]
+    ReaderT $ \env ->
+        hsubparser $
+        mconcat
+            [ command "note" $ runReaderT parseCommandNote env
+            , command "summary" $ runReaderT parseCommandSummary env
+            ]
 
-parseCommandNote :: ParserInfo Command
-parseCommandNote = info parser modifier
-  where
-    parser =
-        CommandNote <$>
-        strArgument
-            (mconcat [metavar "PERSON", help "The person to make a note about."])
-    modifier = fullDesc <> progDesc "Make a note."
+parseCommandNote :: ReaderT ParserEnv ParserInfo Command
+parseCommandNote =
+    ReaderT $ \env ->
+        let parser =
+                CommandNote <$>
+                strArgument
+                    (mconcat
+                         [ metavar "PERSON"
+                         , help "The person to make a note about."
+                         , completer $ listCompleter $ peopleMap env
+                         ])
+            modifier = fullDesc <> progDesc "Make a note."
+        in info parser modifier
 
-parseCommandSummary :: ParserInfo Command
-parseCommandSummary = info parser modifier
-  where
-    parser =
-        CommandSummary <$>
-        strArgument
-            (mconcat
-                 [metavar "PERSON", help "The person to show a summary for."])
-    modifier = fullDesc <> progDesc "Show a summary"
+parseCommandSummary :: ReaderT ParserEnv ParserInfo Command
+parseCommandSummary =
+    ReaderT $ \env ->
+        let parser =
+                CommandSummary <$>
+                strArgument
+                    (mconcat
+                         [ metavar "PERSON"
+                         , help "The person to show a summary for."
+                         , completer $ listCompleter $ peopleMap env
+                         ])
+            modifier = fullDesc <> progDesc "Show a summary"
+        in info parser modifier
 
-parseFlags :: Parser Flags
+peopleMap :: ParserEnv -> [String]
+peopleMap = map fst . M.toList . indexMap . parserEnvIndex
+
+parseFlags :: ReaderT ParserEnv Parser Flags
 parseFlags = pure Flags

@@ -45,6 +45,9 @@ nextRandomPersonUuid = liftIO $ PersonUuid <$> UUID.nextRandom
 personUuidString :: PersonUuid -> String
 personUuidString (PersonUuid uuid) = UUID.toString uuid
 
+parsePersonUuid :: String -> Maybe PersonUuid
+parsePersonUuid = fmap PersonUuid . UUID.fromString
+
 newtype PersonEntry = PersonEntry
     { personEntryProperties :: Map String String
     } deriving (Show, Eq, Ord, Generic)
