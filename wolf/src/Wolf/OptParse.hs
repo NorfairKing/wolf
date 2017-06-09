@@ -119,7 +119,12 @@ parseCommandEntry =
         in info parser modifier
 
 peopleMap :: ParserEnv -> [String]
-peopleMap = map fst . M.toList . indexMap . parserEnvIndex
+peopleMap = map (escapeSpaces . fst) . M.toList . indexMap . parserEnvIndex
+  where
+    escapeSpaces = concatMap go
+      where
+        go ' ' = "\\ "
+        go c = [c]
 
 parseFlags :: ReaderT ParserEnv Parser Flags
 parseFlags = pure Flags
