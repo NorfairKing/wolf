@@ -5,6 +5,7 @@ import Import
 import qualified Data.Map as M
 
 import Wolf.Editor
+import Wolf.Git
 import Wolf.Index
 import Wolf.Path
 import Wolf.Types
@@ -35,6 +36,7 @@ entry person = do
                 Right personEntry -> do
                     putPersonEntry personUuid personEntry
                     putIndex index
+                    makeGitCommit $ unwords ["Added/changed entry for", person]
 
 tmpEntryFileContents :: String -> PersonUuid -> PersonEntry -> String
 tmpEntryFileContents person personUuid pe =

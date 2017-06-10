@@ -7,7 +7,19 @@ import System.Process
 import Wolf.Path
 
 git :: [String] -> IO ()
-git args = do
+git = liftIO . runGit
+
+makeGitCommit
+    :: MonadIO m
+    => String -> m ()
+makeGitCommit message = do
+    runGit ["add", "."]
+    runGit ["commit", "--message", show message]
+
+runGit
+    :: MonadIO m
+    => [String] -> m ()
+runGit args = do
     let gitcmd = "git"
     let cmd = unwords $ gitcmd : args
     wd <- wolfDir
@@ -24,5 +36,5 @@ git args = do
             waitForProcess ph
     case ec of
         ExitFailure code ->
-            die $ unwords [cmd, "failed with exit code", show code]
+            liftIO $ die $ unwords [cmd, "failed with exit code", show code]
         ExitSuccess -> pure ()

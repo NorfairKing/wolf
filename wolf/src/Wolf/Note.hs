@@ -6,13 +6,16 @@ import qualified Data.Text.IO as T
 import Data.Time
 
 import Wolf.Editor
+import Wolf.Git
 import Wolf.Index
 import Wolf.JSONUtils
 import Wolf.NoteIndex
 import Wolf.Path
 import Wolf.Types
 
-note :: MonadIO m => String -> m ()
+note
+    :: MonadIO m
+    => String -> m ()
 note person = do
     origIndex <- getIndex
     (personUuid, index) <- lookupOrCreateNewPerson person origIndex
@@ -39,3 +42,10 @@ note person = do
             writeJSON nf personNote
             putIndex index
             putNoteIndex personUuid noteIndex
+            makeGitCommit $
+                unwords
+                    [ "Added note on"
+                    , person
+                    , "with uuid"
+                    , personNoteUuidString noteUuid
+                    ]

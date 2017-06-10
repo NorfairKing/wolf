@@ -37,7 +37,9 @@ instance FromJSON PersonUuid where
 instance ToJSON PersonUuid where
     toJSON (PersonUuid u) = JSON.String $ UUID.toText u
 
-nextRandomPersonUuid :: MonadIO m => m PersonUuid
+nextRandomPersonUuid
+    :: MonadIO m
+    => m PersonUuid
 nextRandomPersonUuid = liftIO $ PersonUuid <$> UUID.nextRandom
 
 personUuidString :: PersonUuid -> String
@@ -82,7 +84,9 @@ instance FromJSON PersonNoteUuid where
 instance ToJSON PersonNoteUuid where
     toJSON (PersonNoteUuid u) = JSON.String $ UUID.toText u
 
-nextRandomPersonNoteUuid :: MonadIO m => m PersonNoteUuid
+nextRandomPersonNoteUuid
+    :: MonadIO m
+    => m PersonNoteUuid
 nextRandomPersonNoteUuid = liftIO $ PersonNoteUuid <$> UUID.nextRandom
 
 personNoteUuidString :: PersonNoteUuid -> String
