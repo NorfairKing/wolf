@@ -12,6 +12,7 @@ import System.Console.ANSI as ANSI
 import Wolf.Index
 import Wolf.NoteIndex
 import Wolf.Report
+import Wolf.Time
 import Wolf.Types
 
 summary :: String -> IO ()
@@ -32,7 +33,7 @@ summaryReport now mpe pns =
           flip map pns $ \pn ->
               unlinesReport
                   [ colored [SetColor Foreground Dull Blue] $
-                    formatTimeStr (personNoteTimestamp pn) ++ ":"
+                    formatMomentNicely now (personNoteTimestamp pn) ++ ":"
                   , fromString $ T.unpack $ personNoteContents pn
                   ]
         , case mpe of
@@ -42,15 +43,3 @@ summaryReport now mpe pns =
                   flip map (M.toList $ personEntryProperties pe) $ \(prop, val) ->
                       fromString $ unwords [prop ++ ":", val]
         ]
-  where
-    formatTimeStr t =
-        unwords [formatTime defaultTimeLocale "%A %F %R" t, timeAgoStr t]
-    timeAgoStr t
-        | daysAgo > 0 = unwords ["(" ++ show daysAgo, "days ago)"]
-        | hoursAgo > 0 = unwords ["(" ++ show hoursAgo, "hours ago)"]
-        | otherwise = unwords ["(" ++ show minutesAgo, "minutes ago)"]
-      where
-        minutesAgo = round $ dt / 60 :: Int
-        hoursAgo = round $ dt / (60 * 60) :: Int
-        daysAgo = round $ dt / (24 * 60 * 60) :: Int
-        dt = diffUTCTime now t

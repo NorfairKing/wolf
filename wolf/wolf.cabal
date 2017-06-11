@@ -27,6 +27,7 @@ library
         Wolf.Report
         Wolf.Review
         Wolf.Summary
+        Wolf.Time
         Wolf.Types
     build-depends:
         base >=4.9 && <=5,
