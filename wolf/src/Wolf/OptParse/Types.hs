@@ -15,6 +15,7 @@ data Command
     | CommandGit [String]
     | CommandAlias String
                    String
+    | CommandReview
     deriving (Show, Eq)
 
 data Flags =
@@ -32,6 +33,7 @@ data Dispatch
     | DispatchGit [String]
     | DispatchAlias String
                     String
+    | DispatchReview
     deriving (Show, Eq)
 
 data Settings =

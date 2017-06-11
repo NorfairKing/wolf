@@ -50,12 +50,4 @@ summaryReport now mpe pns =
         hoursAgo = round $ dt / (60 * 60) :: Int
         daysAgo = round $ dt / (24 * 60 * 60) :: Int
         dt = diffUTCTime now t
-    str :: String -> ([ANSI.SGR], String)
-    str s = ([], s)
-    unlinesSGR :: [([ANSI.SGR], String)] -> [([ANSI.SGR], String)]
-    unlinesSGR tups =
-        flip map tups $ \(cmds, content) -> (cmds, content ++ "\n")
-
-renderReport :: Report -> String
-renderReport (Report tups) =
-    concatMap (\(cmds, content) -> ANSI.setSGRCode cmds <> content) tups
+    str = reportStr

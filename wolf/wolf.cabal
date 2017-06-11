@@ -24,6 +24,7 @@ library
         Wolf.OptParse
         Wolf.OptParse.Types
         Wolf.Path
+        Wolf.Review
         Wolf.Summary
         Wolf.Types
     build-depends:

@@ -30,6 +30,7 @@ combineToInstructions cmd Flags Configuration = do
             CommandEntry person -> pure $ DispatchEntry person
             CommandGit args -> pure $ DispatchGit args
             CommandAlias old new -> pure $ DispatchAlias old new
+            CommandReview -> pure DispatchReview
     pure (disp, Settings)
 
 getConfiguration :: Command -> Flags -> IO Configuration
@@ -78,6 +79,7 @@ parseCommand =
             , command "entry" $ runReaderT parseCommandEntry env
             , command "git" parseCommandGit
             , command "alias" $ runReaderT parseCommandAlias env
+            , command "review" parseCommandReview
             ]
 
 parseCommandNote :: ReaderT ParserEnv ParserInfo Command
@@ -152,6 +154,12 @@ parseCommandAlias =
             modifier =
                 fullDesc <> progDesc "Perform a git command on the wolf data."
         in info parser modifier
+
+parseCommandReview :: ParserInfo Command
+parseCommandReview =
+    let parser = pure CommandReview
+        modifier = fullDesc <> progDesc "Review notes."
+    in info parser modifier
 
 peopleMap :: ParserEnv -> [String]
 peopleMap = map (escapeSpaces . fst) . M.toList . indexMap . parserEnvIndex

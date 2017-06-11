@@ -5,7 +5,7 @@ module Wolf.Types where
 import Import
 
 import Data.Aeson as JSON
-import Data.Map
+import Data.Map (Map)
 import qualified Data.Map as M
 import Data.Time
 import Data.UUID as UUID
@@ -109,3 +109,13 @@ data EditingResult
 newtype Report = Report
     { unReport :: [([ANSI.SGR], String)]
     } deriving (Show, Eq, Generic)
+
+renderReport :: Report -> String
+renderReport (Report tups) =
+    concatMap (\(cmds, content) -> ANSI.setSGRCode cmds <> content) tups
+
+unlinesSGR :: [([ANSI.SGR], String)] -> [([ANSI.SGR], String)]
+unlinesSGR tups = flip map tups $ \(cmds, content) -> (cmds, content ++ "\n")
+
+reportStr :: String -> ([ANSI.SGR], String)
+reportStr s = ([], s)
