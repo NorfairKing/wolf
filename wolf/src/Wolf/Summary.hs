@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Wolf.Summary where
 
 import Import
@@ -9,6 +11,7 @@ import System.Console.ANSI as ANSI
 
 import Wolf.Index
 import Wolf.NoteIndex
+import Wolf.Report
 import Wolf.Types
 
 summary :: String -> IO ()
@@ -24,20 +27,21 @@ summary person = do
 
 summaryReport :: UTCTime -> Maybe PersonEntry -> [PersonNote] -> Report
 summaryReport now mpe pns =
-    Report $
-    unlinesSGR $
-    (case mpe of
-         Nothing -> [str "No person entry."]
-         Just pe ->
-             flip map (M.toList $ personEntryProperties pe) $ \(prop, val) ->
-                 str $ unwords [prop ++ ":", val]) ++
-    [str ""] ++
-    concat
-        (flip map pns $ \pn ->
-             [ ( [SetColor Foreground Dull Blue]
-               , formatTimeStr (personNoteTimestamp pn) ++ ":")
-             , str $ T.unpack $ personNoteContents pn
-             ])
+    unlinesReport
+        [ case mpe of
+              Nothing -> "No person entry."
+              Just pe ->
+                  unlinesReport $
+                  flip map (M.toList $ personEntryProperties pe) $ \(prop, val) ->
+                      fromString $ unwords [prop ++ ":", val]
+        , mconcat $
+          flip map pns $ \pn ->
+              unlinesReport
+                  [ colored [SetColor Foreground Dull Blue] $
+                    formatTimeStr (personNoteTimestamp pn) ++ ":"
+                  , fromString $ T.unpack $ personNoteContents pn
+                  ]
+        ]
   where
     formatTimeStr t =
         unwords [formatTime defaultTimeLocale "%A %F %R" t, timeAgoStr t]
@@ -50,4 +54,3 @@ summaryReport now mpe pns =
         hoursAgo = round $ dt / (60 * 60) :: Int
         daysAgo = round $ dt / (24 * 60 * 60) :: Int
         dt = diffUTCTime now t
-    str = reportStr

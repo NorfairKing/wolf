@@ -10,7 +10,6 @@ import qualified Data.Map as M
 import Data.Time
 import Data.UUID as UUID
 import Data.UUID.V4 as UUID
-import System.Console.ANSI as ANSI
 
 newtype Index = Index
     { indexMap :: Map String PersonUuid
@@ -105,17 +104,3 @@ data EditingResult
     = EditingSuccess
     | EditingFailure String
     deriving (Show, Eq, Generic)
-
-newtype Report = Report
-    { unReport :: [([ANSI.SGR], String)]
-    } deriving (Show, Eq, Generic)
-
-renderReport :: Report -> String
-renderReport (Report tups) =
-    concatMap (\(cmds, content) -> ANSI.setSGRCode cmds <> content) tups
-
-unlinesSGR :: [([ANSI.SGR], String)] -> [([ANSI.SGR], String)]
-unlinesSGR tups = flip map tups $ \(cmds, content) -> (cmds, content ++ "\n")
-
-reportStr :: String -> ([ANSI.SGR], String)
-reportStr s = ([], s)

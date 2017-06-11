@@ -8,6 +8,7 @@ import System.Console.ANSI as ANSI
 
 import Wolf.Index
 import Wolf.NoteIndex
+import Wolf.Report
 import Wolf.Types
 
 review :: IO ()
@@ -24,11 +25,11 @@ review = do
         print nickName
         print personNote
     let report =
-            Report $
-            concat $
+            mconcat $
             flip map entries $ \(nickName, personNote) ->
-                unlinesSGR
-                    [ ([SetColor Foreground Dull Blue], unwords [nickName])
-                    , reportStr $ T.unpack $ personNoteContents personNote
+                unlinesReport
+                    [ colored [SetColor Foreground Dull Blue] $
+                      unwords [nickName]
+                    , stringReport $ T.unpack $ personNoteContents personNote
                     ]
     putStr $ renderReport report
