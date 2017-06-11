@@ -27,20 +27,20 @@ summary person = do
 
 summaryReport :: UTCTime -> Maybe PersonEntry -> [PersonNote] -> Report
 summaryReport now mpe pns =
-    unlinesReport
-        [ case mpe of
-              Nothing -> "No person entry."
-              Just pe ->
-                  unlinesReport $
-                  flip map (M.toList $ personEntryProperties pe) $ \(prop, val) ->
-                      fromString $ unwords [prop ++ ":", val]
-        , mconcat $
+    mconcat
+        [ mconcat $
           flip map pns $ \pn ->
               unlinesReport
                   [ colored [SetColor Foreground Dull Blue] $
                     formatTimeStr (personNoteTimestamp pn) ++ ":"
                   , fromString $ T.unpack $ personNoteContents pn
                   ]
+        , case mpe of
+              Nothing -> "No person entry."
+              Just pe ->
+                  unlinesReport $
+                  flip map (M.toList $ personEntryProperties pe) $ \(prop, val) ->
+                      fromString $ unwords [prop ++ ":", val]
         ]
   where
     formatTimeStr t =
