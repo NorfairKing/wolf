@@ -44,6 +44,10 @@ library
         process >=1.4 && <1.5,
         text >=1.2 && <1.3,
         time >=1.6 && <1.7,
+        validity >=0.3 && <0.4,
+        validity-containers >=0.1 && <0.2,
+        validity-text >=0.1 && <0.2,
+        validity-time >=0.0 && <0.1,
         uuid >=1.3 && <1.4
     default-language: Haskell2010
     default-extensions: NoImplicitPrelude
@@ -67,8 +71,25 @@ test-suite wolf-test
     build-depends:
         base >=4.9 && <=5,
         wolf -any,
-        hspec -any
+        QuickCheck -any,
+        bytestring -any,
+        containers -any,
+        genvalidity -any,
+        genvalidity-containers -any,
+        genvalidity-time -any,
+        genvalidity-text -any,
+        genvalidity-hspec -any,
+        genvalidity-hspec-aeson -any,
+        hspec -any,
+        path -any,
+        path-io -any,
+        text -any,
+        uuid-types -any
     default-language: Haskell2010
     default-extensions: NoImplicitPrelude
     hs-source-dirs: test/
+    other-modules:
+        TestImport
+        Wolf.TypesSpec
+        Wolf.Types.Gen
     ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall

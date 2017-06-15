@@ -15,6 +15,8 @@ newtype Index = Index
     { indexMap :: Map String PersonUuid
     } deriving (Show, Eq, Ord, Generic)
 
+instance Validity Index
+
 instance FromJSON Index
 
 instance ToJSON Index
@@ -25,6 +27,9 @@ newIndex = Index {indexMap = M.empty}
 newtype PersonUuid = PersonUuid
     { unPersonUuid :: UUID
     } deriving (Show, Eq, Ord, Generic)
+
+instance Validity PersonUuid where
+    isValid = const True
 
 instance FromJSON PersonUuid where
     parseJSON =
@@ -50,6 +55,8 @@ data PersonEntry = PersonEntry
     , personEntryLastUpdatedTimestamp :: UTCTime
     } deriving (Show, Eq, Ord, Generic)
 
+instance Validity PersonEntry
+
 instance FromJSON PersonEntry
 
 instance ToJSON PersonEntry
@@ -63,6 +70,8 @@ data PersonPropertyValue = PersonPropertyValue
     { personPropertyValueContents :: String
     , personPropertyValueLastUpdatedTimestamp :: UTCTime
     } deriving (Show, Eq, Ord, Generic)
+
+instance Validity PersonPropertyValue
 
 instance FromJSON PersonPropertyValue
 
@@ -82,6 +91,9 @@ newNoteIndex = NoteIndex {noteIndexList = []}
 newtype PersonNoteUuid = PersonNoteUuid
     { unPersonNoteUuid :: UUID
     } deriving (Show, Eq, Ord, Generic)
+
+instance Validity PersonNoteUuid where
+    isValid = const True
 
 instance FromJSON PersonNoteUuid where
     parseJSON =
@@ -103,6 +115,8 @@ data PersonNote = PersonNote
     { personNoteContents :: Text
     , personNoteTimestamp :: UTCTime
     } deriving (Show, Eq, Ord, Generic)
+
+instance Validity PersonNote
 
 instance FromJSON PersonNote
 

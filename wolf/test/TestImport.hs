@@ -1,11 +1,11 @@
-module Import
+module TestImport
     ( module X
     ) where
 
 import Debug.Trace as X
 import Prelude as X
 
-import GHC.Generics as X
+import GHC.Generics as X hiding (Selector)
 
 import System.Exit as X
 
@@ -24,7 +24,11 @@ import Data.ByteString as X (ByteString)
 import Data.Map as X (Map)
 import Data.Text as X (Text)
 
-import Data.Validity as X
-import Data.Validity.Containers as X ()
-import Data.Validity.Text as X ()
-import Data.Validity.Time as X ()
+import Test.Hspec as X
+import Test.QuickCheck as X
+import Test.Validity as X
+import Test.Validity.Aeson as X
+
+import Data.GenValidity.Containers as X
+import Data.GenValidity.Text as X
+import Data.GenValidity.Time as X ()
