@@ -6,6 +6,8 @@ module Wolf.Types where
 
 import Import
 
+import System.IO.Unsafe -- TODO remove this
+
 import Data.Aeson as JSON
 import Data.Map (Map)
 import qualified Data.Map as M
@@ -60,9 +62,22 @@ data PersonEntry = PersonEntry
 instance Validity PersonEntry
 
 instance FromJSON PersonEntry where
-    parseJSON =
-        withObject "PersonEntry" $ \o ->
-            PersonEntry <$> o .: "properties" <*> o .: "last-updated"
+    parseJSON ob =
+        (withObject "PersonEntry" $ \o -> do
+             strs <- o .: "personEntryProperties"
+             pure
+                 PersonEntry
+                 { personEntryProperties =
+                       M.map
+                           (`PersonPropertyValue` unsafePerformIO getCurrentTime)
+                           strs
+                 , personEntryLastUpdatedTimestamp =
+                       unsafePerformIO getCurrentTime
+                 })
+            ob <|>
+        (withObject "PersonEntry" $ \o ->
+             PersonEntry <$> o .: "properties" <*> o .: "last-updated")
+            ob
 
 instance ToJSON PersonEntry where
     toJSON PersonEntry {..} =
@@ -100,9 +115,12 @@ newtype NoteIndex = NoteIndex
     } deriving (Show, Eq, Ord, Generic)
 
 instance FromJSON NoteIndex where
-    parseJSON =
-        withArray "NoteIndex" $ \a ->
-            (NoteIndex . toList) <$> traverse parseJSON a
+    parseJSON ob =
+        (withObject "NoteIndex" $ \o -> NoteIndex <$> o .: "noteIndexList") ob -- TODO remove old JSON parsing
+         <|>
+        (withArray "NoteIndex" $ \a ->
+             (NoteIndex . toList) <$> traverse parseJSON a)
+            ob
 
 instance ToJSON NoteIndex where
     toJSON = toJSON . noteIndexList
@@ -141,9 +159,14 @@ data PersonNote = PersonNote
 instance Validity PersonNote
 
 instance FromJSON PersonNote where
-    parseJSON =
-        withObject "PersonNote" $ \o ->
-            PersonNote <$> o .: "contents" <*> o .: "timestamp"
+    parseJSON ob =
+        (withObject "PersonNote" $ \o ->
+             PersonNote <$> o .: "personNoteContents" <*>
+             o .: "personNoteTimestamp")
+            ob <|>
+        (withObject "PersonNote" $ \o ->
+             PersonNote <$> o .: "contents" <*> o .: "timestamp")
+            ob
 
 instance ToJSON PersonNote where
     toJSON PersonNote {..} =
