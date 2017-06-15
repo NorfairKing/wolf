@@ -1,4 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Wolf.Types where
 
@@ -57,9 +59,17 @@ data PersonEntry = PersonEntry
 
 instance Validity PersonEntry
 
-instance FromJSON PersonEntry
+instance FromJSON PersonEntry where
+    parseJSON =
+        withObject "PersonEntry" $ \o ->
+            PersonEntry <$> o .: "properties" <*> o .: "last-updated"
 
-instance ToJSON PersonEntry
+instance ToJSON PersonEntry where
+    toJSON PersonEntry {..} =
+        object
+            [ "properties" .= personEntryProperties
+            , "last-updated" .= personEntryLastUpdatedTimestamp
+            ]
 
 newPersonEntry :: UTCTime -> PersonEntry
 newPersonEntry now =
@@ -73,17 +83,29 @@ data PersonPropertyValue = PersonPropertyValue
 
 instance Validity PersonPropertyValue
 
-instance FromJSON PersonPropertyValue
+instance FromJSON PersonPropertyValue where
+    parseJSON =
+        withObject "PersonPropertyValue" $ \o ->
+            PersonPropertyValue <$> o .: "value" <*> o .: "last-updated"
 
-instance ToJSON PersonPropertyValue
+instance ToJSON PersonPropertyValue where
+    toJSON PersonPropertyValue {..} =
+        object
+            [ "value" .= personPropertyValueContents
+            , "last-updated" .= personPropertyValueLastUpdatedTimestamp
+            ]
 
 newtype NoteIndex = NoteIndex
     { noteIndexList :: [PersonNoteUuid]
     } deriving (Show, Eq, Ord, Generic)
 
-instance FromJSON NoteIndex
+instance FromJSON NoteIndex where
+    parseJSON =
+        withArray "NoteIndex" $ \a ->
+            (NoteIndex . toList) <$> traverse parseJSON a
 
-instance ToJSON NoteIndex
+instance ToJSON NoteIndex where
+    toJSON = toJSON . noteIndexList
 
 newNoteIndex :: NoteIndex
 newNoteIndex = NoteIndex {noteIndexList = []}
@@ -118,9 +140,17 @@ data PersonNote = PersonNote
 
 instance Validity PersonNote
 
-instance FromJSON PersonNote
+instance FromJSON PersonNote where
+    parseJSON =
+        withObject "PersonNote" $ \o ->
+            PersonNote <$> o .: "contents" <*> o .: "timestamp"
 
-instance ToJSON PersonNote
+instance ToJSON PersonNote where
+    toJSON PersonNote {..} =
+        object
+            [ "contents" .= personNoteContents
+            , "timestamp" .= personNoteTimestamp
+            ]
 
 data EditingResult
     = EditingSuccess
