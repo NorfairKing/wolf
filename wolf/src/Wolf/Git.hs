@@ -9,16 +9,12 @@ import Wolf.Path
 git :: [String] -> IO ()
 git = liftIO . runGit
 
-makeGitCommit
-    :: MonadIO m
-    => String -> m ()
+makeGitCommit :: MonadIO m => String -> m ()
 makeGitCommit message = do
     runGit ["add", "."]
     runGit ["commit", "--message", show message]
 
-runGit
-    :: MonadIO m
-    => [String] -> m ()
+runGit :: MonadIO m => [String] -> m ()
 runGit args = do
     let gitcmd = "git"
     let cmd = unwords $ gitcmd : args

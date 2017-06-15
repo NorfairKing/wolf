@@ -21,4 +21,5 @@ import Path as X
 import Path.IO as X
 
 import Data.ByteString as X (ByteString)
+import Data.Map as X (Map)
 import Data.Text as X (Text)

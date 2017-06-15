@@ -4,9 +4,7 @@ import Import
 
 import Wolf.Index
 
-alias
-    :: MonadIO m
-    => String -> String -> m ()
+alias :: MonadIO m => String -> String -> m ()
 alias new old = do
     origIndex <- getIndex
     personUuid <-

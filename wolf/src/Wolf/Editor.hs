@@ -9,9 +9,7 @@ import System.Process
 
 import Wolf.Types
 
-startEditorOn
-    :: MonadIO m
-    => Path Abs File -> m EditingResult
+startEditorOn :: MonadIO m => Path Abs File -> m EditingResult
 startEditorOn path = do
     ensureDir $ parent path
     let getContentsOfFile =

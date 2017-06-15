@@ -36,9 +36,7 @@ instance FromJSON PersonUuid where
 instance ToJSON PersonUuid where
     toJSON (PersonUuid u) = JSON.String $ UUID.toText u
 
-nextRandomPersonUuid
-    :: MonadIO m
-    => m PersonUuid
+nextRandomPersonUuid :: MonadIO m => m PersonUuid
 nextRandomPersonUuid = liftIO $ PersonUuid <$> UUID.nextRandom
 
 personUuidString :: PersonUuid -> String
@@ -47,16 +45,28 @@ personUuidString (PersonUuid uuid) = UUID.toString uuid
 parsePersonUuid :: String -> Maybe PersonUuid
 parsePersonUuid = fmap PersonUuid . UUID.fromString
 
-newtype PersonEntry = PersonEntry
-    { personEntryProperties :: Map String String
+data PersonEntry = PersonEntry
+    { personEntryProperties :: Map String PersonPropertyValue
+    , personEntryLastUpdatedTimestamp :: UTCTime
     } deriving (Show, Eq, Ord, Generic)
 
 instance FromJSON PersonEntry
 
 instance ToJSON PersonEntry
 
-newPersonEntry :: PersonEntry
-newPersonEntry = PersonEntry {personEntryProperties = M.empty}
+newPersonEntry :: UTCTime -> PersonEntry
+newPersonEntry now =
+    PersonEntry
+    {personEntryProperties = M.empty, personEntryLastUpdatedTimestamp = now}
+
+data PersonPropertyValue = PersonPropertyValue
+    { personPropertyValueContents :: String
+    , personPropertyValueLastUpdatedTimestamp :: UTCTime
+    } deriving (Show, Eq, Ord, Generic)
+
+instance FromJSON PersonPropertyValue
+
+instance ToJSON PersonPropertyValue
 
 newtype NoteIndex = NoteIndex
     { noteIndexList :: [PersonNoteUuid]
@@ -83,9 +93,7 @@ instance FromJSON PersonNoteUuid where
 instance ToJSON PersonNoteUuid where
     toJSON (PersonNoteUuid u) = JSON.String $ UUID.toText u
 
-nextRandomPersonNoteUuid
-    :: MonadIO m
-    => m PersonNoteUuid
+nextRandomPersonNoteUuid :: MonadIO m => m PersonNoteUuid
 nextRandomPersonNoteUuid = liftIO $ PersonNoteUuid <$> UUID.nextRandom
 
 personNoteUuidString :: PersonNoteUuid -> String

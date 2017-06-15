@@ -41,5 +41,6 @@ summaryReport now mpe pns =
               Just pe ->
                   unlinesReport $
                   flip map (M.toList $ personEntryProperties pe) $ \(prop, val) ->
-                      fromString $ unwords [prop ++ ":", val]
+                      fromString $
+                      unwords [prop ++ ":", personPropertyValueContents val]
         ]

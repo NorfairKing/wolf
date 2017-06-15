@@ -3,6 +3,7 @@ module Wolf.Entry where
 import Import
 
 import qualified Data.Map as M
+import Data.Time
 
 import Wolf.Editor
 import Wolf.Git
@@ -33,29 +34,66 @@ entry person = do
             contents <- readFile $ toFilePath tmpFile
             case parseEntryFileContents contents of
                 Left err -> die $ unwords ["Unable to parse entry file:", err]
-                Right personEntry -> do
-                    putPersonEntry personUuid personEntry
-                    putIndex index
-                    makeGitCommit $ unwords ["Added/changed entry for", person]
+                Right personEntryMap -> do
+                    now <- liftIO getCurrentTime
+                    let personEntry =
+                            reconstructPersonEntry
+                                now
+                                origPersonEntry
+                                personEntryMap
+                    unless (personEntry == origPersonEntry) $ do
+                        putPersonEntry personUuid personEntry
+                        putIndex index
+                        makeGitCommit $
+                            unwords ["Added/changed entry for", person]
+
+reconstructPersonEntry ::
+       UTCTime -> PersonEntry -> Map String String -> PersonEntry
+reconstructPersonEntry now old newMap =
+    if M.map personPropertyValueContents (personEntryProperties old) == newMap
+        then old -- If there is no difference, don't change the last changed timestamp.
+        else PersonEntry
+             { personEntryProperties = M.mapWithKey go newMap
+             , personEntryLastUpdatedTimestamp = now
+             }
+  where
+    go :: String -> String -> PersonPropertyValue
+    go key value =
+        case M.lookup key (personEntryProperties old) of
+            Nothing -- Key did not exist before, therefore it was created here.
+             ->
+                PersonPropertyValue
+                { personPropertyValueContents = value
+                , personPropertyValueLastUpdatedTimestamp = now
+                }
+            Just oldValue -- Key did exist before, have to check if there's a difference.
+             ->
+                PersonPropertyValue
+                { personPropertyValueContents = value
+                , personPropertyValueLastUpdatedTimestamp =
+                      if value == personPropertyValueContents oldValue
+                          then personPropertyValueLastUpdatedTimestamp oldValue
+                          else now
+                }
 
 tmpEntryFileContents :: String -> PersonUuid -> PersonEntry -> String
 tmpEntryFileContents person personUuid pe =
     unlines $
     map (uncurry toLineStr) (sortOn fst $ M.toList $ personEntryProperties pe) ++
     separator ++
-    map
-        (uncurry toLineStr)
+    map (uncurry toLineStr')
         [("uuid", personUuidString personUuid), ("reference used", person)]
   where
     separator = ["", "", "", line, str, line]
       where
         str = "| Anything below this bar will be ignored. |"
         line = replicate (length str) '-'
-    toLineStr k v = unwords [k ++ ":", v]
+    toLineStr k v = toLineStr' k $ personPropertyValueContents v
+    toLineStr' k v = unwords [k ++ ":", v]
 
-parseEntryFileContents :: String -> Either String PersonEntry
+parseEntryFileContents :: String -> Either String (Map String String)
 parseEntryFileContents str =
-    (PersonEntry . M.fromList) <$>
+    M.fromList <$>
     mapM
         parseProperty
         (filter (not . null) . takeWhile (not . isPrefixOf "---") . lines $ str)
