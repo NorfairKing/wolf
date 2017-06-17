@@ -15,9 +15,27 @@ entry person = do
     origIndex <- getIndex
     (personUuid, index) <- lookupOrCreateNewPerson person origIndex
     tmpFile <- tmpPersonEntryFile personUuid
-    origPersonEntry <- getPersonEntryOrNew personUuid
+    mPersonEntry <- getPersonEntry personUuid
+    (origPersonEntry, inFilePersonEntry) <-
+        case mPersonEntry of
+            Nothing -> do
+                now <- getCurrentTime
+                pure $
+                    (,) (newPersonEntry now) $
+                    case parseFirstnameLastname person of
+                        Nothing -> newPersonEntry now
+                        Just (fn, ln) ->
+                            PersonEntry
+                            { personEntryProperties =
+                                  [ ("first name", PersonPropertyValue fn now)
+                                  , ("last name", PersonPropertyValue ln now)
+                                  ]
+                            , personEntryLastUpdatedTimestamp = now
+                            }
+            Just pe -> pure (pe, pe)
     ensureDir $ parent tmpFile
-    let tmpFileContents = tmpEntryFileContents person personUuid origPersonEntry
+    let tmpFileContents =
+            tmpEntryFileContents person personUuid inFilePersonEntry
     writeFile (toFilePath tmpFile) tmpFileContents
     editResult <- startEditorOn tmpFile
     case editResult of
@@ -45,6 +63,12 @@ entry person = do
                         putIndex index
                         makeGitCommit $
                             unwords ["Added/changed entry for", person]
+
+parseFirstnameLastname :: String -> Maybe (String, String)
+parseFirstnameLastname s =
+    case words s of
+        [fn, ln] -> Just (fn, ln)
+        _ -> Nothing
 
 reconstructPersonEntry ::
        UTCTime -> PersonEntry -> [(String, String)] -> PersonEntry

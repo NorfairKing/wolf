@@ -3,7 +3,6 @@ module Wolf.Index where
 import Import
 
 import qualified Data.Map as M
-import Data.Time
 
 import Wolf.JSONUtils
 import Wolf.Path
@@ -35,11 +34,6 @@ lookupOrCreateNewPerson person origIndex =
 getPersonEntry :: MonadIO m => PersonUuid -> m (Maybe PersonEntry)
 getPersonEntry personUuid =
     personEntryFile personUuid >>= readJSONWithDefault Nothing
-
-getPersonEntryOrNew :: MonadIO m => PersonUuid -> m PersonEntry
-getPersonEntryOrNew personUuid = do
-    now <- liftIO getCurrentTime
-    personEntryFile personUuid >>= readJSONWithDefault (newPersonEntry now)
 
 putPersonEntry :: MonadIO m => PersonUuid -> PersonEntry -> m ()
 putPersonEntry personUuid personEntry = do
