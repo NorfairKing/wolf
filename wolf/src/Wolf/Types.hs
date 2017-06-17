@@ -81,7 +81,7 @@ instance FromJSON PersonEntry where
                            (second
                                 (`PersonPropertyValue` unsafePerformIO
                                                            getCurrentTime))
-                           strs
+                           (M.toList strs)
                  , personEntryLastUpdatedTimestamp =
                        unsafePerformIO getCurrentTime
                  })
