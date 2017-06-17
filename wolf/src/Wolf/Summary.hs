@@ -4,7 +4,6 @@ module Wolf.Summary where
 
 import Import
 
-import qualified Data.Map as M
 import qualified Data.Text as T
 import Data.Time
 import System.Console.ANSI as ANSI
@@ -40,7 +39,7 @@ summaryReport now mpe pns =
               Nothing -> "No person entry."
               Just pe ->
                   unlinesReport $
-                  flip map (M.toList $ personEntryProperties pe) $ \(prop, val) ->
+                  flip map (personEntryProperties pe) $ \(prop, val) ->
                       fromString $
                       unwords [prop ++ ":", personPropertyValueContents val]
         ]

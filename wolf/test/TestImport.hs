@@ -14,6 +14,7 @@ import Data.Maybe as X
 import Data.Monoid as X
 import Data.String as X
 
+import Control.Arrow as X
 import Control.Monad as X
 import Control.Monad.IO.Class as X
 

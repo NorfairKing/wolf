@@ -15,6 +15,8 @@ import Data.Time
 import Data.UUID as UUID
 import Data.UUID.V4 as UUID
 
+{-# ANN module ("HLint: ignore Use &&" :: String) #-}
+
 newtype Index = Index
     { indexMap :: Map String PersonUuid
     } deriving (Show, Eq, Ord, Generic)
@@ -55,11 +57,18 @@ parsePersonUuid :: String -> Maybe PersonUuid
 parsePersonUuid = fmap PersonUuid . UUID.fromString
 
 data PersonEntry = PersonEntry
-    { personEntryProperties :: Map String PersonPropertyValue
+    { personEntryProperties :: [(String, PersonPropertyValue)]
     , personEntryLastUpdatedTimestamp :: UTCTime
     } deriving (Show, Eq, Ord, Generic)
 
-instance Validity PersonEntry
+instance Validity PersonEntry where
+    isValid PersonEntry {..} =
+        and
+            [ isValid personEntryProperties
+            , isValid personEntryLastUpdatedTimestamp
+            , let ls = map fst personEntryProperties
+              in nub ls == ls
+            ]
 
 instance FromJSON PersonEntry where
     parseJSON ob =
@@ -68,8 +77,10 @@ instance FromJSON PersonEntry where
              pure
                  PersonEntry
                  { personEntryProperties =
-                       M.map
-                           (`PersonPropertyValue` unsafePerformIO getCurrentTime)
+                       map
+                           (second
+                                (`PersonPropertyValue` unsafePerformIO
+                                                           getCurrentTime))
                            strs
                  , personEntryLastUpdatedTimestamp =
                        unsafePerformIO getCurrentTime
@@ -89,7 +100,7 @@ instance ToJSON PersonEntry where
 newPersonEntry :: UTCTime -> PersonEntry
 newPersonEntry now =
     PersonEntry
-    {personEntryProperties = M.empty, personEntryLastUpdatedTimestamp = now}
+    {personEntryProperties = [], personEntryLastUpdatedTimestamp = now}
 
 data PersonPropertyValue = PersonPropertyValue
     { personPropertyValueContents :: String

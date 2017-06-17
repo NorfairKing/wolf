@@ -10,6 +10,7 @@ import GHC.Generics as X
 import System.Exit as X
 
 import Data.Foldable as X
+import Data.Function as X
 import Data.List as X
 import Data.Maybe as X
 import Data.Monoid as X

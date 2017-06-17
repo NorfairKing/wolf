@@ -2,7 +2,6 @@ module Wolf.Entry where
 
 import Import
 
-import qualified Data.Map as M
 import Data.Time
 
 import Wolf.Editor
@@ -48,18 +47,20 @@ entry person = do
                             unwords ["Added/changed entry for", person]
 
 reconstructPersonEntry ::
-       UTCTime -> PersonEntry -> Map String String -> PersonEntry
+       UTCTime -> PersonEntry -> [(String, String)] -> PersonEntry
 reconstructPersonEntry now old newMap =
-    if M.map personPropertyValueContents (personEntryProperties old) == newMap
+    if map (second personPropertyValueContents) (personEntryProperties old) ==
+       newMap
         then old -- If there is no difference, don't change the last changed timestamp.
         else PersonEntry
-             { personEntryProperties = M.mapWithKey go newMap
+             { personEntryProperties =
+                   map (\(k, v) -> (k, go k v)) $ nubBy ((==) `on` fst) newMap
              , personEntryLastUpdatedTimestamp = now
              }
   where
     go :: String -> String -> PersonPropertyValue
     go key value =
-        case M.lookup key (personEntryProperties old) of
+        case lookup key (personEntryProperties old) of
             Nothing -- Key did not exist before, therefore it was created here.
              ->
                 PersonPropertyValue
@@ -79,7 +80,7 @@ reconstructPersonEntry now old newMap =
 tmpEntryFileContents :: String -> PersonUuid -> PersonEntry -> String
 tmpEntryFileContents person personUuid pe =
     unlines $
-    map (uncurry toLineStr) (sortOn fst $ M.toList $ personEntryProperties pe) ++
+    map (uncurry toLineStr) (personEntryProperties pe) ++
     separator ++
     map (uncurry toLineStr')
         [("uuid", personUuidString personUuid), ("reference used", person)]
@@ -91,9 +92,8 @@ tmpEntryFileContents person personUuid pe =
     toLineStr k v = toLineStr' k $ personPropertyValueContents v
     toLineStr' k v = unwords [k ++ ":", v]
 
-parseEntryFileContents :: String -> Either String (Map String String)
+parseEntryFileContents :: String -> Either String [(String, String)]
 parseEntryFileContents str =
-    M.fromList <$>
     mapM
         parseProperty
         (filter (not . null) . takeWhile (not . isPrefixOf "---") . lines $ str)
