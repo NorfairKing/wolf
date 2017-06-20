@@ -1,10 +1,13 @@
+{-# LANGUAGE FlexibleContexts #-}
+
 module Wolf.Alias where
 
 import Import
 
 import Wolf.Index
+import Wolf.OptParse.Types
 
-alias :: MonadIO m => String -> String -> m ()
+alias :: (MonadIO m, MonadReader Settings m) => String -> String -> m ()
 alias new old = do
     origIndex <- getIndex
     personUuid <-

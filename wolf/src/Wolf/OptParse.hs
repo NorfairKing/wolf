@@ -8,7 +8,6 @@ module Wolf.OptParse
 
 import Import
 
-import Control.Monad.Reader
 import qualified Data.Map as M
 import System.Environment (getArgs)
 
@@ -55,7 +54,10 @@ getArguments = do
     handleParseResult result
 
 getParserEnv :: IO ParserEnv
-getParserEnv = ParserEnv <$> defaultWolfDir <*> getIndex
+getParserEnv = do
+    wd <- defaultWolfDir
+    i <- runReaderT getIndex Settings {setWolfDir = wd}
+    pure ParserEnv {parserEnvDefaultWolfDir = wd, parserEnvIndex = i}
 
 runArgumentsParser :: ParserEnv -> [String] -> ParserResult Arguments
 runArgumentsParser env = execParserPure prefs_ $ runReaderT argParser env

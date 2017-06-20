@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 module Wolf.Summary where
 
@@ -10,20 +11,21 @@ import System.Console.ANSI as ANSI
 
 import Wolf.Index
 import Wolf.NoteIndex
+import Wolf.OptParse.Types
 import Wolf.Report
 import Wolf.Time
 import Wolf.Types
 
-summary :: String -> IO ()
+summary :: (MonadIO m, MonadReader Settings m) => String -> m ()
 summary person = do
     index <- getIndex
     case lookupInIndex person index of
-        Nothing -> die $ unwords ["No person found for", show person]
+        Nothing -> liftIO $ die $ unwords ["No person found for", show person]
         Just personUuid -> do
-            now <- getCurrentTime
+            now <- liftIO getCurrentTime
             mpe <- getPersonEntry personUuid
             pns <- getPersonNotes personUuid
-            putStr $ renderReport $ summaryReport now mpe pns
+            liftIO $ putStr $ renderReport $ summaryReport now mpe pns
 
 summaryReport :: UTCTime -> Maybe PersonEntry -> [PersonNote] -> Report
 summaryReport now mpe pns =
