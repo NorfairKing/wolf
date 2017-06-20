@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleContexts #-}
+
 module Wolf.Entry where
 
 import Import
@@ -7,10 +9,11 @@ import Data.Time
 import Wolf.Editor
 import Wolf.Git
 import Wolf.Index
+import Wolf.OptParse.Types
 import Wolf.Path
 import Wolf.Types
 
-entry :: String -> IO ()
+entry :: (MonadIO m, MonadReader Settings m) => String -> m ()
 entry person = do
     origIndex <- getIndex
     (personUuid, index) <- lookupOrCreateNewPerson person origIndex
@@ -19,7 +22,7 @@ entry person = do
     (origPersonEntry, inFilePersonEntry) <-
         case mPersonEntry of
             Nothing -> do
-                now <- getCurrentTime
+                now <- liftIO getCurrentTime
                 pure $
                     (,) (newPersonEntry now) $
                     case parseFirstnameLastname person of
@@ -36,7 +39,7 @@ entry person = do
     ensureDir $ parent tmpFile
     let tmpFileContents =
             tmpEntryFileContents person personUuid inFilePersonEntry
-    writeFile (toFilePath tmpFile) tmpFileContents
+    liftIO $ writeFile (toFilePath tmpFile) tmpFileContents
     editResult <- startEditorOn tmpFile
     case editResult of
         EditingFailure reason ->
@@ -48,9 +51,10 @@ entry person = do
                 , ",not saving."
                 ]
         EditingSuccess -> do
-            contents <- readFile $ toFilePath tmpFile
+            contents <- liftIO $ readFile $ toFilePath tmpFile
             case parseEntryFileContents contents of
-                Left err -> die $ unwords ["Unable to parse entry file:", err]
+                Left err ->
+                    liftIO $ die $ unwords ["Unable to parse entry file:", err]
                 Right personEntryMap -> do
                     now <- liftIO getCurrentTime
                     let personEntry =

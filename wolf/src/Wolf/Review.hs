@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleContexts #-}
+
 module Wolf.Review where
 
 import Import
@@ -9,11 +11,12 @@ import System.Console.ANSI as ANSI
 
 import Wolf.Index
 import Wolf.NoteIndex
+import Wolf.OptParse.Types
 import Wolf.Report
 import Wolf.Time
 import Wolf.Types
 
-review :: IO ()
+review :: (MonadIO m, MonadReader Settings m) => m ()
 review = do
     index <- getIndex
     let tups = nubBy (\t1 t2 -> snd t1 == snd t2) $ M.toList $ indexMap index
@@ -23,7 +26,7 @@ review = do
             notes <- getPersonNotes personUuid
             pure $ map ((,) nn) notes
     let entries = sortOn (personNoteTimestamp . snd) noteTups
-    now <- getCurrentTime
+    now <- liftIO getCurrentTime
     let report =
             mconcat $
             flip map entries $ \(nickName, personNote) ->
@@ -37,4 +40,4 @@ review = do
                           ]
                     , stringReport $ T.unpack $ personNoteContents personNote
                     ]
-    putStr $ renderReport report
+    liftIO $ putStr $ renderReport report

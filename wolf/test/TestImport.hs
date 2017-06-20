@@ -3,13 +3,13 @@ module TestImport
     ) where
 
 import Debug.Trace as X
-import Prelude as X
+import Prelude as X hiding (head, init, last, tail)
 
 import GHC.Generics as X hiding (Selector)
 
 import System.Exit as X
 
-import Data.List as X
+import Data.List as X hiding (head, init, last, tail)
 import Data.Maybe as X
 import Data.Monoid as X
 import Data.String as X

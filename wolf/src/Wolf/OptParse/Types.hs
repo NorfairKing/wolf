@@ -9,7 +9,8 @@ type Arguments = (Command, Flags)
 type Instructions = (Dispatch, Settings)
 
 data Command
-    = CommandNote String
+    = CommandInit
+    | CommandNote String
     | CommandSummary String
     | CommandEntry String
     | CommandGit [String]
@@ -18,16 +19,17 @@ data Command
     | CommandReview
     deriving (Show, Eq)
 
-data Flags =
-    Flags
-    deriving (Show, Eq)
+newtype Flags = Flags
+    { flagWolfDir :: Maybe FilePath
+    } deriving (Show, Eq)
 
 data Configuration =
     Configuration
     deriving (Show, Eq)
 
 data Dispatch
-    = DispatchNote String
+    = DispatchInit
+    | DispatchNote String
     | DispatchSummary String
     | DispatchEntry String
     | DispatchGit [String]
@@ -36,10 +38,11 @@ data Dispatch
     | DispatchReview
     deriving (Show, Eq)
 
-data Settings =
-    Settings
-    deriving (Show, Eq)
+newtype Settings = Settings
+    { setWolfDir :: Path Abs Dir
+    } deriving (Show, Eq)
 
-newtype ParserEnv = ParserEnv
-    { parserEnvIndex :: Index
+data ParserEnv = ParserEnv
+    { parserEnvDefaultWolfDir :: Path Abs Dir
+    , parserEnvIndex :: Index
     } deriving (Show, Eq)

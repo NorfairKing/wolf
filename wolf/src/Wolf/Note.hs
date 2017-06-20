@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleContexts #-}
+
 module Wolf.Note where
 
 import Import
@@ -10,10 +12,11 @@ import Wolf.Git
 import Wolf.Index
 import Wolf.JSONUtils
 import Wolf.NoteIndex
+import Wolf.OptParse.Types
 import Wolf.Path
 import Wolf.Types
 
-note :: MonadIO m => String -> m ()
+note :: (MonadIO m, MonadReader Settings m) => String -> m ()
 note person = do
     origIndex <- getIndex
     (personUuid, index) <- lookupOrCreateNewPerson person origIndex
