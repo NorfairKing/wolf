@@ -1,3 +1,6 @@
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE RecordWildCards #-}
+
 module Wolf.OptParse
     ( module Wolf.OptParse
     , module Wolf.OptParse.Types
@@ -22,16 +25,24 @@ getInstructions = do
     combineToInstructions cmd flags config
 
 combineToInstructions :: Command -> Flags -> Configuration -> IO Instructions
-combineToInstructions cmd Flags Configuration = do
+combineToInstructions cmd Flags {..} Configuration = do
+    wd <-
+        case flagWolfDir of
+            Nothing -> defaultWolfDir
+            Just d -> resolveDir' d
     disp <-
         case cmd of
+            CommandInit -> pure DispatchInit
             CommandNote person -> pure $ DispatchNote person
             CommandSummary person -> pure $ DispatchSummary person
             CommandEntry person -> pure $ DispatchEntry person
             CommandGit args -> pure $ DispatchGit args
             CommandAlias old new -> pure $ DispatchAlias old new
             CommandReview -> pure DispatchReview
-    pure (disp, Settings)
+    pure (disp, Settings {setWolfDir = wd})
+
+defaultWolfDir :: MonadIO m => m (Path Abs Dir)
+defaultWolfDir = (</> $(mkRelDir ".wolf")) <$> liftIO getHomeDir
 
 getConfiguration :: Command -> Flags -> IO Configuration
 getConfiguration _ _ = pure Configuration
@@ -44,7 +55,7 @@ getArguments = do
     handleParseResult result
 
 getParserEnv :: IO ParserEnv
-getParserEnv = ParserEnv <$> getIndex
+getParserEnv = ParserEnv <$> defaultWolfDir <*> getIndex
 
 runArgumentsParser :: ParserEnv -> [String] -> ParserResult Arguments
 runArgumentsParser env = execParserPure prefs_ $ runReaderT argParser env
@@ -74,13 +85,20 @@ parseCommand =
     ReaderT $ \env ->
         hsubparser $
         mconcat
-            [ command "note" $ runReaderT parseCommandNote env
+            [ command "init" parseCommandInit
+            , command "note" $ runReaderT parseCommandNote env
             , command "summary" $ runReaderT parseCommandSummary env
             , command "entry" $ runReaderT parseCommandEntry env
             , command "git" parseCommandGit
             , command "alias" $ runReaderT parseCommandAlias env
             , command "review" parseCommandReview
             ]
+
+parseCommandInit :: ParserInfo Command
+parseCommandInit =
+    let parser = pure CommandInit
+        modifier = fullDesc <> progDesc "Initialise the wolf data repository."
+    in info parser modifier
 
 parseCommandNote :: ReaderT ParserEnv ParserInfo Command
 parseCommandNote =
@@ -170,4 +188,16 @@ peopleMap = map (escapeSpaces . fst) . M.toList . indexMap . parserEnvIndex
         go c = [c]
 
 parseFlags :: ReaderT ParserEnv Parser Flags
-parseFlags = pure Flags
+parseFlags =
+    ReaderT $ \env ->
+        Flags <$>
+        option
+            (Just <$> str)
+            (mconcat
+                 [ long "wolf-dir"
+                 , metavar "DIR"
+                 , help "the data directory for all wolf data"
+                 , value Nothing
+                 , showDefaultWith
+                       (const $ toFilePath $ parserEnvDefaultWolfDir env)
+                 ])

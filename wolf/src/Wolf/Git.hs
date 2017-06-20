@@ -9,6 +9,9 @@ import Wolf.Path
 git :: [String] -> IO ()
 git = liftIO . runGit
 
+gitInit :: MonadIO m => m ()
+gitInit = runGit ["init"]
+
 makeGitCommit :: MonadIO m => String -> m ()
 makeGitCommit message = do
     runGit ["add", "."]
