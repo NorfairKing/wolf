@@ -16,7 +16,7 @@ import Data.String as X
 
 import Control.Arrow as X
 import Control.Monad as X
-import Control.Monad.IO.Class as X
+import Control.Monad.Reader as X
 
 import Path as X
 import Path.IO as X

@@ -83,6 +83,7 @@ test-suite wolf-test
         genvalidity-hspec -any,
         genvalidity-hspec-aeson -any,
         hspec -any,
+        mtl -any,
         path -any,
         path-io -any,
         text -any,

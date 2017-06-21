@@ -10,6 +10,11 @@ import Wolf.Types
 wolfDir :: MonadReader Settings m => m (Path Abs Dir)
 wolfDir = asks setWolfDir
 
+initFile :: (MonadReader Settings m, MonadIO m) => m (Path Abs File)
+initFile = do
+    wd <- wolfDir
+    liftIO $ resolveFile wd "init.json"
+
 indexFile :: (MonadReader Settings m, MonadIO m) => m (Path Abs File)
 indexFile = do
     wd <- wolfDir

@@ -17,6 +17,16 @@ import Data.UUID.V4 as UUID
 
 {-# ANN module ("HLint: ignore Use &&" :: String) #-}
 
+newtype InitData = InitData
+    { initTimestamp :: UTCTime
+    } deriving (Show, Eq, Ord, Generic)
+
+instance Validity InitData
+
+instance FromJSON InitData
+
+instance ToJSON InitData
+
 newtype Index = Index
     { indexMap :: Map String PersonUuid
     } deriving (Show, Eq, Ord, Generic)
