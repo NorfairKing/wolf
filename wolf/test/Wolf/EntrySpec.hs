@@ -3,14 +3,22 @@ module Wolf.EntrySpec
     ) where
 
 import TestImport
+import TestUtils
 
 import Wolf.Entry
+import Wolf.OptParse.Types
 import Wolf.Types
 
 import Wolf.Types.Gen ()
 
 spec :: Spec
-spec =
+spec = do
+    describe "entry" $
+        withSandbox $
+        it "fails if no wolf repo has been initialised" $ \sb ->
+            forAll genValid $ \person ->
+                runReaderT (entry person) Settings {setWolfDir = sb} `shouldThrow`
+                (\e -> e == ExitFailure 1)
     describe "reconstructPersonEntry" $ do
         it "doesn't change anything if nothing changed" $
             forAll genValid $ \now ->
