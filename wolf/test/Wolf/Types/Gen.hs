@@ -13,6 +13,10 @@ instance GenUnchecked UUID where
         let genWord = fromIntegral <$> (genUnchecked :: Gen Int)
         in fromWords <$> genWord <*> genWord <*> genWord <*> genWord
 
+instance GenUnchecked InitData
+
+instance GenValid InitData
+
 instance GenUnchecked Index
 
 instance GenUnchecked PersonUuid
