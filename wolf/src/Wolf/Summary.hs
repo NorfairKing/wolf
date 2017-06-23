@@ -10,6 +10,7 @@ import Data.Time
 import System.Console.ANSI as ANSI
 
 import Wolf.Index
+import Wolf.Init
 import Wolf.NoteIndex
 import Wolf.OptParse.Types
 import Wolf.Report
@@ -17,7 +18,7 @@ import Wolf.Time
 import Wolf.Types
 
 summary :: (MonadIO m, MonadReader Settings m) => String -> m ()
-summary person = do
+summary person = withInitCheck $ do
     index <- getIndex
     case lookupInIndex person index of
         Nothing -> liftIO $ die $ unwords ["No person found for", show person]
