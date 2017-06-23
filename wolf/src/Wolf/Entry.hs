@@ -6,12 +6,6 @@ import Import
 
 import Data.Time
 
-import Wolf.Editor
-import Wolf.Git
-import Wolf.Index
-import Wolf.Init
-import Wolf.OptParse.Types
-import Wolf.Path
 import Wolf.Types
 
 parseFirstnameLastname :: String -> Maybe (String, String)
@@ -56,7 +50,8 @@ tmpEntryFileContents person personUuid pe =
     unlines $
     map (uncurry toLineStr) (personEntryProperties pe) ++
     separator ++
-    map (uncurry toLineStr')
+    map
+        (uncurry toLineStr')
         [("uuid", personUuidString personUuid), ("reference used", person)]
   where
     separator = ["", "", "", line, str, line]

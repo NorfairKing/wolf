@@ -28,7 +28,8 @@ spec = do
                             reconstructPersonEntry
                                 now
                                 pe
-                                (map (second personPropertyValueContents)
+                                (map
+                                     (second personPropertyValueContents)
                                      (personEntryProperties pe))
                     in personEntryLastUpdatedTimestamp pe' `shouldBe`
                        personEntryLastUpdatedTimestamp pe
