@@ -1,6 +1,6 @@
 {-# LANGUAGE FlexibleContexts #-}
 
-module Wolf.Alias where
+module Wolf.Command.Alias where
 
 import Import
 

@@ -5,7 +5,7 @@ module Wolf.InitSpec
 import TestImport
 import TestUtils
 
-import Wolf.Init
+import Wolf.Command.Init
 import Wolf.OptParse.Types
 
 spec :: Spec

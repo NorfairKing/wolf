@@ -13,21 +13,24 @@ author: Tom Sydney Kerckhove
 library
     exposed-modules:
         Wolf
-        Wolf.Alias
+        Wolf.Command.Alias
+        Wolf.Command.Entry
+        Wolf.Command.Git
+        Wolf.Command.Init
+        Wolf.Command.Note
+        Wolf.Command.Review
+        Wolf.Command.Summary
         Wolf.Editor
         Wolf.Entry
         Wolf.Git
         Wolf.Index
         Wolf.Init
         Wolf.JSONUtils
-        Wolf.Note
         Wolf.NoteIndex
         Wolf.OptParse
         Wolf.OptParse.Types
         Wolf.Path
         Wolf.Report
-        Wolf.Review
-        Wolf.Summary
         Wolf.Time
         Wolf.Types
     build-depends:
@@ -95,6 +98,7 @@ test-suite wolf-test
         TestImport
         TestUtils
         Wolf.EntrySpec
+        Wolf.GitSpec
         Wolf.InitSpec
         Wolf.NoteSpec
         Wolf.ReviewSpec

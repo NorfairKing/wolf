@@ -1,6 +1,6 @@
 {-# LANGUAGE FlexibleContexts #-}
 
-module Wolf.Note where
+module Wolf.Command.Note where
 
 import Import
 

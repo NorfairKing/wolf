@@ -1,20 +1,20 @@
-module Wolf.SummarySpec
+module Wolf.GitSpec
     ( spec
     ) where
 
 import TestImport
 import TestUtils
 
-import Wolf.Command.Summary
+import Wolf.Command.Git
 import Wolf.OptParse.Types
 
 import Wolf.Types.Gen ()
 
 spec :: Spec
 spec =
-    describe "summary" $
+    describe "git" $
     withSandbox $
     it "fails if no wolf repo has been initialised" $ \sb ->
-        forAll genValid $ \person ->
-            runReaderT (summary person) Settings {setWolfDir = sb} `shouldThrow`
+        forAll genValid $ \args ->
+            runReaderT (git args) Settings {setWolfDir = sb} `shouldThrow`
             (\e -> e == ExitFailure 1)

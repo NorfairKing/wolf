@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleContexts #-}
 
-module Wolf.Summary where
+module Wolf.Command.Summary where
 
 import Import
 
@@ -18,15 +18,17 @@ import Wolf.Time
 import Wolf.Types
 
 summary :: (MonadIO m, MonadReader Settings m) => String -> m ()
-summary person = withInitCheck $ do
-    index <- getIndex
-    case lookupInIndex person index of
-        Nothing -> liftIO $ die $ unwords ["No person found for", show person]
-        Just personUuid -> do
-            now <- liftIO getCurrentTime
-            mpe <- getPersonEntry personUuid
-            pns <- getPersonNotes personUuid
-            liftIO $ putStr $ renderReport $ summaryReport now mpe pns
+summary person =
+    withInitCheck $ do
+        index <- getIndex
+        case lookupInIndex person index of
+            Nothing ->
+                liftIO $ die $ unwords ["No person found for", show person]
+            Just personUuid -> do
+                now <- liftIO getCurrentTime
+                mpe <- getPersonEntry personUuid
+                pns <- getPersonNotes personUuid
+                liftIO $ putStr $ renderReport $ summaryReport now mpe pns
 
 summaryReport :: UTCTime -> Maybe PersonEntry -> [PersonNote] -> Report
 summaryReport now mpe pns =

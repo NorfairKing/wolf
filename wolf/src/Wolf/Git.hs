@@ -9,9 +9,6 @@ import System.Process
 import Wolf.OptParse.Types
 import Wolf.Path
 
-git :: (MonadReader Settings m, MonadIO m) => [String] -> m ()
-git = runGit
-
 gitInit :: (MonadReader Settings m, MonadIO m) => m ()
 gitInit = runGit ["init"]
 
