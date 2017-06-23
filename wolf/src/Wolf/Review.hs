@@ -12,12 +12,13 @@ import System.Console.ANSI as ANSI
 import Wolf.Index
 import Wolf.NoteIndex
 import Wolf.OptParse.Types
+import Wolf.Init
 import Wolf.Report
 import Wolf.Time
 import Wolf.Types
 
 review :: (MonadIO m, MonadReader Settings m) => m ()
-review = do
+review = withInitCheck $ do
     index <- getIndex
     let tups = nubBy (\t1 t2 -> snd t1 == snd t2) $ M.toList $ indexMap index
     noteTups <-
