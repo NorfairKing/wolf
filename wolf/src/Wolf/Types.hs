@@ -66,16 +66,14 @@ personUuidString (PersonUuid uuid) = UUID.toString uuid
 parsePersonUuid :: String -> Maybe PersonUuid
 parsePersonUuid = fmap PersonUuid . UUID.fromString
 
-data PersonEntry = PersonEntry
+newtype PersonEntry = PersonEntry
     { personEntryProperties :: [(String, PersonPropertyValue)]
-    , personEntryLastUpdatedTimestamp :: UTCTime
     } deriving (Show, Eq, Ord, Generic)
 
 instance Validity PersonEntry where
     isValid PersonEntry {..} =
         and
             [ isValid personEntryProperties
-            , isValid personEntryLastUpdatedTimestamp
             , let ls = map fst personEntryProperties
               in nub ls == ls
             ]
@@ -92,25 +90,15 @@ instance FromJSON PersonEntry where
                                 (`PersonPropertyValue` unsafePerformIO
                                                            getCurrentTime))
                            (M.toList strs)
-                 , personEntryLastUpdatedTimestamp =
-                       unsafePerformIO getCurrentTime
                  })
             ob <|>
-        (withObject "PersonEntry" $ \o ->
-             PersonEntry <$> o .: "properties" <*> o .: "last-updated")
-            ob
+        (withObject "PersonEntry" $ \o -> PersonEntry <$> o .: "properties") ob
 
 instance ToJSON PersonEntry where
-    toJSON PersonEntry {..} =
-        object
-            [ "properties" .= personEntryProperties
-            , "last-updated" .= personEntryLastUpdatedTimestamp
-            ]
+    toJSON PersonEntry {..} = object ["properties" .= personEntryProperties]
 
-newPersonEntry :: UTCTime -> PersonEntry
-newPersonEntry now =
-    PersonEntry
-    {personEntryProperties = [], personEntryLastUpdatedTimestamp = now}
+newPersonEntry :: PersonEntry
+newPersonEntry = PersonEntry {personEntryProperties = []}
 
 data PersonPropertyValue = PersonPropertyValue
     { personPropertyValueContents :: String

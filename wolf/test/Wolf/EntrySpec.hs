@@ -24,15 +24,11 @@ spec = do
         it "doesn't change anything if nothing changed" $
             forAll genValid $ \now ->
                 forAll genValid $ \pe ->
-                    let pe' =
                             reconstructPersonEntry
                                 now
                                 pe
-                                (map
-                                     (second personPropertyValueContents)
-                                     (personEntryProperties pe))
-                    in personEntryLastUpdatedTimestamp pe' `shouldBe`
-                       personEntryLastUpdatedTimestamp pe
+                                (map (second personPropertyValueContents)
+                                     (personEntryProperties pe)) `shouldBe` pe
         it "keeps all the new keys in the right order" $
             forAll genValid $ \now ->
                 forAll genValid $ \pe ->

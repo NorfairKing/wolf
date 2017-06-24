@@ -27,9 +27,9 @@ entry person =
                 Nothing -> do
                     now <- liftIO getCurrentTime
                     pure $
-                        (,) (newPersonEntry now) $
+                        (,) newPersonEntry $
                         case parseFirstnameLastname person of
-                            Nothing -> newPersonEntry now
+                            Nothing -> newPersonEntry
                             Just (fn, ln) ->
                                 PersonEntry
                                 { personEntryProperties =
@@ -38,7 +38,6 @@ entry person =
                                       , ( "last name"
                                         , PersonPropertyValue ln now)
                                       ]
-                                , personEntryLastUpdatedTimestamp = now
                                 }
                 Just pe -> pure (pe, pe)
         ensureDir $ parent tmpFile

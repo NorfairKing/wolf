@@ -23,7 +23,6 @@ reconstructPersonEntry now old newMap =
         else PersonEntry
              { personEntryProperties =
                    map (\(k, v) -> (k, go k v)) $ nubBy ((==) `on` fst) newMap
-             , personEntryLastUpdatedTimestamp = now
              }
   where
     go :: String -> String -> PersonPropertyValue
