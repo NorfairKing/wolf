@@ -49,8 +49,7 @@ tmpEntryFileContents person personUuid pe =
     unlines $
     map (uncurry toLineStr) (personEntryProperties pe) ++
     separator ++
-    map
-        (uncurry toLineStr')
+    map (uncurry toLineStr')
         [("uuid", personUuidString personUuid), ("reference used", person)]
   where
     separator = ["", "", "", line, str, line]

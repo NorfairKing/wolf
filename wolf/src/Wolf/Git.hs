@@ -26,7 +26,6 @@ runGitIn :: MonadIO m => Path Abs Dir -> [String] -> m ()
 runGitIn wd args = do
     let gitcmd = "git"
     let cmd = unwords $ gitcmd : args
-    liftIO $ print wd
     let cp =
             (proc gitcmd args)
             { cwd = Just $ toFilePath wd
