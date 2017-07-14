@@ -1,5 +1,7 @@
 packages:
-- wolf
+- wolf-api
+- wolf-cli
+- wolf-data
 extra-deps:
 - genvalidity-0.3.1.0
 - genvalidity-containers-0.2.0.1

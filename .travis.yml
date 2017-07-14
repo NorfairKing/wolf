@@ -21,8 +21,6 @@ install:
   - stack build --only-snapshot
   - stack install hindent
   - stack install cabal-install
-  - git config --global user.email "you@example.com"
-  - git config --global user.name "Your Name"
 
 script:
   - git --version
