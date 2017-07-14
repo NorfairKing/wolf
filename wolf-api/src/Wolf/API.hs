@@ -3,11 +3,16 @@
 
 module Wolf.API where
 
+import Data.Proxy
+
 import Servant.API
 
 import Wolf.Types
 
 type WolfAPI = PersonAPI
+
+wolfAPI :: Proxy WolfAPI
+wolfAPI = Proxy
 
 type PersonAPI = PostNewPerson :<|> GetPersonEntry
 

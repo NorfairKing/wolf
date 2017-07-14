@@ -1,8 +1,6 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module Wolf.Server
-    ( runWolfServer
-    ) where
+module Wolf.Server where
 
 import Import
 
@@ -26,9 +24,6 @@ runWolfServer = do
 
 wolfApp :: Wai.Application
 wolfApp = serve wolfAPI wolfServer
-
-wolfAPI :: Proxy WolfAPI
-wolfAPI = Proxy
 
 wolfServer :: Server WolfAPI
 wolfServer = servePostNewPerson :<|> serveGetPersonEntry

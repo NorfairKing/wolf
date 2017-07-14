@@ -1,6 +1,7 @@
 packages:
 - wolf-api
 - wolf-cli
+- wolf-client
 - wolf-data
 - wolf-server
 extra-deps:
@@ -16,4 +17,5 @@ extra-deps:
 - validity-path-0.1.0.1
 - validity-time-0.0.0.1
 - validity-text-0.1.2.1
+- servant-quickcheck-0.0.2.4
 resolver: lts-8.17
