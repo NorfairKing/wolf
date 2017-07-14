@@ -11,9 +11,11 @@ import System.IO.Unsafe -- TODO remove this
 import Data.Aeson as JSON
 import Data.Map (Map)
 import qualified Data.Map as M
+import qualified Data.Text as T
 import Data.Time
 import Data.UUID as UUID
 import Data.UUID.V4 as UUID
+import Servant
 
 {-# ANN module ("HLint: ignore Use &&" :: String) #-}
 
@@ -56,6 +58,15 @@ instance FromJSON PersonUuid where
 
 instance ToJSON PersonUuid where
     toJSON (PersonUuid u) = JSON.String $ UUID.toText u
+
+instance FromHttpApiData PersonUuid where
+    parseUrlPiece t =
+        case UUID.fromText t of
+            Nothing -> fail $ "Invalid UUID in Url Piece: " ++ T.unpack t
+            Just uuid -> pure $ PersonUuid uuid
+
+instance ToHttpApiData PersonUuid where
+    toUrlPiece (PersonUuid uuid) = UUID.toText uuid
 
 nextRandomPersonUuid :: MonadIO m => m PersonUuid
 nextRandomPersonUuid = liftIO $ PersonUuid <$> UUID.nextRandom

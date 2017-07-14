@@ -15,4 +15,4 @@ type PostNewPerson
      = "person" :> "new" :> ReqBody '[ JSON] PersonEntry :> Post '[ JSON] PersonUuid
 
 type GetPersonEntry
-     = "person" :> Capture "person-uuid" PersonUuid :> Get '[ JSON] [PersonEntry]
+     = "person" :> Capture "person-uuid" PersonUuid :> Get '[ JSON] PersonEntry
