@@ -9,17 +9,18 @@ import qualified Data.Text as T
 import Data.Time
 import System.Console.ANSI as ANSI
 
+import Wolf.Cli.Utils
 import Wolf.Index
 import Wolf.Init
 import Wolf.NoteIndex
-import Wolf.Cli.Utils
 import Wolf.OptParse.Types
 import Wolf.Report
 import Wolf.Time
 import Wolf.Types
 
 review :: (MonadIO m, MonadReader Settings m) => m ()
-review = runData $
+review =
+    runData $
     withInitCheck $ do
         index <- getIndex
         let tups =

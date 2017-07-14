@@ -7,6 +7,7 @@ import TestUtils
 
 import Wolf.Command.Summary
 import Wolf.OptParse.Types
+import Wolf.Types
 
 import Wolf.Types.Gen ()
 
@@ -16,5 +17,7 @@ spec =
     withSandbox $
     it "fails if no wolf repo has been initialised" $ \sb ->
         forAll genValid $ \person ->
-            runReaderT (summary person) Settings {setWolfDir = sb} `shouldThrow`
+            runReaderT
+                (summary person)
+                Settings {setDataSets = DataSettings {dataSetWolfDir = sb}} `shouldThrow`
             (\e -> e == ExitFailure 1)

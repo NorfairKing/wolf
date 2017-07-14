@@ -6,8 +6,8 @@ import Import
 
 import System.Process
 
-import Wolf.Types
 import Wolf.Path
+import Wolf.Types
 
 gitInit :: (MonadReader DataSettings m, MonadIO m) => m ()
 gitInit = runGit ["init"]

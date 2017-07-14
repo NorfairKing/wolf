@@ -56,7 +56,7 @@ test-suite wolf-test
     main-is: Spec.hs
     build-depends:
         base >=4.9 && <=5,
-        wolf -any,
+        wolf-data -any,
         QuickCheck -any,
         bytestring -any,
         containers -any,
@@ -77,13 +77,8 @@ test-suite wolf-test
     hs-source-dirs: test/
     other-modules:
         TestImport
-        TestUtils
         Wolf.EntrySpec
-        Wolf.GitSpec
         Wolf.InitSpec
-        Wolf.NoteSpec
-        Wolf.ReviewSpec
-        Wolf.SummarySpec
         Wolf.Types.Gen
         Wolf.TypesSpec
     ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall

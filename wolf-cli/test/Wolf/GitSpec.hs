@@ -7,6 +7,7 @@ import TestUtils
 
 import Wolf.Command.Git
 import Wolf.OptParse.Types
+import Wolf.Types
 
 import Wolf.Types.Gen ()
 
@@ -16,5 +17,7 @@ spec =
     withSandbox $
     it "fails if no wolf repo has been initialised" $ \sb ->
         forAll genValid $ \args ->
-            runReaderT (git args) Settings {setWolfDir = sb} `shouldThrow`
+            runReaderT
+                (git args)
+                Settings {setDataSets = DataSettings {dataSetWolfDir = sb}} `shouldThrow`
             (\e -> e == ExitFailure 1)

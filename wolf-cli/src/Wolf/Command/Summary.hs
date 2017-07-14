@@ -9,9 +9,9 @@ import qualified Data.Text as T
 import Data.Time
 import System.Console.ANSI as ANSI
 
+import Wolf.Cli.Utils
 import Wolf.Index
 import Wolf.Init
-import Wolf.Cli.Utils
 import Wolf.NoteIndex
 import Wolf.OptParse.Types
 import Wolf.Report
@@ -19,7 +19,8 @@ import Wolf.Time
 import Wolf.Types
 
 summary :: (MonadIO m, MonadReader Settings m) => String -> m ()
-summary person = runData $
+summary person =
+    runData $
     withInitCheck $ do
         index <- getIndex
         case lookupInIndex person index of

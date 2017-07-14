@@ -18,7 +18,9 @@ spec = do
         withSandbox $
         it "fails if no wolf repo has been initialised" $ \sb ->
             forAll genValid $ \person ->
-                runReaderT (entry person) Settings {setWolfDir = sb} `shouldThrow`
+                runReaderT
+                    (entry person)
+                    Settings {setDataSets = DataSettings {dataSetWolfDir = sb}} `shouldThrow`
                 (\e -> e == ExitFailure 1)
     describe "reconstructPersonEntry" $ do
         it "doesn't change anything if nothing changed" $

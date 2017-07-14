@@ -45,7 +45,10 @@ getPersonEntry personUuid =
     personEntryFile personUuid >>= readJSONWithDefault Nothing
 
 putPersonEntry ::
-       (MonadIO m, MonadReader DataSettings m) => PersonUuid -> PersonEntry -> m ()
+       (MonadIO m, MonadReader DataSettings m)
+    => PersonUuid
+    -> PersonEntry
+    -> m ()
 putPersonEntry personUuid personEntry = do
     pef <- personEntryFile personUuid
     writeJSON pef personEntry

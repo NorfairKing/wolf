@@ -19,7 +19,8 @@ import Wolf.Path
 import Wolf.Types
 
 note :: (MonadIO m, MonadReader Settings m) => String -> m ()
-note person = runData $
+note person =
+    runData $
     withInitCheck $ do
         origIndex <- getIndex
         (personUuid, index) <- lookupOrCreateNewPerson person origIndex

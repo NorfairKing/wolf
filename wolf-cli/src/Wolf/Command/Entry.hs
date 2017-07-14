@@ -17,11 +17,11 @@ import Wolf.Path
 import Wolf.Types
 
 entry :: (MonadIO m, MonadReader Settings m) => String -> m ()
-entry person = runData $
+entry person =
+    runData $
     withInitCheck $ do
         origIndex <- getIndex
-        (personUuid, index) <-
-            lookupOrCreateNewPerson person origIndex
+        (personUuid, index) <- lookupOrCreateNewPerson person origIndex
         tmpFile <- tmpPersonEntryFile personUuid
         mPersonEntry <- getPersonEntry personUuid
         (origPersonEntry, inFilePersonEntry) <-
