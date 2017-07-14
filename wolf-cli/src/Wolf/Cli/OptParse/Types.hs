@@ -1,4 +1,4 @@
-module Wolf.OptParse.Types where
+module Wolf.Cli.OptParse.Types where
 
 import Import
 
@@ -20,7 +20,11 @@ data Command
     deriving (Show, Eq)
 
 newtype Flags = Flags
-    { flagWolfDir :: Maybe FilePath
+    { flagDataFlags :: DataFlags
+    } deriving (Show, Eq)
+
+newtype DataFlags = DataFlags
+    { dataFlagWolfDir :: Maybe FilePath
     } deriving (Show, Eq)
 
 data Configuration =

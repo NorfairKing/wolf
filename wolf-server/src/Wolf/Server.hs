@@ -19,7 +19,7 @@ import Wolf.Server.OptParse
 
 runWolfServer :: IO ()
 runWolfServer = do
-    (DispatchServe ServeSettings {..}, Settings) <- getInstructions
+    (DispatchServe ServeSettings {..}, Settings {..}) <- getInstructions
     Warp.run serveSetPort wolfApp
 
 wolfApp :: Wai.Application

@@ -4,6 +4,7 @@ module Wolf.Cli where
 
 import Import
 
+import Wolf.Cli.OptParse
 import Wolf.Command.Alias
 import Wolf.Command.Entry
 import Wolf.Command.Git
@@ -11,7 +12,6 @@ import Wolf.Command.Init
 import Wolf.Command.Note
 import Wolf.Command.Review
 import Wolf.Command.Summary
-import Wolf.OptParse
 
 wolf :: IO ()
 wolf = do

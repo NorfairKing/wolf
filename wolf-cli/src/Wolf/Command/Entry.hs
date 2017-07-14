@@ -6,13 +6,13 @@ import Import
 
 import Data.Time
 
+import Wolf.Cli.OptParse.Types
 import Wolf.Cli.Utils
 import Wolf.Editor
 import Wolf.Entry
 import Wolf.Git
 import Wolf.Index
 import Wolf.Init
-import Wolf.OptParse.Types
 import Wolf.Path
 import Wolf.Types
 

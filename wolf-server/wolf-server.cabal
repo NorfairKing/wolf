@@ -35,6 +35,7 @@ library
         wai >=3.2 && <3.3,
         warp >=3.2 && <3.3,
         wolf-api >=0.0 && <0.1,
+        wolf-cli >=0.0 && <0.1,
         wolf-data >=0.0 && <0.1
     default-language: Haskell2010
     default-extensions: NoImplicitPrelude

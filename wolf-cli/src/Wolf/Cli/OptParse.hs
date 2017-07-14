@@ -1,9 +1,9 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE RecordWildCards #-}
 
-module Wolf.OptParse
-    ( module Wolf.OptParse
-    , module Wolf.OptParse.Types
+module Wolf.Cli.OptParse
+    ( module Wolf.Cli.OptParse
+    , module Wolf.Cli.OptParse.Types
     ) where
 
 import Import
@@ -13,8 +13,8 @@ import System.Environment (getArgs)
 
 import Options.Applicative
 
+import Wolf.Cli.OptParse.Types
 import Wolf.Index
-import Wolf.OptParse.Types
 import Wolf.Types
 
 getInstructions :: IO Instructions
@@ -25,10 +25,7 @@ getInstructions = do
 
 combineToInstructions :: Command -> Flags -> Configuration -> IO Instructions
 combineToInstructions cmd Flags {..} Configuration = do
-    wd <-
-        case flagWolfDir of
-            Nothing -> defaultWolfDir
-            Just d -> resolveDir' d
+    ds <- deriveDataSettings flagDataFlags
     disp <-
         case cmd of
             CommandInit -> pure DispatchInit
@@ -38,10 +35,19 @@ combineToInstructions cmd Flags {..} Configuration = do
             CommandGit args -> pure $ DispatchGit args
             CommandAlias old new -> pure $ DispatchAlias old new
             CommandReview -> pure DispatchReview
-    pure (disp, Settings {setDataSets = DataSettings {dataSetWolfDir = wd}})
+    pure (disp, Settings {setDataSets = ds})
 
 defaultWolfDir :: MonadIO m => m (Path Abs Dir)
 defaultWolfDir = (</> $(mkRelDir ".wolf")) <$> liftIO getHomeDir
+
+deriveDataSettings :: MonadIO m => DataFlags -> m DataSettings
+deriveDataSettings DataFlags {..} = do
+    wd <-
+        liftIO $
+        case dataFlagWolfDir of
+            Nothing -> defaultWolfDir
+            Just d -> resolveDir' d
+    pure DataSettings {dataSetWolfDir = wd}
 
 getConfiguration :: Command -> Flags -> IO Configuration
 getConfiguration _ _ = pure Configuration
@@ -191,9 +197,12 @@ peopleMap = map (escapeSpaces . fst) . M.toList . indexMap . parserEnvIndex
         go c = [c]
 
 parseFlags :: ReaderT ParserEnv Parser Flags
-parseFlags =
+parseFlags = Flags <$> parseDataFlags
+
+parseDataFlags :: ReaderT ParserEnv Parser DataFlags
+parseDataFlags =
     ReaderT $ \env ->
-        Flags <$>
+        DataFlags <$>
         option
             (Just <$> str)
             (mconcat

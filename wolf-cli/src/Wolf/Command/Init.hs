@@ -4,11 +4,11 @@ module Wolf.Command.Init where
 
 import Import
 
+import Wolf.Cli.OptParse.Types
 import Wolf.Cli.Utils
 import Wolf.Git
 import Wolf.Init
 import Wolf.JSONUtils
-import Wolf.OptParse.Types
 import Wolf.Path
 import Wolf.Types
 

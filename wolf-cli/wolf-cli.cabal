@@ -14,8 +14,8 @@ library
     exposed-modules:
         Wolf.Cli
         Wolf.Cli.Utils
-        Wolf.OptParse
-        Wolf.OptParse.Types
+        Wolf.Cli.OptParse
+        Wolf.Cli.OptParse.Types
         Wolf.Command.Alias
         Wolf.Command.Entry
         Wolf.Command.Git
