@@ -16,7 +16,7 @@ library
     build-depends:
         base >=4.9 && <=5,
         servant >=0.9 && <0.10,
-        wolf >=0.0 && <0.1
+        wolf-data >=0.0 && <0.1
     default-language: Haskell2010
     default-extensions: NoImplicitPrelude
     hs-source-dirs: src/
