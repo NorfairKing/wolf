@@ -1,4 +1,4 @@
-name: wolf-cli
+name: wolf-test-utils
 version: 0.0.0.0
 cabal-version: >=1.10
 build-type: Simple
@@ -12,34 +12,31 @@ author: Tom Sydney Kerckhove
 
 library
     exposed-modules:
-        Wolf.Cli
-        Wolf.Cli.Utils
-        Wolf.Cli.OptParse
-        Wolf.Cli.OptParse.Types
-        Wolf.Command.Alias
-        Wolf.Command.Entry
-        Wolf.Command.Git
-        Wolf.Command.Init
-        Wolf.Command.Note
-        Wolf.Command.Review
-        Wolf.Command.Summary
+        Wolf.Data.Types.Gen
     build-depends:
         base >=4.9 && <=5,
+        QuickCheck >=2.9 && <2.10,
         aeson >=1.0 && <1.1,
-        aeson-pretty >=0.8 && <0.9,
         ansi-terminal >=0.6 && <0.7,
         bytestring >=0.10 && <0.11,
         configurator >=0.3 && <0.4,
         containers >=0.5 && <0.6,
+        genvalidity -any,
+        genvalidity-containers -any,
+        genvalidity-hspec -any,
+        genvalidity-hspec-aeson -any,
+        genvalidity-text -any,
+        genvalidity-time -any,
+        hspec >=2.4 && <2.5,
         mtl >=2.2 && <2.3,
-        optparse-applicative >=0.13 && <0.14,
         path >=0.5 && <0.6,
         path-io >=1.2 && <1.3,
-        process >=1.4 && <1.5,
+        servant-server >=0.9 && <0.10,
         text >=1.2 && <1.3,
         time >=1.6 && <1.7,
         unordered-containers >=0.2 && <0.3,
         uuid >=1.3 && <1.4,
+        uuid-types >=1.0 && <1.1,
         validity >=0.3 && <0.4,
         validity-containers >=0.1 && <0.2,
         validity-text >=0.1 && <0.2,
@@ -52,16 +49,7 @@ library
         Import
     ghc-options: -Wall
 
-executable wolf
-    main-is: Main.hs
-    build-depends:
-        base >=4.9 && <=5,
-        wolf-cli -any
-    default-language: Haskell2010
-    hs-source-dirs: app/
-    ghc-options: -threaded -rtsopts -with-rtsopts=-N
-
-test-suite wolf-test
+test-suite wolf-data-test
     type: exitcode-stdio-1.0
     main-is: Spec.hs
     build-depends:
@@ -81,7 +69,6 @@ test-suite wolf-test
         path-io -any,
         text -any,
         uuid-types -any,
-        wolf-cli -any,
         wolf-data -any,
         wolf-test-utils -any
     default-language: Haskell2010
@@ -89,13 +76,5 @@ test-suite wolf-test
     hs-source-dirs: test/
     other-modules:
         TestImport
-        TestUtils
-        Wolf.EntrySpec
-        Wolf.GitSpec
-        Wolf.InitSpec
-        Wolf.NoteSpec
-        Wolf.ReviewSpec
-        Wolf.SummarySpec
-        Wolf.Types.Gen
         Wolf.TypesSpec
     ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall

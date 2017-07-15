@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Wolf.Time
+module Wolf.Data.Time
     ( formatMomentNicely
     , timeAgoStr
     ) where

@@ -7,7 +7,7 @@ import Servant.API
 import Servant.Client
 
 import Wolf.API
-import Wolf.Types
+import Wolf.Data.Types
 
 clientPostNewPerson :: PersonEntry -> ClientM PersonUuid
 clientGetPersonEntry :: PersonUuid -> ClientM PersonEntry

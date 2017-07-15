@@ -6,7 +6,7 @@ import Import
 
 import Wolf.Cli.OptParse.Types
 import Wolf.Cli.Utils
-import Wolf.Index
+import Wolf.Data.Index
 
 alias :: (MonadIO m, MonadReader Settings m) => String -> String -> m ()
 alias new old = do

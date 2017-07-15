@@ -1,12 +1,12 @@
 {-# LANGUAGE FlexibleContexts #-}
 
-module Wolf.Entry where
+module Wolf.Data.Entry where
 
 import Import
 
 import Data.Time
 
-import Wolf.Types
+import Wolf.Data.Types
 
 parseFirstnameLastname :: String -> Maybe (String, String)
 parseFirstnameLastname s =

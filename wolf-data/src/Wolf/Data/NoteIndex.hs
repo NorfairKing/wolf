@@ -1,12 +1,12 @@
 {-# LANGUAGE FlexibleContexts #-}
 
-module Wolf.NoteIndex where
+module Wolf.Data.NoteIndex where
 
 import Import
 
-import Wolf.JSONUtils
-import Wolf.Path
-import Wolf.Types
+import Wolf.Data.JSONUtils
+import Wolf.Data.Path
+import Wolf.Data.Types
 
 getNoteIndex ::
        (MonadIO m, MonadReader DataSettings m) => PersonUuid -> m NoteIndex

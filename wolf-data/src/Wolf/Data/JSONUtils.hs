@@ -1,4 +1,4 @@
-module Wolf.JSONUtils where
+module Wolf.Data.JSONUtils where
 
 import Import
 

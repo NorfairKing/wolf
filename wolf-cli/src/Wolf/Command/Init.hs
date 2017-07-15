@@ -6,11 +6,11 @@ import Import
 
 import Wolf.Cli.OptParse.Types
 import Wolf.Cli.Utils
-import Wolf.Git
-import Wolf.Init
-import Wolf.JSONUtils
-import Wolf.Path
-import Wolf.Types
+import Wolf.Data.Git
+import Wolf.Data.Init
+import Wolf.Data.JSONUtils
+import Wolf.Data.Path
+import Wolf.Data.Types
 
 init :: (MonadIO m, MonadReader Settings m) => m ()
 init = do

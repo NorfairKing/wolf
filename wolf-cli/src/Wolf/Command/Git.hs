@@ -6,8 +6,8 @@ import Import
 
 import Wolf.Cli.OptParse.Types
 import Wolf.Cli.Utils
-import Wolf.Git
-import Wolf.Init
+import Wolf.Data.Git
+import Wolf.Data.Init
 
 git :: (MonadReader Settings m, MonadIO m) => [String] -> m ()
 git = runData . withInitCheck . runGit

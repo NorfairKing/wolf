@@ -1,13 +1,13 @@
 {-# LANGUAGE FlexibleContexts #-}
 
-module Wolf.Git where
+module Wolf.Data.Git where
 
 import Import
 
 import System.Process
 
-import Wolf.Path
-import Wolf.Types
+import Wolf.Data.Path
+import Wolf.Data.Types
 
 gitInit :: (MonadReader DataSettings m, MonadIO m) => m ()
 gitInit = runGit ["init"]

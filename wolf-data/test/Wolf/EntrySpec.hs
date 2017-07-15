@@ -4,10 +4,10 @@ module Wolf.EntrySpec
 
 import TestImport
 
-import Wolf.Entry
-import Wolf.Types
+import Wolf.Data.Entry
+import Wolf.Data.Types
 
-import Wolf.Types.Gen ()
+import Wolf.Data.Types.Gen ()
 
 spec :: Spec
 spec =

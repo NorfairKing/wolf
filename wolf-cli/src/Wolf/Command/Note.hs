@@ -9,14 +9,14 @@ import Data.Time
 
 import Wolf.Cli.OptParse.Types
 import Wolf.Cli.Utils
-import Wolf.Editor
-import Wolf.Git
-import Wolf.Index
-import Wolf.Init
-import Wolf.JSONUtils
-import Wolf.NoteIndex
-import Wolf.Path
-import Wolf.Types
+import Wolf.Data.Editor
+import Wolf.Data.Git
+import Wolf.Data.Index
+import Wolf.Data.Init
+import Wolf.Data.JSONUtils
+import Wolf.Data.NoteIndex
+import Wolf.Data.Path
+import Wolf.Data.Types
 
 note :: (MonadIO m, MonadReader Settings m) => String -> m ()
 note person =

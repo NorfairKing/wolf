@@ -11,12 +11,12 @@ import System.Console.ANSI as ANSI
 
 import Wolf.Cli.OptParse.Types
 import Wolf.Cli.Utils
-import Wolf.Index
-import Wolf.Init
-import Wolf.NoteIndex
-import Wolf.Report
-import Wolf.Time
-import Wolf.Types
+import Wolf.Data.Index
+import Wolf.Data.Init
+import Wolf.Data.NoteIndex
+import Wolf.Data.Report
+import Wolf.Data.Time
+import Wolf.Data.Types
 
 review :: (MonadIO m, MonadReader Settings m) => m ()
 review =

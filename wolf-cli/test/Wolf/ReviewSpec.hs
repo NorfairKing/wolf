@@ -7,9 +7,9 @@ import TestUtils
 
 import Wolf.Cli.OptParse.Types
 import Wolf.Command.Review
-import Wolf.Types
+import Wolf.Data.Types
 
-import Wolf.Types.Gen ()
+import Wolf.Data.Types.Gen ()
 
 spec :: Spec
 spec =

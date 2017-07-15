@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 
-module Wolf.Types where
+module Wolf.Data.Types where
 
 import Import
 

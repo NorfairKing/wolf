@@ -1,14 +1,14 @@
 {-# LANGUAGE FlexibleContexts #-}
 
-module Wolf.Index where
+module Wolf.Data.Index where
 
 import Import
 
 import qualified Data.Map as M
 
-import Wolf.JSONUtils
-import Wolf.Path
-import Wolf.Types
+import Wolf.Data.JSONUtils
+import Wolf.Data.Path
+import Wolf.Data.Types
 
 getIndex :: (MonadIO m, MonadReader DataSettings m) => m Index
 getIndex = indexFile >>= readJSONWithDefault newIndex

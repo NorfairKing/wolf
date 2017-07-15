@@ -1,4 +1,4 @@
-module Wolf.Editor where
+module Wolf.Data.Editor where
 
 import Import
 
@@ -7,7 +7,7 @@ import qualified Data.ByteString as SB
 import System.Environment
 import System.Process
 
-import Wolf.Types
+import Wolf.Data.Types
 
 startEditorOn :: MonadIO m => Path Abs File -> m EditingResult
 startEditorOn path = do

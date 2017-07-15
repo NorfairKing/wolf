@@ -1,10 +1,10 @@
 {-# LANGUAGE FlexibleContexts #-}
 
-module Wolf.Path where
+module Wolf.Data.Path where
 
 import Import
 
-import Wolf.Types
+import Wolf.Data.Types
 
 wolfDir :: MonadReader DataSettings m => m (Path Abs Dir)
 wolfDir = asks dataSetWolfDir

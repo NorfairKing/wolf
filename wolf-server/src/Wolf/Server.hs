@@ -10,7 +10,7 @@ import Servant.Server
 import Network.Wai as Wai
 import Network.Wai.Handler.Warp as Warp
 
-import Wolf.Types
+import Wolf.Data.Types
 
 import Wolf.API
 

@@ -7,7 +7,7 @@ import Data.Proxy
 
 import Servant.API
 
-import Wolf.Types
+import Wolf.Data.Types
 
 type WolfAPI = PersonAPI
 

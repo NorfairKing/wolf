@@ -1,15 +1,15 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE RecordWildCards #-}
 
-module Wolf.Init where
+module Wolf.Data.Init where
 
 import Import
 
 import Data.Time
 
-import Wolf.JSONUtils
-import Wolf.Path
-import Wolf.Types
+import Wolf.Data.JSONUtils
+import Wolf.Data.Path
+import Wolf.Data.Types
 
 genInitData :: MonadIO m => m InitData
 genInitData = liftIO $ InitData <$> getCurrentTime

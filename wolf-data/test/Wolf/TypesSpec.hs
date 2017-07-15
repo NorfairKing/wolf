@@ -6,9 +6,9 @@ module Wolf.TypesSpec
 
 import TestImport
 
-import Wolf.Types
+import Wolf.Data.Types
 
-import Wolf.Types.Gen ()
+import Wolf.Data.Types.Gen ()
 
 spec :: Spec
 spec = do

@@ -1,8 +1,8 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
-module Wolf.Types.Gen where
+module Wolf.Data.Types.Gen where
 
-import TestImport
+import Import
 
 import Data.UUID.Types
 

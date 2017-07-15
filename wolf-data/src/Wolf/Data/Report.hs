@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Wolf.Report
+module Wolf.Data.Report
     ( Report
     , renderReport
     , stringReport
