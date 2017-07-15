@@ -1,4 +1,5 @@
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeOperators #-}
 
 module Wolf.Server where
@@ -14,6 +15,7 @@ import Servant.Server
 import Network.Wai as Wai
 import Network.Wai.Handler.Warp as Warp
 
+import Wolf.Data.Index
 import Wolf.Data.Types
 
 import Wolf.API
@@ -39,8 +41,24 @@ makeWolfServer cfg = enter (readerToEither cfg) wolfServer
 wolfServer :: ServerT WolfAPI WolfHandler
 wolfServer = servePostNewPerson :<|> serveGetPersonEntry
 
+runData :: ReaderT DataSettings IO a -> WolfHandler a
+runData func = do
+    ds <- asks wseDataSettings
+    liftIO $ runReaderT func ds
+
 servePostNewPerson :: PersonEntry -> WolfHandler PersonUuid
 servePostNewPerson = undefined
 
 serveGetPersonEntry :: PersonUuid -> WolfHandler PersonEntry
-serveGetPersonEntry = undefined
+serveGetPersonEntry personUuid = do
+    mpe <- runData $ getPersonEntry personUuid
+    case mpe of
+        Nothing ->
+            throwError $
+            err404
+            { errBody =
+                  "Person entry for person with uuid " <>
+                  personUuidLBs personUuid <>
+                  " not found."
+            }
+        Just pe -> pure pe

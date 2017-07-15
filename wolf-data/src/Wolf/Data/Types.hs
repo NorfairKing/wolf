@@ -9,6 +9,7 @@ import Import
 import System.IO.Unsafe -- TODO remove this
 
 import Data.Aeson as JSON
+import qualified Data.ByteString.Lazy as LB
 import Data.Map (Map)
 import qualified Data.Map as M
 import qualified Data.Text as T
@@ -45,6 +46,12 @@ newIndex = Index {indexMap = M.empty}
 newtype PersonUuid = PersonUuid
     { unPersonUuid :: UUID
     } deriving (Show, Eq, Ord, Generic)
+
+personUuidBs :: PersonUuid -> ByteString
+personUuidBs (PersonUuid uuid) = UUID.toASCIIBytes uuid
+
+personUuidLBs :: PersonUuid -> LB.ByteString
+personUuidLBs = LB.fromStrict . personUuidBs
 
 instance Validity PersonUuid where
     isValid = const True
