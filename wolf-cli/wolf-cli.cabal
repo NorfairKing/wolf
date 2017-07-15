@@ -61,7 +61,7 @@ executable wolf
     hs-source-dirs: app/
     ghc-options: -threaded -rtsopts -with-rtsopts=-N
 
-test-suite wolf-test
+test-suite wolf-cli-test
     type: exitcode-stdio-1.0
     main-is: Spec.hs
     build-depends:
@@ -96,6 +96,5 @@ test-suite wolf-test
         Wolf.NoteSpec
         Wolf.ReviewSpec
         Wolf.SummarySpec
-        Wolf.Types.Gen
         Wolf.TypesSpec
     ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall

@@ -1,8 +1,12 @@
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeOperators #-}
 
 module Wolf.Server where
 
 import Import
+
+import Control.Monad.Except
+import Control.Monad.Reader
 
 import Servant.API
 import Servant.Server
@@ -14,22 +18,29 @@ import Wolf.Data.Types
 
 import Wolf.API
 
--- import Wolf.Server.Types
 import Wolf.Server.OptParse
+import Wolf.Server.Types
 
 runWolfServer :: IO ()
 runWolfServer = do
     (DispatchServe ServeSettings {..}, Settings {..}) <- getInstructions
-    Warp.run serveSetPort wolfApp
+    let env = WolfServerEnv {wseDataSettings = setDataSettings}
+    Warp.run serveSetPort $ wolfApp env
 
-wolfApp :: Wai.Application
-wolfApp = serve wolfAPI wolfServer
+wolfApp :: WolfServerEnv -> Wai.Application
+wolfApp = serve wolfAPI . makeWolfServer
 
-wolfServer :: Server WolfAPI
+makeWolfServer :: WolfServerEnv -> Server WolfAPI
+makeWolfServer cfg = enter (readerToEither cfg) wolfServer
+  where
+    readerToEither :: WolfServerEnv -> WolfHandler :~> ExceptT ServantErr IO
+    readerToEither env = Nat $ \x -> runReaderT x env
+
+wolfServer :: ServerT WolfAPI WolfHandler
 wolfServer = servePostNewPerson :<|> serveGetPersonEntry
 
-servePostNewPerson :: PersonEntry -> Handler PersonUuid
+servePostNewPerson :: PersonEntry -> WolfHandler PersonUuid
 servePostNewPerson = undefined
 
-serveGetPersonEntry :: PersonUuid -> Handler PersonEntry
+serveGetPersonEntry :: PersonUuid -> WolfHandler PersonEntry
 serveGetPersonEntry = undefined

@@ -77,7 +77,8 @@ test-suite wolf-server-test
         text -any,
         wai -any,
         warp -any,
-        wolf-api -any
+        wolf-api -any,
+        wolf-data -any
     default-language: Haskell2010
     default-extensions: NoImplicitPrelude
     hs-source-dirs: test/

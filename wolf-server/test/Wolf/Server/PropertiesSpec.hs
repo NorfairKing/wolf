@@ -15,11 +15,20 @@ import Servant.Client (BaseUrl(..), Scheme(..))
 import Wolf.API
 import Wolf.Server
 
+import Wolf.Data.Types
+import Wolf.Server.Types
+
 spec :: Spec
 spec =
     describe "wolf server" $
-    it "starts up nicely" $
-    withServantServer wolfAPI (pure wolfServer) $ const $ pure ()
+    it "starts up nicely" $ do
+        let getServer = do
+                td <- resolveDir' "/tmp/wolf-test-sandbox"
+                let env =
+                        WolfServerEnv
+                        {wseDataSettings = DataSettings {dataSetWolfDir = td}}
+                pure $ makeWolfServer env
+        withServantServer wolfAPI getServer $ const $ pure ()
 
 -- | Start a servant application on an open port, run the provided function,
 -- then stop the application.
