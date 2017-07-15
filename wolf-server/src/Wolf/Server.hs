@@ -47,7 +47,10 @@ runData func = do
     liftIO $ runReaderT func ds
 
 servePostNewPerson :: PersonEntry -> WolfHandler PersonUuid
-servePostNewPerson = undefined
+servePostNewPerson personEntry = do
+    personUuid <- liftIO nextRandomPersonUuid
+    runData $ putPersonEntry personUuid personEntry
+    pure personUuid
 
 serveGetPersonEntry :: PersonUuid -> WolfHandler PersonEntry
 serveGetPersonEntry personUuid = do
