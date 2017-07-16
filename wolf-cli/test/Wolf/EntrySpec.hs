@@ -5,8 +5,8 @@ module Wolf.EntrySpec
 import TestImport
 import TestUtils
 
+import Wolf.Cli.Command.Entry
 import Wolf.Cli.OptParse.Types
-import Wolf.Command.Entry
 import Wolf.Data.Entry
 import Wolf.Data.Types
 

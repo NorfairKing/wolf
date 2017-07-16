@@ -16,13 +16,13 @@ library
         Wolf.Cli.Utils
         Wolf.Cli.OptParse
         Wolf.Cli.OptParse.Types
-        Wolf.Command.Alias
-        Wolf.Command.Entry
-        Wolf.Command.Git
-        Wolf.Command.Init
-        Wolf.Command.Note
-        Wolf.Command.Review
-        Wolf.Command.Summary
+        Wolf.Cli.Command.Alias
+        Wolf.Cli.Command.Entry
+        Wolf.Cli.Command.Git
+        Wolf.Cli.Command.Init
+        Wolf.Cli.Command.Note
+        Wolf.Cli.Command.Review
+        Wolf.Cli.Command.Summary
     build-depends:
         base >=4.9 && <=5,
         aeson >=1.0 && <1.1,

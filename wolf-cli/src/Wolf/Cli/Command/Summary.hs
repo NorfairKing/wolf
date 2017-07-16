@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleContexts #-}
 
-module Wolf.Command.Summary where
+module Wolf.Cli.Command.Summary where
 
 import Import
 

@@ -1,6 +1,6 @@
 {-# LANGUAGE FlexibleContexts #-}
 
-module Wolf.Command.Git where
+module Wolf.Cli.Command.Git where
 
 import Import
 

@@ -5,8 +5,8 @@ module Wolf.NoteSpec
 import TestImport
 import TestUtils
 
+import Wolf.Cli.Command.Note
 import Wolf.Cli.OptParse.Types
-import Wolf.Command.Note
 import Wolf.Data.Types
 
 import Wolf.Data.Types.Gen ()
