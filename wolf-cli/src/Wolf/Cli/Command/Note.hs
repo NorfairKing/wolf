@@ -4,6 +4,7 @@ module Wolf.Cli.Command.Note where
 
 import Import
 
+import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import Data.Time
 
@@ -18,7 +19,7 @@ import Wolf.Data.NoteIndex
 import Wolf.Data.Path
 import Wolf.Data.Types
 
-note :: (MonadIO m, MonadReader Settings m) => String -> m ()
+note :: (MonadIO m, MonadReader Settings m) => Text -> m ()
 note person =
     runData $
     withInitCheck $ do
@@ -52,7 +53,7 @@ note person =
                 makeGitCommit $
                     unwords
                         [ "Added note on"
-                        , person
+                        , T.unpack person
                         , "with uuid"
                         , personNoteUuidString noteUuid
                         ]

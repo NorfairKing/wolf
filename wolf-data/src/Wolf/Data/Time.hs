@@ -7,20 +7,22 @@ module Wolf.Data.Time
 
 import Import
 
+import qualified Data.Text as T
+
 import Data.Time
 
-formatMomentNicely :: UTCTime -> UTCTime -> String
+formatMomentNicely :: UTCTime -> UTCTime -> Text
 formatMomentNicely now t =
-    unwords
-        [ formatTime defaultTimeLocale "%A %F %R" t
-        , "(" ++ timeAgoStr now t ++ ")"
+    T.unwords
+        [ T.pack $ formatTime defaultTimeLocale "%A %F %R" t
+        , T.concat ["(", timeAgoStr now t, ")"]
         ]
 
-timeAgoStr :: UTCTime -> UTCTime -> String
+timeAgoStr :: UTCTime -> UTCTime -> Text
 timeAgoStr now t
-    | daysAgo > 0 = unwords [show daysAgo, "days ago"]
-    | hoursAgo > 0 = unwords [show hoursAgo, "hours ago"]
-    | otherwise = unwords [show minutesAgo, "minutes ago"]
+    | daysAgo > 0 = T.pack $ unwords [show daysAgo, "days ago"]
+    | hoursAgo > 0 = T.pack $ unwords [show hoursAgo, "hours ago"]
+    | otherwise = T.pack $ unwords [show minutesAgo, "minutes ago"]
   where
     minutesAgo = round $ dt / 60 :: Int
     hoursAgo = round $ dt / (60 * 60) :: Int

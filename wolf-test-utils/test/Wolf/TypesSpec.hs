@@ -13,7 +13,7 @@ import Wolf.Data.Types.Gen ()
 spec :: Spec
 spec = do
     jsonSpecOnValid @InitData
-    jsonSpec @Index
+    jsonSpecOnValid @Index
     jsonSpec @PersonUuid
     jsonSpecOnValid @PersonEntry
     jsonSpecOnValid @PersonPropertyValue

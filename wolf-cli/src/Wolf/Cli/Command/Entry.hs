@@ -1,8 +1,12 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Wolf.Cli.Command.Entry where
 
 import Import
+
+import qualified Data.Text as T
+import qualified Data.Text.IO as T
 
 import Data.Time
 
@@ -16,7 +20,7 @@ import Wolf.Data.Init
 import Wolf.Data.Path
 import Wolf.Data.Types
 
-entry :: (MonadIO m, MonadReader Settings m) => String -> m ()
+entry :: (MonadIO m, MonadReader Settings m) => Text -> m ()
 entry person =
     runData $
     withInitCheck $ do
@@ -45,7 +49,7 @@ entry person =
         ensureDir $ parent tmpFile
         let tmpFileContents =
                 tmpEntryFileContents person personUuid inFilePersonEntry
-        liftIO $ writeFile (toFilePath tmpFile) tmpFileContents
+        liftIO $ T.writeFile (toFilePath tmpFile) tmpFileContents
         editResult <- startEditorOn tmpFile
         case editResult of
             EditingFailure reason ->
@@ -57,11 +61,12 @@ entry person =
                     , ",not saving."
                     ]
             EditingSuccess -> do
-                contents <- liftIO $ readFile $ toFilePath tmpFile
+                contents <- liftIO $ T.readFile $ toFilePath tmpFile
                 case parseEntryFileContents contents of
                     Left err ->
                         liftIO $
-                        die $ unwords ["Unable to parse entry file:", err]
+                        die $
+                        unwords ["Unable to parse entry file:", T.unpack err]
                     Right personEntryMap -> do
                         now <- liftIO getCurrentTime
                         let personEntry =
@@ -73,4 +78,5 @@ entry person =
                             putPersonEntry personUuid personEntry
                             putIndex index
                             makeGitCommit $
-                                unwords ["Added/changed entry for", person]
+                                unwords
+                                    ["Added/changed entry for", T.unpack person]

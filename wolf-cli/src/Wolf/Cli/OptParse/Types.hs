@@ -10,12 +10,12 @@ type Instructions = (Dispatch, Settings)
 
 data Command
     = CommandInit
-    | CommandNote String
-    | CommandSummary String
-    | CommandEntry String
+    | CommandNote Text
+    | CommandSummary Text
+    | CommandEntry Text
     | CommandGit [String]
-    | CommandAlias String
-                   String
+    | CommandAlias Text
+                   Text
     | CommandReview
     deriving (Show, Eq)
 
@@ -33,12 +33,12 @@ data Configuration =
 
 data Dispatch
     = DispatchInit
-    | DispatchNote String
-    | DispatchSummary String
-    | DispatchEntry String
+    | DispatchNote Text
+    | DispatchSummary Text
+    | DispatchEntry Text
     | DispatchGit [String]
-    | DispatchAlias String
-                    String
+    | DispatchAlias Text
+                    Text
     | DispatchReview
     deriving (Show, Eq)
 

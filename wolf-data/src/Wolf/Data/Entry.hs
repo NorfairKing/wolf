@@ -1,21 +1,23 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Wolf.Data.Entry where
 
 import Import
 
+import qualified Data.Text as T
 import Data.Time
 
 import Wolf.Data.Types
 
-parseFirstnameLastname :: String -> Maybe (String, String)
+parseFirstnameLastname :: Text -> Maybe (Text, Text)
 parseFirstnameLastname s =
-    case words s of
+    case T.words s of
         [fn, ln] -> Just (fn, ln)
         _ -> Nothing
 
 reconstructPersonEntry ::
-       UTCTime -> PersonEntry -> [(String, String)] -> PersonEntry
+       UTCTime -> PersonEntry -> [(Text, Text)] -> PersonEntry
 reconstructPersonEntry now old newMap =
     if map (second personPropertyValueContents) (personEntryProperties old) ==
        newMap
@@ -25,7 +27,7 @@ reconstructPersonEntry now old newMap =
                    map (\(k, v) -> (k, go k v)) $ nubBy ((==) `on` fst) newMap
              }
   where
-    go :: String -> String -> PersonPropertyValue
+    go :: Text -> Text -> PersonPropertyValue
     go key value =
         case lookup key (personEntryProperties old) of
             Nothing -- Key did not exist before, therefore it was created here.
@@ -44,35 +46,40 @@ reconstructPersonEntry now old newMap =
                           else now
                 }
 
-tmpEntryFileContents :: String -> PersonUuid -> PersonEntry -> String
+tmpEntryFileContents :: Text -> PersonUuid -> PersonEntry -> Text
 tmpEntryFileContents person personUuid pe =
-    unlines $
+    T.unlines $
     map (uncurry toLineStr) (personEntryProperties pe) ++
     separator ++
     map (uncurry toLineStr')
-        [("uuid", personUuidString personUuid), ("reference used", person)]
+        [("uuid", personUuidText personUuid), ("reference used", person)]
   where
     separator = ["", "", "", line, str, line]
       where
         str = "| Anything below this bar will be ignored. |"
-        line = replicate (length str) '-'
+        line = T.pack $ replicate (T.length str) '-'
     toLineStr k v = toLineStr' k $ personPropertyValueContents v
-    toLineStr' k v = unwords [k ++ ":", v]
+    toLineStr' k v = T.unwords [k <> ":", v]
 
-parseEntryFileContents :: String -> Either String [(String, String)]
+parseEntryFileContents :: Text -> Either Text [(Text, Text)]
 parseEntryFileContents str =
     mapM
         parseProperty
-        (filter (not . null) . takeWhile (not . isPrefixOf "---") . lines $ str)
+        (filter (not . T.null) . takeWhile (not . T.isPrefixOf "---") . T.lines $
+         str)
   where
-    parseProperty :: String -> Either String (String, String)
+    parseProperty :: Text -> Either Text (Text, Text)
     parseProperty s =
-        case break (== ':') s of
+        case break (== ':') $ T.unpack s of
             (_, []) ->
-                Left $ unwords ["Could not parse a property from", show s]
-            (key, ':':val) -> Right (stripWhitespace key, stripWhitespace val)
+                Left $
+                T.pack $ unwords ["Could not parse a property from", show s]
+            (key, ':':val) ->
+                Right
+                    (T.pack $ stripWhitespace key, T.pack $ stripWhitespace val)
             _ ->
                 Left $
+                T.pack $
                 unwords
                     [ "Something really weird happened while parsing"
                     , show s

@@ -9,6 +9,8 @@ module Wolf.Cli.OptParse
 import Import
 
 import qualified Data.Map as M
+import qualified Data.Text as T
+
 import System.Environment (getArgs)
 
 import Options.Applicative
@@ -113,7 +115,8 @@ parseCommandNote =
     ReaderT $ \env ->
         let parser =
                 CommandNote <$>
-                strArgument
+                argument
+                    (T.pack <$> str)
                     (mconcat
                          [ metavar "PERSON"
                          , help "The person to make a note about."
@@ -127,7 +130,8 @@ parseCommandSummary =
     ReaderT $ \env ->
         let parser =
                 CommandSummary <$>
-                strArgument
+                argument
+                    (T.pack <$> str)
                     (mconcat
                          [ metavar "PERSON"
                          , help "The person to show a summary for."
@@ -141,7 +145,8 @@ parseCommandEntry =
     ReaderT $ \env ->
         let parser =
                 CommandEntry <$>
-                strArgument
+                argument
+                    (T.pack <$> str)
                     (mconcat
                          [ metavar "PERSON"
                          , help "The person to edit the entry for."
@@ -170,8 +175,11 @@ parseCommandAlias =
     ReaderT $ \env ->
         let parser =
                 CommandAlias <$>
-                strArgument (mconcat [metavar "NEW", help "The alias"]) <*>
-                strArgument
+                argument
+                    (T.pack <$> str)
+                    (mconcat [metavar "NEW", help "The alias"]) <*>
+                argument
+                    (T.pack <$> str)
                     (mconcat
                          [ metavar "OLD"
                          , help "What the alias will refer to"
@@ -191,7 +199,7 @@ parseCommandReview =
 peopleMap :: ParserEnv -> [String]
 peopleMap = map (escapeSpaces . fst) . M.toList . indexMap . parserEnvIndex
   where
-    escapeSpaces = concatMap go
+    escapeSpaces = concatMap go . T.unpack
       where
         go ' ' = "\\ "
         go c = [c]

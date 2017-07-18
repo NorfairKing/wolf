@@ -3,6 +3,7 @@ module Wolf.Cli.Editor where
 import Import
 
 import qualified Data.ByteString as SB
+import qualified Data.Text as T
 
 import System.Environment
 import System.Process
@@ -27,6 +28,7 @@ startEditorOn path = do
         ExitFailure code ->
             pure $
             EditingFailure $
+            T.pack $
             unwords
                 [ "Invoking"
                 , editor
@@ -39,6 +41,7 @@ startEditorOn path = do
             pure $
             if contentsBefore == contentsAfter
                 then EditingFailure $
+                     T.pack $
                      unwords
                          [ "Nothing was changed in file"
                          , toFilePath path

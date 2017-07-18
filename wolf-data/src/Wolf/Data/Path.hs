@@ -1,8 +1,11 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Wolf.Data.Path where
 
 import Import
+
+import qualified Data.Text as T
 
 import Wolf.Data.Types
 
@@ -28,7 +31,7 @@ personDir ::
        (MonadReader DataSettings m, MonadIO m) => PersonUuid -> m (Path Abs Dir)
 personDir personUuid = do
     pd <- peopleDir
-    liftIO $ resolveDir pd $ personUuidString personUuid
+    liftIO $ resolveDir pd $ T.unpack $ personUuidText personUuid
 
 personEntryFile ::
        (MonadReader DataSettings m, MonadIO m)
@@ -44,7 +47,8 @@ tmpPersonEntryFile ::
     -> m (Path Abs File)
 tmpPersonEntryFile personUuid = do
     td <- liftIO getTempDir
-    liftIO $ resolveFile td $ personUuidString personUuid ++ "-entry.wolf"
+    liftIO $
+        resolveFile td $ T.unpack (personUuidText personUuid) ++ "-entry.wolf"
 
 noteIndexFile ::
        (MonadReader DataSettings m, MonadIO m)
@@ -67,7 +71,7 @@ personNoteFile ::
     -> m (Path Abs File)
 personNoteFile personUuid personNoteUuid = do
     pnd <- personNotesDir personUuid
-    liftIO $ resolveFile pnd $ personNoteUuidString personNoteUuid
+    liftIO $ resolveFile pnd $ T.unpack $ personNoteUuidText personNoteUuid
 
 tmpPersonNoteFile ::
        (MonadReader DataSettings m, MonadIO m)
@@ -78,6 +82,7 @@ tmpPersonNoteFile personUuid personNoteUuid = do
     tmpDir <- liftIO getTempDir
     liftIO $
         resolveFile tmpDir $
-        intercalate
+        T.unpack $
+        T.intercalate
             "-"
-            [personUuidString personUuid, personNoteUuidString personNoteUuid]
+            [personUuidText personUuid, personNoteUuidText personNoteUuid]

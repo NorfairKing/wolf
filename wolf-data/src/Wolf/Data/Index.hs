@@ -18,16 +18,16 @@ putIndex index = do
     i <- indexFile
     writeJSON i index
 
-lookupInIndex :: String -> Index -> Maybe PersonUuid
+lookupInIndex :: Text -> Index -> Maybe PersonUuid
 lookupInIndex person index = M.lookup person (indexMap index)
 
-addIndexEntry :: String -> PersonUuid -> Index -> Index
+addIndexEntry :: Text -> PersonUuid -> Index -> Index
 addIndexEntry person uuid origIndex =
     origIndex {indexMap = M.insert person uuid $ indexMap origIndex}
 
 lookupOrCreateNewPerson ::
        (MonadIO m, MonadReader DataSettings m)
-    => String
+    => Text
     -> Index
     -> m (PersonUuid, Index)
 lookupOrCreateNewPerson person origIndex =

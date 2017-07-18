@@ -97,5 +97,4 @@ test-suite wolf-cli-test
         Wolf.NoteSpec
         Wolf.ReviewSpec
         Wolf.SummarySpec
-        Wolf.TypesSpec
     ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall

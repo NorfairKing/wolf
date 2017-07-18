@@ -18,7 +18,7 @@ import Data.UUID as UUID
 import Data.UUID.V4 as UUID
 import Servant
 
-{-# ANN module ("HLint: ignore Use &&" :: String) #-}
+{-# ANN module ("HLint: ignore Use &&" :: Text) #-}
 
 newtype InitData = InitData
     { initTimestamp :: UTCTime
@@ -31,7 +31,7 @@ instance FromJSON InitData
 instance ToJSON InitData
 
 newtype Index = Index
-    { indexMap :: Map String PersonUuid
+    { indexMap :: Map Text PersonUuid
     } deriving (Show, Eq, Ord, Generic)
 
 instance Validity Index
@@ -52,6 +52,9 @@ personUuidBs (PersonUuid uuid) = UUID.toASCIIBytes uuid
 
 personUuidLBs :: PersonUuid -> LB.ByteString
 personUuidLBs = LB.fromStrict . personUuidBs
+
+personUuidString :: PersonUuid -> String
+personUuidString (PersonUuid uuid) = UUID.toString uuid
 
 instance Validity PersonUuid where
     isValid = const True
@@ -78,14 +81,14 @@ instance ToHttpApiData PersonUuid where
 nextRandomPersonUuid :: MonadIO m => m PersonUuid
 nextRandomPersonUuid = liftIO $ PersonUuid <$> UUID.nextRandom
 
-personUuidString :: PersonUuid -> String
-personUuidString (PersonUuid uuid) = UUID.toString uuid
+personUuidText :: PersonUuid -> Text
+personUuidText (PersonUuid uuid) = UUID.toText uuid
 
-parsePersonUuid :: String -> Maybe PersonUuid
-parsePersonUuid = fmap PersonUuid . UUID.fromString
+parsePersonUuid :: Text -> Maybe PersonUuid
+parsePersonUuid = fmap PersonUuid . UUID.fromText
 
 newtype PersonEntry = PersonEntry
-    { personEntryProperties :: [(String, PersonPropertyValue)]
+    { personEntryProperties :: [(Text, PersonPropertyValue)]
     } deriving (Show, Eq, Ord, Generic)
 
 instance Validity PersonEntry where
@@ -119,7 +122,7 @@ newPersonEntry :: PersonEntry
 newPersonEntry = PersonEntry {personEntryProperties = []}
 
 data PersonPropertyValue = PersonPropertyValue
-    { personPropertyValueContents :: String
+    { personPropertyValueContents :: Text
     , personPropertyValueLastUpdatedTimestamp :: UTCTime
     } deriving (Show, Eq, Ord, Generic)
 
@@ -175,6 +178,9 @@ instance ToJSON PersonNoteUuid where
 nextRandomPersonNoteUuid :: MonadIO m => m PersonNoteUuid
 nextRandomPersonNoteUuid = liftIO $ PersonNoteUuid <$> UUID.nextRandom
 
+personNoteUuidText :: PersonNoteUuid -> Text
+personNoteUuidText (PersonNoteUuid uuid) = UUID.toText uuid
+
 personNoteUuidString :: PersonNoteUuid -> String
 personNoteUuidString (PersonNoteUuid uuid) = UUID.toString uuid
 
@@ -204,7 +210,7 @@ instance ToJSON PersonNote where
 
 data EditingResult
     = EditingSuccess
-    | EditingFailure String
+    | EditingFailure Text
     deriving (Show, Eq, Generic)
 
 newtype DataSettings = DataSettings

@@ -3,12 +3,17 @@
 
 module Wolf.Client where
 
+import Data.Text
+
 import Servant.API
 import Servant.Client
 
 import Wolf.API
 import Wolf.Data.Types
 
-clientPostNewPerson :: PersonEntry -> ClientM PersonUuid
 clientGetPersonEntry :: PersonUuid -> ClientM PersonEntry
-clientPostNewPerson :<|> clientGetPersonEntry = client wolfAPI
+clientPostNewPerson :: PersonEntry -> ClientM PersonUuid
+clientGetPerson :: Text -> ClientM PersonUuid
+clientGetPersonQuery :: PersonQuery -> ClientM [PersonUuid]
+clientGetPersonEntry :<|> clientPostNewPerson :<|> clientGetPerson :<|> clientGetPersonQuery =
+    client wolfAPI

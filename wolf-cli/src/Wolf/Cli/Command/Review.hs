@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Wolf.Cli.Command.Review where
 
@@ -38,8 +39,9 @@ review =
                     unlinesReport
                         [ colored [SetColor Foreground Dull Blue] $
                           unwords
-                              [ nickName ++ ","
-                              , formatMomentNicely
+                              [ T.unpack nickName ++ ","
+                              , T.unpack $
+                                formatMomentNicely
                                     now
                                     (personNoteTimestamp personNote)
                               ]

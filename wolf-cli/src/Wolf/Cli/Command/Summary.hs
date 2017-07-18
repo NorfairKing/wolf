@@ -18,7 +18,7 @@ import Wolf.Data.Report
 import Wolf.Data.Time
 import Wolf.Data.Types
 
-summary :: (MonadIO m, MonadReader Settings m) => String -> m ()
+summary :: (MonadIO m, MonadReader Settings m) => Text -> m ()
 summary person =
     runData $
     withInitCheck $ do
@@ -39,7 +39,8 @@ summaryReport now mpe pns =
           flip map pns $ \pn ->
               unlinesReport
                   [ colored [SetColor Foreground Dull Blue] $
-                    formatMomentNicely now (personNoteTimestamp pn) ++ ":"
+                    T.unpack $
+                    formatMomentNicely now (personNoteTimestamp pn) <> ":"
                   , fromString $ T.unpack $ personNoteContents pn
                   ]
         , case mpe of
@@ -48,5 +49,8 @@ summaryReport now mpe pns =
                   unlinesReport $
                   flip map (personEntryProperties pe) $ \(prop, val) ->
                       fromString $
-                      unwords [prop ++ ":", personPropertyValueContents val]
+                      unwords
+                          [ T.unpack prop ++ ":"
+                          , T.unpack $ personPropertyValueContents val
+                          ]
         ]
