@@ -1,4 +1,4 @@
-module Wolf.Data.Editor where
+module Wolf.Cli.Editor where
 
 import Import
 

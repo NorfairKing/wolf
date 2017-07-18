@@ -12,7 +12,6 @@ author: Tom Sydney Kerckhove
 
 library
     exposed-modules:
-        Wolf.Data.Editor
         Wolf.Data.Entry
         Wolf.Data.Git
         Wolf.Data.Index

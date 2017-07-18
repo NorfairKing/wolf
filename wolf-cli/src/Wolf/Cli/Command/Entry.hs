@@ -6,9 +6,9 @@ import Import
 
 import Data.Time
 
+import Wolf.Cli.Editor
 import Wolf.Cli.OptParse.Types
 import Wolf.Cli.Utils
-import Wolf.Data.Editor
 import Wolf.Data.Entry
 import Wolf.Data.Git
 import Wolf.Data.Index

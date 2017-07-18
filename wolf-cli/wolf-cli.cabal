@@ -13,9 +13,6 @@ author: Tom Sydney Kerckhove
 library
     exposed-modules:
         Wolf.Cli
-        Wolf.Cli.Utils
-        Wolf.Cli.OptParse
-        Wolf.Cli.OptParse.Types
         Wolf.Cli.Command.Alias
         Wolf.Cli.Command.Entry
         Wolf.Cli.Command.Git
@@ -23,6 +20,10 @@ library
         Wolf.Cli.Command.Note
         Wolf.Cli.Command.Review
         Wolf.Cli.Command.Summary
+        Wolf.Cli.Editor
+        Wolf.Cli.OptParse
+        Wolf.Cli.OptParse.Types
+        Wolf.Cli.Utils
     build-depends:
         base >=4.9 && <=5,
         aeson >=1.0 && <1.1,
