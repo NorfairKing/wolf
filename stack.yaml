@@ -2,6 +2,7 @@ packages:
 - wolf-api
 - wolf-cli
 - wolf-client
+- wolf-cub
 - wolf-data
 - wolf-server
 - wolf-test-utils
