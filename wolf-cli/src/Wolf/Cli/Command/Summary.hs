@@ -22,7 +22,7 @@ summary :: (MonadIO m, MonadReader Settings m) => Text -> m ()
 summary person =
     runData $
     withInitCheck $ do
-        index <- getIndex
+        index <- getIndexWithDefault
         case lookupInIndex person index of
             Nothing ->
                 liftIO $ die $ unwords ["No person found for", show person]

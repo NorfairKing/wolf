@@ -64,7 +64,8 @@ getArguments = do
 getParserEnv :: IO ParserEnv
 getParserEnv = do
     wd <- defaultWolfDir
-    i <- runReaderT getIndex DataSettings {dataSetWolfDir = wd}
+    i <- runReaderT getIndexWithDefault DataSettings {dataSetWolfDir = wd}
+    -- TODO possibly do something with the information that the index does not exist yet.
     pure ParserEnv {parserEnvDefaultWolfDir = wd, parserEnvIndex = i}
 
 runArgumentsParser :: ParserEnv -> [String] -> ParserResult Arguments

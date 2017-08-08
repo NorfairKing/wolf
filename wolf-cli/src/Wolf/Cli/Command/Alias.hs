@@ -10,7 +10,7 @@ import Wolf.Data.Index
 
 alias :: (MonadIO m, MonadReader Settings m) => Text -> Text -> m ()
 alias new old = do
-    origIndex <- runData getIndex
+    origIndex <- runData getIndexWithDefault
     personUuid <-
         case lookupInIndex old origIndex of
             Nothing ->

@@ -31,5 +31,6 @@ import Test.Validity as X
 import Test.Validity.Aeson as X
 
 import Data.GenValidity.Containers as X
-import Data.GenValidity.Text as X
+import Data.GenValidity.Path as X ()
+import Data.GenValidity.Text as X ()
 import Data.GenValidity.Time as X ()

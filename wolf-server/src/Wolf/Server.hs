@@ -74,7 +74,7 @@ servePostNewPerson personEntry = do
 
 serveGetPerson :: Text -> WolfHandler PersonUuid
 serveGetPerson key = do
-    mPersonUuid <- runData $ lookupInIndex key <$> getIndex
+    mPersonUuid <- runData $ lookupInIndex key <$> getIndexWithDefault
     case mPersonUuid of
         Nothing ->
             throwError $

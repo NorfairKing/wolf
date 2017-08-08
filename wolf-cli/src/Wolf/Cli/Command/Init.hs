@@ -16,19 +16,18 @@ init :: (MonadIO m, MonadReader Settings m) => m ()
 init = do
     dir <- runData wolfDir
     iFile <- runData initFile
-    mex <- liftIO $ forgivingAbsence $ doesFileExist iFile
+    mex <- readJSONWithMaybe iFile
     case mex of
-        Just True -> do
-            d <- readJSON iFile
+        Just d ->
             liftIO $
-                die $
-                unwords
-                    [ "A wolf repository has already been initialised in"
-                    , toFilePath dir
-                    , "on"
-                    , show $ initTimestamp d
-                    ]
-        _ -> do
+            die $
+            unwords
+                [ "A wolf repository has already been initialised in"
+                , toFilePath dir
+                , "on"
+                , show $ initTimestamp d
+                ]
+        Nothing -> do
             ensureDir dir
             d <- genInitData
             writeJSON iFile d

@@ -23,7 +23,7 @@ note :: (MonadIO m, MonadReader Settings m) => Text -> m ()
 note person =
     runData $
     withInitCheck $ do
-        origIndex <- getIndex
+        origIndex <- getIndexWithDefault
         (personUuid, index) <- lookupOrCreateNewPerson person origIndex
         origNoteIndex <- getNoteIndex personUuid
         (noteUuid, noteIndex) <- createNewNote personUuid origNoteIndex

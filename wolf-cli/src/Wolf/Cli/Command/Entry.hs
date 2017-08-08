@@ -24,7 +24,7 @@ entry :: (MonadIO m, MonadReader Settings m) => Text -> m ()
 entry person =
     runData $
     withInitCheck $ do
-        origIndex <- getIndex
+        origIndex <- getIndexWithDefault
         (personUuid, index) <- lookupOrCreateNewPerson person origIndex
         tmpFile <- tmpPersonEntryFile personUuid
         mPersonEntry <- getPersonEntry personUuid
