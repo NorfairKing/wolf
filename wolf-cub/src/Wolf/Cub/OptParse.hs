@@ -64,7 +64,7 @@ parseArgs pEnv = (,) <$> parseCommand pEnv <*> parseFlags
 
 parseCommand :: Cli.ParserEnv -> Parser Command
 parseCommand pEnv =
-    hsubparser (mconcat [command "serve" $ parseCommandRun pEnv]) <|>
+    hsubparser (mconcat [command "run" $ parseCommandRun pEnv]) <|>
     parseCommandRunParser pEnv
 
 parseCommandRun :: Cli.ParserEnv -> ParserInfo Command
