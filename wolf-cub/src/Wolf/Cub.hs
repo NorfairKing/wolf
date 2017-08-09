@@ -65,21 +65,42 @@ drawUI CubState {..} =
     popup (personUuid, mpe) =
         centerLayer $
         borderWithLabel (str $ personUuidString personUuid) $
+        padAll 1 $
         case mpe of
             Nothing ->
                 let str_ = "No entry found."
                 in vLimit 3 $ hLimit (length str_ + 2) $ str str_
             Just pe ->
                 let tups = personEntryTuples pe
-                    keys = vBox $ map (txt . (<> ": ") . fst) tups
+                    keys =
+                        vBox $
+                        withAttr headerAttr (txt "Key") :
+                        map (txt . (<> ":") . fst) tups
                     values =
                         vBox $
+                        withAttr headerAttr (txt "Value") :
                         map (txt . personPropertyValueContents . snd) tups
-                in keys <+> values
+                    lastChangeds =
+                        vBox $
+                        withAttr headerAttr (txt "Last Updated") :
+                        map
+                            (str .
+                             show .
+                             personPropertyValueLastUpdatedTimestamp . snd)
+                            tups
+                in keys <+> padLeftRight 1 values <+> lastChangeds
+
+headerAttr :: AttrName
+headerAttr = "header"
 
 theMap :: A.AttrMap
 theMap =
-    A.attrMap V.defAttr [(listAttr, fg V.white), (listSelectedAttr, fg V.blue)]
+    A.attrMap
+        V.defAttr
+        [ (listAttr, fg V.white)
+        , (listSelectedAttr, fg V.blue)
+        , (headerAttr, fg V.brightWhite)
+        ]
 
 appEvent ::
        CubState
