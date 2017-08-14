@@ -21,7 +21,7 @@ type PersonAPI
      = GetPersonEntry :<|> PostNewPerson :<|> GetPerson :<|> GetPersonQuery
 
 type GetPersonEntry
-     = "person" :> Capture "person-uuid" PersonUuid :> Get '[ JSON] PersonEntry
+     = "person" :> "entry" :> Capture "person-uuid" PersonUuid :> Get '[ JSON] PersonEntry
 
 type PostNewPerson
      = "person" :> "new" :> ReqBody '[ JSON] PersonEntry :> Post '[ JSON] PersonUuid
