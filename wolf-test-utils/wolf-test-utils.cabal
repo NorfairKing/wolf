@@ -1,0 +1,81 @@
+name: wolf-test-utils
+version: 0.0.0.0
+cabal-version: >=1.10
+build-type: Simple
+license: AllRightsReserved
+license-file: LICENSE
+copyright: Copyright: (c) 2017 Tom Sydney Kerckhove
+maintainer: syd.kerckhove@gmail.com
+homepage: http://cs-syd.eu
+category: People
+author: Tom Sydney Kerckhove
+
+library
+    exposed-modules:
+        Wolf.Data.Types.Gen
+    build-depends:
+        base >=4.9 && <=5,
+        QuickCheck >=2.9 && <2.10,
+        aeson >=1.0 && <1.1,
+        ansi-terminal >=0.6 && <0.7,
+        bytestring >=0.10 && <0.11,
+        containers >=0.5 && <0.6,
+        genvalidity -any,
+        genvalidity-containers -any,
+        genvalidity-hspec -any,
+        genvalidity-hspec-aeson -any,
+        genvalidity-text -any,
+        genvalidity-time -any,
+        hspec >=2.4 && <2.5,
+        mtl >=2.2 && <2.3,
+        path >=0.5 && <0.6,
+        path-io >=1.2 && <1.3,
+        servant-server >=0.9 && <0.10,
+        text >=1.2 && <1.3,
+        time >=1.6 && <1.7,
+        unordered-containers >=0.2 && <0.3,
+        uuid >=1.3 && <1.4,
+        uuid-types >=1.0 && <1.1,
+        validity >=0.3 && <0.4,
+        validity-containers >=0.1 && <0.2,
+        validity-text >=0.1 && <0.2,
+        validity-time >=0.0 && <0.1,
+        wolf-data >=0.0 && <0.1
+    default-language: Haskell2010
+    default-extensions: NoImplicitPrelude
+    hs-source-dirs: src/
+    other-modules:
+        Import
+    ghc-options: -Wall
+
+test-suite wolf-data-test
+    type: exitcode-stdio-1.0
+    main-is: Spec.hs
+    build-depends:
+        base >=4.9 && <=5,
+        QuickCheck -any,
+        bytestring -any,
+        containers -any,
+        genvalidity -any,
+        genvalidity-containers -any,
+        genvalidity-hspec -any,
+        genvalidity-hspec-aeson -any,
+        genvalidity-text -any,
+        genvalidity-path -any,
+        genvalidity-time -any,
+        hspec -any,
+        mtl -any,
+        path -any,
+        path-io -any,
+        text -any,
+        uuid-types -any,
+        wolf-data -any,
+        wolf-test-utils -any
+    default-language: Haskell2010
+    default-extensions: NoImplicitPrelude
+    hs-source-dirs: test/
+    other-modules:
+        TestImport
+        Wolf.TypesSpec
+        Wolf.Data.IndexSpec
+    ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall

@@ -5,11 +5,11 @@ module Wolf.SummarySpec
 import TestImport
 import TestUtils
 
-import Wolf.Command.Summary
-import Wolf.OptParse.Types
-import Wolf.Types
+import Wolf.Cli.Command.Summary
+import Wolf.Cli.OptParse.Types
+import Wolf.Data.Types
 
-import Wolf.Types.Gen ()
+import Wolf.Data.Types.Gen ()
 
 spec :: Spec
 spec =

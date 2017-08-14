@@ -5,12 +5,12 @@ module Wolf.EntrySpec
 import TestImport
 import TestUtils
 
-import Wolf.Command.Entry
-import Wolf.Entry
-import Wolf.OptParse.Types
-import Wolf.Types
+import Wolf.Cli.Command.Entry
+import Wolf.Cli.OptParse.Types
+import Wolf.Data.Entry
+import Wolf.Data.Types
 
-import Wolf.Types.Gen ()
+import Wolf.Data.Types.Gen ()
 
 spec :: Spec
 spec = do

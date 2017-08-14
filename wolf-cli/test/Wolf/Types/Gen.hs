@@ -6,7 +6,7 @@ import TestImport
 
 import Data.UUID.Types
 
-import Wolf.Types
+import Wolf.Data.Types
 
 instance GenUnchecked UUID where
     genUnchecked =

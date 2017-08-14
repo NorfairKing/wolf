@@ -4,14 +4,14 @@ module Wolf.Cli where
 
 import Import
 
-import Wolf.Command.Alias
-import Wolf.Command.Entry
-import Wolf.Command.Git
-import Wolf.Command.Init
-import Wolf.Command.Note
-import Wolf.Command.Review
-import Wolf.Command.Summary
-import Wolf.OptParse
+import Wolf.Cli.Command.Alias
+import Wolf.Cli.Command.Entry
+import Wolf.Cli.Command.Git
+import Wolf.Cli.Command.Init
+import Wolf.Cli.Command.Note
+import Wolf.Cli.Command.Review
+import Wolf.Cli.Command.Summary
+import Wolf.Cli.OptParse
 
 wolf :: IO ()
 wolf = do

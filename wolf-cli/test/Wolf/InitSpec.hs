@@ -5,8 +5,8 @@ module Wolf.InitSpec
 import TestImport
 
 -- import TestUtils
--- import Wolf.Command.Init
--- import Wolf.OptParse.Types
+-- import Wolf.Cli.Command.Init
+-- import Wolf.Cli.OptParse.Types
 spec :: Spec
 spec = pure ()
     -- describe "init" $ do

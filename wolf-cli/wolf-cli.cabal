@@ -13,16 +13,17 @@ author: Tom Sydney Kerckhove
 library
     exposed-modules:
         Wolf.Cli
+        Wolf.Cli.Command.Alias
+        Wolf.Cli.Command.Entry
+        Wolf.Cli.Command.Git
+        Wolf.Cli.Command.Init
+        Wolf.Cli.Command.Note
+        Wolf.Cli.Command.Review
+        Wolf.Cli.Command.Summary
+        Wolf.Cli.Editor
+        Wolf.Cli.OptParse
+        Wolf.Cli.OptParse.Types
         Wolf.Cli.Utils
-        Wolf.OptParse
-        Wolf.OptParse.Types
-        Wolf.Command.Alias
-        Wolf.Command.Entry
-        Wolf.Command.Git
-        Wolf.Command.Init
-        Wolf.Command.Note
-        Wolf.Command.Review
-        Wolf.Command.Summary
     build-depends:
         base >=4.9 && <=5,
         aeson >=1.0 && <1.1,
@@ -61,28 +62,29 @@ executable wolf
     hs-source-dirs: app/
     ghc-options: -threaded -rtsopts -with-rtsopts=-N
 
-test-suite wolf-test
+test-suite wolf-cli-test
     type: exitcode-stdio-1.0
     main-is: Spec.hs
     build-depends:
         base >=4.9 && <=5,
-        wolf-cli -any,
-        wolf-data -any,
         QuickCheck -any,
         bytestring -any,
         containers -any,
         genvalidity -any,
         genvalidity-containers -any,
-        genvalidity-time -any,
-        genvalidity-text -any,
         genvalidity-hspec -any,
         genvalidity-hspec-aeson -any,
+        genvalidity-text -any,
+        genvalidity-time -any,
         hspec -any,
         mtl -any,
         path -any,
         path-io -any,
         text -any,
-        uuid-types -any
+        uuid-types -any,
+        wolf-cli -any,
+        wolf-data -any,
+        wolf-test-utils -any
     default-language: Haskell2010
     default-extensions: NoImplicitPrelude
     hs-source-dirs: test/
@@ -95,6 +97,4 @@ test-suite wolf-test
         Wolf.NoteSpec
         Wolf.ReviewSpec
         Wolf.SummarySpec
-        Wolf.Types.Gen
-        Wolf.TypesSpec
     ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
