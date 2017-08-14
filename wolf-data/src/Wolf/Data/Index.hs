@@ -1,7 +1,9 @@
 {-# LANGUAGE FlexibleContexts #-}
 
 module Wolf.Data.Index
-    ( lookupInIndex
+    ( indexKeys
+    , indexTuples
+    , lookupInIndex
     , addIndexEntry
     , lookupOrCreateNewPerson
     -- * Impure operations
@@ -21,6 +23,12 @@ import qualified Data.Map as M
 import Wolf.Data.JSONUtils
 import Wolf.Data.Path
 import Wolf.Data.Types
+
+indexKeys :: Index -> [Text]
+indexKeys = M.keys . indexMap
+
+indexTuples :: Index -> [(Text, PersonUuid)]
+indexTuples = M.toList . indexMap
 
 -- | Look up a `PersonUuid` in the 'Index' by its alias
 lookupInIndex :: Text -> Index -> Maybe PersonUuid

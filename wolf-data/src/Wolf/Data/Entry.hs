@@ -10,6 +10,9 @@ import Data.Time
 
 import Wolf.Data.Types
 
+personEntryTuples :: PersonEntry -> [(Text, PersonPropertyValue)]
+personEntryTuples = personEntryProperties
+
 parseFirstnameLastname :: Text -> Maybe (Text, Text)
 parseFirstnameLastname s =
     case T.words s of
