@@ -4,6 +4,8 @@ module Import
 
 import Prelude as X
 
+import Debug.Trace as X
+
 import GHC.Generics as X
 
 import Data.Maybe as X

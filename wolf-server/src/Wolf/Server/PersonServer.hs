@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeOperators #-}
 
 module Wolf.Server.PersonServer
@@ -27,7 +28,8 @@ import Wolf.Server.Utils
 
 personServer :: ServerT WolfAPI WolfHandler
 personServer =
-    serveGetPersonEntry :<|> servePostNewPerson :<|> serveGetPerson :<|>
+    serveGetPersonEntry :<|> servePostNewPerson :<|> serveGetPersonByAlias :<|>
+    servePostPersonSetAlias :<|>
     serveGetPersonQuery
 
 serveGetPersonEntry :: PersonUuid -> WolfHandler PersonEntry
@@ -50,9 +52,9 @@ servePostNewPerson pe = do
     runData $ putPersonEntry personUuid pe
     pure personUuid
 
-serveGetPerson :: Text -> WolfHandler PersonUuid
-serveGetPerson key = do
-    mPersonUuid <- runData $ lookupInIndex key <$> getIndexWithDefault
+serveGetPersonByAlias :: Text -> WolfHandler PersonUuid
+serveGetPersonByAlias key = do
+    mPersonUuid <- runData $ (>>= lookupInIndex key) <$> getIndex
     case mPersonUuid of
         Nothing ->
             throwError $
@@ -63,6 +65,14 @@ serveGetPerson key = do
                   " not found."
             }
         Just personUuid -> pure personUuid
+
+servePostPersonSetAlias :: SetPersonAlias -> WolfHandler ()
+servePostPersonSetAlias SetPersonAlias {..} =
+    runData $ do
+        index <- getIndexWithDefault
+        let index' =
+                addIndexEntry setPersonAliasAlias setPersonAliasPersonUuid index
+        putIndex index'
 
 serveGetPersonQuery :: PersonQuery -> WolfHandler [PersonUuid]
 serveGetPersonQuery = undefined

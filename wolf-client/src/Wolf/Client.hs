@@ -1,7 +1,18 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeOperators #-}
 
-module Wolf.Client where
+module Wolf.Client
+    ( PersonUuid
+    , PersonEntry
+    , Text
+    , clientGetPersonEntry
+    , clientPostNewPerson
+    , clientGetPersonByAlias
+    , SetPersonAlias(..)
+    , clientPostSetPersonAlias
+    , PersonQuery
+    , clientGetPersonQuery
+    ) where
 
 import Data.Text
 
@@ -14,7 +25,8 @@ import Wolf.Data.Types
 
 clientGetPersonEntry :: PersonUuid -> ClientM PersonEntry
 clientPostNewPerson :: PersonEntry -> ClientM PersonUuid
-clientGetPerson :: Text -> ClientM PersonUuid
+clientGetPersonByAlias :: Text -> ClientM PersonUuid
+clientPostSetPersonAlias :: SetPersonAlias -> ClientM ()
 clientGetPersonQuery :: PersonQuery -> ClientM [PersonUuid]
-clientGetPersonEntry :<|> clientPostNewPerson :<|> clientGetPerson :<|> clientGetPersonQuery =
+clientGetPersonEntry :<|> clientPostNewPerson :<|> clientGetPersonByAlias :<|> clientPostSetPersonAlias :<|> clientGetPersonQuery =
     client wolfAPI

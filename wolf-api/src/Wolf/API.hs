@@ -19,7 +19,7 @@ wolfAPI :: Proxy WolfAPI
 wolfAPI = Proxy
 
 type PersonAPI
-     = GetPersonEntry :<|> PostNewPerson :<|> GetPerson :<|> GetPersonQuery
+     = GetPersonEntry :<|> PostNewPerson :<|> GetPersonByAlias :<|> PostPersonSetAlias :<|> GetPersonQuery
 
 type GetPersonEntry
      = "person" :> "entry" :> Capture "person-uuid" PersonUuid :> Get '[ JSON] PersonEntry
@@ -27,8 +27,22 @@ type GetPersonEntry
 type PostNewPerson
      = "person" :> "new" :> ReqBody '[ JSON] PersonEntry :> Post '[ JSON] PersonUuid
 
-type GetPerson
-     = "person" :> "by-key" :> Capture "person-key" Text :> Get '[ JSON] PersonUuid
+type GetPersonByAlias
+     = "person" :> "by-alias" :> ReqBody '[ JSON] Text :> Get '[ JSON] PersonUuid
+
+type PostPersonSetAlias
+     = "person" :> "alias" :> ReqBody '[ JSON] SetPersonAlias :> Post '[ JSON] ()
+
+data SetPersonAlias = SetPersonAlias
+    { setPersonAliasPersonUuid :: PersonUuid
+    , setPersonAliasAlias :: Text
+    } deriving (Show, Eq, Generic)
+
+instance Validity SetPersonAlias
+
+instance FromJSON SetPersonAlias
+
+instance ToJSON SetPersonAlias
 
 type GetPersonQuery
      = "person" :> "by-entry-query" :> ReqBody '[ JSON] PersonQuery :> Get '[ JSON] [PersonUuid]
