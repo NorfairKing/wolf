@@ -15,4 +15,4 @@ withDataSetsGen = beforeAll mkGen . afterAll_ cleanup
             pure DataSettings {dataSetWolfDir = sbd </> rd}
     cleanup = do
         sbd <- resolveTestSandbox
-        removeDirRecur sbd
+        ignoringAbsence $ removeDirRecur sbd
