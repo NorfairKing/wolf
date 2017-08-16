@@ -19,7 +19,7 @@ import Network.Wai.Handler.Warp (withApplication)
 
 import Wolf.API
 import Wolf.Data.Types
-import Wolf.Server
+import Wolf.Server.Serve
 import Wolf.Server.Types
 
 withWolfServer :: SpecWith ClientEnv -> Spec
@@ -41,7 +41,7 @@ withWolfServer specFunc = do
                 in func cenv
     let cleanup = do
             wd <- getDataDir -- FIXME could go wrong if the server makes any symbolic links
-            removeDirRecur wd
+            ignoringAbsence $ removeDirRecur wd
     afterAll_ cleanup $ beforeAll setupDSAndMan $ aroundWith withApp specFunc
 
 -- | Start a servant application on an open port, run the provided function,
