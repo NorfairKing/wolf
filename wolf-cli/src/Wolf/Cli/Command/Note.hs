@@ -1,10 +1,10 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Wolf.Cli.Command.Note where
 
 import Import
 
-import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import Data.Time
 
@@ -14,20 +14,18 @@ import Wolf.Cli.Utils
 import Wolf.Data.Git
 import Wolf.Data.Index
 import Wolf.Data.Init
-import Wolf.Data.JSONUtils
+import Wolf.Data.Note
 import Wolf.Data.NoteIndex
-import Wolf.Data.Path
 import Wolf.Data.Types
 
-note :: (MonadIO m, MonadReader Settings m) => Text -> m ()
-note person =
+note :: (MonadIO m, MonadReader Settings m) => [Text] -> m ()
+note people =
     runData $
     withInitCheck $ do
         origIndex <- getIndexWithDefault
-        (personUuid, index) <- lookupOrCreateNewPerson person origIndex
-        origNoteIndex <- getNoteIndex personUuid
-        (noteUuid, noteIndex) <- createNewNote personUuid origNoteIndex
-        tnf <- tmpPersonNoteFile personUuid noteUuid
+        tnf <- tmpNoteFile
+        (peopleUuids, index) <-
+            getRelevantPeopleUuidsAndNewIndex people origIndex
         editingResult <- startEditorOn tnf
         case editingResult of
             EditingFailure reason ->
@@ -41,19 +39,34 @@ note person =
             EditingSuccess -> do
                 now <- liftIO getCurrentTime
                 contents <- liftIO $ T.readFile $ toFilePath tnf
-                let personNote =
-                        PersonNote
-                        { personNoteContents = contents
-                        , personNoteTimestamp = now
+                let n =
+                        Note
+                        { noteContents = contents
+                        , noteTimestamp = now
+                        , noteRelevantPeople = peopleUuids
                         }
-                nf <- personNoteFile personUuid noteUuid
-                writeJSON nf personNote
                 putIndex index
-                putNoteIndex personUuid noteIndex
+                noteUuid <- createNewNote n
                 makeGitCommit $
                     unwords
                         [ "Added note on"
-                        , T.unpack person
+                        , show people
                         , "with uuid"
-                        , personNoteUuidString noteUuid
+                        , noteUuidString noteUuid
                         ]
+
+getRelevantPeopleUuidsAndNewIndex ::
+       (MonadIO m, MonadReader DataSettings m)
+    => [Text]
+    -> Index
+    -> m ([PersonUuid], Index)
+getRelevantPeopleUuidsAndNewIndex [] origIndex = pure ([], origIndex)
+getRelevantPeopleUuidsAndNewIndex (t:ts) origIndex = do
+    (personUuid, index) <- lookupOrCreateNewPerson t origIndex
+    (puuids, index') <- getRelevantPeopleUuidsAndNewIndex ts index
+    pure (personUuid : puuids, index')
+
+tmpNoteFile :: MonadIO m => m (Path Abs File)
+tmpNoteFile = do
+    tmpDir <- liftIO getTempDir
+    liftIO $ resolveFile tmpDir "note.txt"

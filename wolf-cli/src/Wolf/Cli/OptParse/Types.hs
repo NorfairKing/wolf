@@ -10,7 +10,8 @@ type Instructions = (Dispatch, Settings)
 
 data Command
     = CommandInit
-    | CommandNote Text
+    | CommandNote (Maybe Text)
+                  [Text]
     | CommandSummary Text
     | CommandEntry Text
     | CommandGit [String]
@@ -33,7 +34,7 @@ data Configuration =
 
 data Dispatch
     = DispatchInit
-    | DispatchNote Text
+    | DispatchNote [Text]
     | DispatchSummary Text
     | DispatchEntry Text
     | DispatchGit [String]

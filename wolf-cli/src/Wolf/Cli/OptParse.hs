@@ -31,7 +31,12 @@ combineToInstructions cmd Flags {..} Configuration = do
     disp <-
         case cmd of
             CommandInit -> pure DispatchInit
-            CommandNote person -> pure $ DispatchNote person
+            CommandNote mp people ->
+                pure $
+                DispatchNote $
+                case mp of
+                    Just p -> p : people
+                    Nothing -> people
             CommandSummary person -> pure $ DispatchSummary person
             CommandEntry person -> pure $ DispatchEntry person
             CommandGit args -> pure $ DispatchGit args
@@ -117,12 +122,24 @@ parseCommandNote =
         let parser =
                 CommandNote <$>
                 argument
-                    (T.pack <$> str)
+                    ((Just . T.pack) <$> str)
                     (mconcat
                          [ metavar "PERSON"
-                         , help "The person to make a note about."
-                         , completer $ listCompleter $ peopleMap env
-                         ])
+                         , value Nothing
+                         , help "The first person to make a note about."
+                         , completeWith $ peopleMap env
+                         ]) <*>
+                many
+                    (option
+                         (T.pack <$> str)
+                         (mconcat
+                              [ short 'p'
+                              , long "person"
+                              , metavar "PERSON"
+                              , help
+                                    "The rest of the people to make a note about."
+                              , completeWith $ peopleMap env
+                              ]))
             modifier = fullDesc <> progDesc "Make a note."
         in info parser modifier
 

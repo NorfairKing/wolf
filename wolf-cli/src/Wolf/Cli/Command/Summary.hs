@@ -15,9 +15,9 @@ import Wolf.Cli.Utils
 import Wolf.Data.Entry.Types
 import Wolf.Data.Index
 import Wolf.Data.Init
+import Wolf.Data.Note.Types
 import Wolf.Data.NoteIndex
 import Wolf.Data.Time
-import Wolf.Data.Types
 
 summary :: (MonadIO m, MonadReader Settings m) => Text -> m ()
 summary person =
@@ -33,16 +33,15 @@ summary person =
                 pns <- getPersonNotes personUuid
                 liftIO $ putStr $ renderReport $ summaryReport now mpe pns
 
-summaryReport :: UTCTime -> Maybe PersonEntry -> [PersonNote] -> Report
+summaryReport :: UTCTime -> Maybe PersonEntry -> [Note] -> Report
 summaryReport now mpe pns =
     mconcat
         [ mconcat $
           flip map pns $ \pn ->
               unlinesReport
                   [ colored [SetColor Foreground Dull Blue] $
-                    T.unpack $
-                    formatMomentNicely now (personNoteTimestamp pn) <> ":"
-                  , fromString $ T.unpack $ personNoteContents pn
+                    T.unpack $ formatMomentNicely now (noteTimestamp pn) <> ":"
+                  , fromString $ T.unpack $ noteContents pn
                   ]
         , case mpe of
               Nothing -> "No person entry."

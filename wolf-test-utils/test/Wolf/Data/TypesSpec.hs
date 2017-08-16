@@ -16,5 +16,4 @@ spec = do
     jsonSpecOnValid @Index
     jsonSpec @PersonUuid
     jsonSpec @NoteIndex
-    jsonSpec @PersonNoteUuid
-    jsonSpecOnValid @PersonNote
+    jsonSpec @NoteUuid

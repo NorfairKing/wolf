@@ -15,6 +15,7 @@ import Wolf.Cli.Report
 import Wolf.Cli.Utils
 import Wolf.Data.Index
 import Wolf.Data.Init
+import Wolf.Data.Note.Types
 import Wolf.Data.NoteIndex
 import Wolf.Data.Time
 import Wolf.Data.Types
@@ -31,7 +32,7 @@ review =
             forM tups $ \(nn, personUuid) -> do
                 notes <- getPersonNotes personUuid
                 pure $ map ((,) nn) notes
-        let entries = sortOn (personNoteTimestamp . snd) noteTups
+        let entries = sortOn (noteTimestamp . snd) noteTups
         now <- liftIO getCurrentTime
         let report =
                 mconcat $
@@ -43,9 +44,8 @@ review =
                               , T.unpack $
                                 formatMomentNicely
                                     now
-                                    (personNoteTimestamp personNote)
+                                    (noteTimestamp personNote)
                               ]
-                        , stringReport $
-                          T.unpack $ personNoteContents personNote
+                        , stringReport $ T.unpack $ noteContents personNote
                         ]
         liftIO $ putStr $ renderReport report

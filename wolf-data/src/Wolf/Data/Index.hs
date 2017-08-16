@@ -40,9 +40,10 @@ addIndexEntry :: Text -> PersonUuid -> Index -> Index
 addIndexEntry person uuid origIndex =
     origIndex {indexMap = M.insert person uuid $ indexMap origIndex}
 
--- | Look up a `PersonUuid` in the 'Index' by its alias, but create a new
--- 'PersonUuid' and put it in the 'Index' at the given alias if it does not
--- exist yet.
+-- | Look up a `PersonUuid` in the 'Index' by its alias
+-- if the index does not exist, try looking up the text as a uuid.
+-- If neither exist, then create a new 'PersonUuid' and put it in the
+-- 'Index' at the given alias if it does not exist yet.
 lookupOrCreateNewPerson ::
        (MonadIO m, MonadReader DataSettings m)
     => Text
@@ -50,10 +51,14 @@ lookupOrCreateNewPerson ::
     -> m (PersonUuid, Index)
 lookupOrCreateNewPerson person origIndex =
     case lookupInIndex person origIndex of
-        Nothing -> do
-            uuid <- nextRandomPersonUuid
-            pure (uuid, addIndexEntry person uuid origIndex)
         Just i -> pure (i, origIndex)
+        Nothing ->
+            case find ((== person) . personUuidText) $
+                 M.elems (indexMap origIndex) of
+                Just puuid -> pure (puuid, origIndex)
+                Nothing -> do
+                    uuid <- nextRandomPersonUuid
+                    pure (uuid, addIndexEntry person uuid origIndex)
 
 -- | Get the index if it is there
 getIndex :: (MonadIO m, MonadReader DataSettings m) => m (Maybe Index)
