@@ -15,8 +15,10 @@ library
         Wolf.Server
         Wolf.Server.OptParse
         Wolf.Server.OptParse.Types
+        Wolf.Server.PersonServer
         Wolf.Server.Serve
         Wolf.Server.Types
+        Wolf.Server.Utils
     build-depends:
         base >=4.9 && <=5,
         bytestring >=0.10 && <0.11,
