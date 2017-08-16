@@ -9,6 +9,7 @@ import Data.String
 
 import Brick.Widgets.List (List)
 
+import Wolf.Data.Entry.Types
 import Wolf.Data.Types
 
 data CubState = CubState

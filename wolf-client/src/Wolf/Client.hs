@@ -9,6 +9,7 @@ import Servant.API
 import Servant.Client
 
 import Wolf.API
+import Wolf.Data.Entry.Types
 import Wolf.Data.Types
 
 clientGetPersonEntry :: PersonUuid -> ClientM PersonEntry

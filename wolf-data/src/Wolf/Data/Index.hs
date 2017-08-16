@@ -20,6 +20,7 @@ import Import
 
 import qualified Data.Map as M
 
+import Wolf.Data.Entry.Types
 import Wolf.Data.JSONUtils
 import Wolf.Data.Path
 import Wolf.Data.Types

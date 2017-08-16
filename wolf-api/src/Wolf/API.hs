@@ -10,6 +10,7 @@ import Data.Aeson
 
 import Servant.API
 
+import Wolf.Data.Entry.Types
 import Wolf.Data.Types
 
 type WolfAPI = PersonAPI

@@ -10,6 +10,7 @@ import TestImport
 
 import Wolf.Client
 
+import Wolf.Data.Entry.Types.Gen ()
 import Wolf.Data.Types.Gen ()
 
 import Wolf.Server.TestUtils

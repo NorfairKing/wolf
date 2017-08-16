@@ -5,7 +5,7 @@ module Wolf.Data.Entry where
 
 import Import
 
-import Wolf.Data.Types
+import Wolf.Data.Entry.Types
 
 -- | Get the individual entry list out of a person entry.
 personEntryTuples :: PersonEntry -> [(Text, PersonPropertyValue)]

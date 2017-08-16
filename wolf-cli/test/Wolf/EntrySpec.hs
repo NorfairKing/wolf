@@ -7,8 +7,10 @@ import TestUtils
 
 import Wolf.Cli.Command.Entry
 import Wolf.Cli.OptParse.Types
+import Wolf.Data.Entry.Types
 import Wolf.Data.Types
 
+import Wolf.Data.Entry.Types.Gen ()
 import Wolf.Data.Types.Gen ()
 
 spec :: Spec

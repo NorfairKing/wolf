@@ -12,6 +12,7 @@ import System.Console.ANSI as ANSI
 import Wolf.Cli.OptParse.Types
 import Wolf.Cli.Report
 import Wolf.Cli.Utils
+import Wolf.Data.Entry.Types
 import Wolf.Data.Index
 import Wolf.Data.Init
 import Wolf.Data.NoteIndex

@@ -19,6 +19,7 @@ import Servant.Server
 import Network.Wai as Wai
 import Network.Wai.Handler.Warp as Warp
 
+import Wolf.Data.Entry.Types
 import Wolf.Data.Index
 import Wolf.Data.Types
 

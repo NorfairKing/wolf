@@ -13,6 +13,7 @@ author: Tom Sydney Kerckhove
 library
     exposed-modules:
         Wolf.Data.Entry
+        Wolf.Data.Entry.Types
         Wolf.Data.Git
         Wolf.Data.Index
         Wolf.Data.Init

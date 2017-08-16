@@ -1,6 +1,6 @@
 {-# LANGUAGE TypeApplications #-}
 
-module Wolf.TypesSpec
+module Wolf.Data.TypesSpec
     ( spec
     ) where
 
@@ -15,8 +15,6 @@ spec = do
     jsonSpecOnValid @InitData
     jsonSpecOnValid @Index
     jsonSpec @PersonUuid
-    jsonSpecOnValid @PersonEntry
-    jsonSpecOnValid @PersonPropertyValue
     jsonSpec @NoteIndex
     jsonSpec @PersonNoteUuid
     jsonSpecOnValid @PersonNote
