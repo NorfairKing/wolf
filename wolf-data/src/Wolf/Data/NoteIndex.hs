@@ -5,6 +5,7 @@ module Wolf.Data.NoteIndex where
 import Import
 
 import Wolf.Data.JSONUtils
+import Wolf.Data.Note.Types
 import Wolf.Data.Path
 import Wolf.Data.Types
 

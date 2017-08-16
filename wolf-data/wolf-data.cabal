@@ -19,6 +19,7 @@ library
         Wolf.Data.Init
         Wolf.Data.JSONUtils
         Wolf.Data.NoteIndex
+        Wolf.Data.Note.Types
         Wolf.Data.Path
         Wolf.Data.Time
         Wolf.Data.Types

@@ -1,6 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
 
 module Wolf.Data.Types where
 
@@ -128,30 +127,6 @@ personNoteUuidText (PersonNoteUuid uuid) = UUID.toText uuid
 
 personNoteUuidString :: PersonNoteUuid -> String
 personNoteUuidString (PersonNoteUuid uuid) = UUID.toString uuid
-
-data PersonNote = PersonNote
-    { personNoteContents :: Text
-    , personNoteTimestamp :: UTCTime
-    } deriving (Show, Eq, Ord, Generic)
-
-instance Validity PersonNote
-
-instance FromJSON PersonNote where
-    parseJSON ob =
-        (withObject "PersonNote" $ \o ->
-             PersonNote <$> o .: "personNoteContents" <*>
-             o .: "personNoteTimestamp")
-            ob <|>
-        (withObject "PersonNote" $ \o ->
-             PersonNote <$> o .: "contents" <*> o .: "timestamp")
-            ob
-
-instance ToJSON PersonNote where
-    toJSON PersonNote {..} =
-        object
-            [ "contents" .= personNoteContents
-            , "timestamp" .= personNoteTimestamp
-            ]
 
 data EditingResult
     = EditingSuccess

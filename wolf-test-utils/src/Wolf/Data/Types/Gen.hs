@@ -35,7 +35,3 @@ instance GenValid PersonUuid where
 instance GenUnchecked NoteIndex
 
 instance GenUnchecked PersonNoteUuid
-
-instance GenUnchecked PersonNote
-
-instance GenValid PersonNote

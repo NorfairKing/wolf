@@ -15,9 +15,9 @@ import Wolf.Cli.Utils
 import Wolf.Data.Entry.Types
 import Wolf.Data.Index
 import Wolf.Data.Init
+import Wolf.Data.Note.Types
 import Wolf.Data.NoteIndex
 import Wolf.Data.Time
-import Wolf.Data.Types
 
 summary :: (MonadIO m, MonadReader Settings m) => Text -> m ()
 summary person =

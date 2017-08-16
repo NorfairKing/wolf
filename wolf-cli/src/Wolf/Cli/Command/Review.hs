@@ -15,6 +15,7 @@ import Wolf.Cli.Report
 import Wolf.Cli.Utils
 import Wolf.Data.Index
 import Wolf.Data.Init
+import Wolf.Data.Note.Types
 import Wolf.Data.NoteIndex
 import Wolf.Data.Time
 import Wolf.Data.Types

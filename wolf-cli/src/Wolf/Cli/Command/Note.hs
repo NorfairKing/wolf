@@ -15,6 +15,7 @@ import Wolf.Data.Git
 import Wolf.Data.Index
 import Wolf.Data.Init
 import Wolf.Data.JSONUtils
+import Wolf.Data.Note.Types
 import Wolf.Data.NoteIndex
 import Wolf.Data.Path
 import Wolf.Data.Types
