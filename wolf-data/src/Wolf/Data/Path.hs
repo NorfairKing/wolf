@@ -10,13 +10,11 @@ module Wolf.Data.Path
     , notesDir
     , personDir
     , personEntryFile
-    , tmpPersonEntryFile
     , personNoteIndexFile
     , noteFile
     , personNotesDir
     , personNotesFile
     , personNoteFile
-    , tmpNoteFile
     ) where
 
 import Import
@@ -67,15 +65,6 @@ personEntryFile personUuid = do
     pd <- personDir personUuid
     liftIO $ resolveFile pd "entry.json"
 
-tmpPersonEntryFile ::
-       (MonadReader DataSettings m, MonadIO m)
-    => PersonUuid
-    -> m (Path Abs File)
-tmpPersonEntryFile personUuid = do
-    td <- liftIO getTempDir
-    liftIO $
-        resolveFile td $ T.unpack (personUuidText personUuid) ++ "-entry.wolf"
-
 personNoteIndexFile ::
        (MonadReader DataSettings m, MonadIO m)
     => PersonUuid
@@ -112,15 +101,3 @@ personNoteFile ::
 personNoteFile personUuid noteUuid = do
     pnd <- personNotesDir personUuid
     liftIO $ resolveFile pnd $ T.unpack $ noteUuidText noteUuid
-
-tmpNoteFile ::
-       (MonadReader DataSettings m, MonadIO m)
-    => PersonUuid
-    -> NoteUuid
-    -> m (Path Abs File)
-tmpNoteFile personUuid noteUuid = do
-    tmpDir <- liftIO getTempDir
-    liftIO $
-        resolveFile tmpDir $
-        T.unpack $
-        T.intercalate "-" [personUuidText personUuid, noteUuidText noteUuid]

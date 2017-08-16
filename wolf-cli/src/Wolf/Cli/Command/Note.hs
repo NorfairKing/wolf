@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Wolf.Cli.Command.Note where
 
@@ -16,7 +17,6 @@ import Wolf.Data.Index
 import Wolf.Data.Init
 import Wolf.Data.Note
 import Wolf.Data.NoteIndex
-import Wolf.Data.Path
 import Wolf.Data.Types
 
 note :: (MonadIO m, MonadReader Settings m) => Text -> m ()
@@ -24,10 +24,8 @@ note person =
     runData $
     withInitCheck $ do
         origIndex <- getIndexWithDefault
+        tnf <- tmpNoteFile
         (personUuid, index) <- lookupOrCreateNewPerson person origIndex
-        origNoteIndex <- getNoteIndex personUuid
-        (noteUuid, noteIndex) <- createNewNote personUuid origNoteIndex
-        tnf <- tmpPersonNoteFile personUuid noteUuid
         editingResult <- startEditorOn tnf
         case editingResult of
             EditingFailure reason ->
@@ -41,18 +39,23 @@ note person =
             EditingSuccess -> do
                 now <- liftIO getCurrentTime
                 contents <- liftIO $ T.readFile $ toFilePath tnf
-                let personNote =
-                        PersonNote
-                        { personNoteContents = contents
-                        , personNoteTimestamp = now
+                let n =
+                        Note
+                        { noteContents = contents
+                        , noteTimestamp = now
+                        , noteRelevantPeople = [personUuid]
                         }
-                writePersonNote personUuid noteUuid personNote
                 putIndex index
-                putNoteIndex personUuid noteIndex
+                noteUuid <- createNewNote n
                 makeGitCommit $
                     unwords
                         [ "Added note on"
                         , T.unpack person
                         , "with uuid"
-                        , personNoteUuidString noteUuid
+                        , noteUuidString noteUuid
                         ]
+
+tmpNoteFile :: MonadIO m => m (Path Abs File)
+tmpNoteFile = do
+    tmpDir <- liftIO getTempDir
+    liftIO $ resolveFile tmpDir "note.txt"

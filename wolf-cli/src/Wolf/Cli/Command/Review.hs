@@ -32,7 +32,7 @@ review =
             forM tups $ \(nn, personUuid) -> do
                 notes <- getPersonNotes personUuid
                 pure $ map ((,) nn) notes
-        let entries = sortOn (personNoteTimestamp . snd) noteTups
+        let entries = sortOn (noteTimestamp . snd) noteTups
         now <- liftIO getCurrentTime
         let report =
                 mconcat $
@@ -44,9 +44,8 @@ review =
                               , T.unpack $
                                 formatMomentNicely
                                     now
-                                    (personNoteTimestamp personNote)
+                                    (noteTimestamp personNote)
                               ]
-                        , stringReport $
-                          T.unpack $ personNoteContents personNote
+                        , stringReport $ T.unpack $ noteContents personNote
                         ]
         liftIO $ putStr $ renderReport report

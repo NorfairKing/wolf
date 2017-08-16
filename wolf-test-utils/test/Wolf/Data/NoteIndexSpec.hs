@@ -73,7 +73,7 @@ spec =
                                         (,) personUuid <$>
                                         getPersonNoteIndex personUuid
                                 pure (nid, pnis)
-                        forM_ pnis $ \(personUuid, personNoteIndex) ->
+                        forM_ pnis $ \(_, personNoteIndex) ->
                             personNoteIndex `shouldSatisfy`
                             (`containsNoteUuid` noteUuid)
         describe "createNewNoteUuid" $

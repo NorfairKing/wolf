@@ -9,12 +9,15 @@ module Wolf.Data.NoteIndex
     -- * Manipulate the global note index
     , getNoteIndex
     , putNoteIndex
+    -- ** Convenience functions for all notes
+    , getNoteUuids
+    , getNotes
     -- * Manipulate a person's note index
     , getPersonNoteIndex
     , putPersonNoteIndex
     -- ** Convenience functions for a person's notes
-    , getNoteUuids
-    , getNotes
+    , getPersonNoteUuids
+    , getPersonNotes
     -- * Creating new notes, end-to-end
     , createNewNote
     , createNewNoteUuid
@@ -50,6 +53,16 @@ putNoteIndex noteIndex = do
     i <- noteIndexFile
     writeJSON i noteIndex
 
+-- | Retrieve all note uuids
+getNoteUuids :: (MonadIO m, MonadReader DataSettings m) => m [NoteUuid]
+getNoteUuids = noteIndexList <$> getNoteIndex
+
+-- | Retrieve all notes
+getNotes :: (MonadIO m, MonadReader DataSettings m) => m [Note]
+getNotes = do
+    nuuids <- getNoteUuids
+    catMaybes <$> mapM readNote nuuids
+
 -- | Retrieve a person's note index
 getPersonNoteIndex ::
        (MonadIO m, MonadReader DataSettings m) => PersonUuid -> m NoteIndex
@@ -67,14 +80,15 @@ putPersonNoteIndex personUuid noteIndex = do
     writeJSON i noteIndex
 
 -- | Get all notes' uuid's for a given person
-getNoteUuids ::
+getPersonNoteUuids ::
        (MonadIO m, MonadReader DataSettings m) => PersonUuid -> m [NoteUuid]
-getNoteUuids personUuid = noteIndexList <$> getPersonNoteIndex personUuid
+getPersonNoteUuids personUuid = noteIndexList <$> getPersonNoteIndex personUuid
 
 -- | Retrieve all notes for a given person
-getNotes :: (MonadIO m, MonadReader DataSettings m) => PersonUuid -> m [Note]
-getNotes personUuid = do
-    nuuids <- getNoteUuids personUuid
+getPersonNotes ::
+       (MonadIO m, MonadReader DataSettings m) => PersonUuid -> m [Note]
+getPersonNotes personUuid = do
+    nuuids <- getPersonNoteUuids personUuid
     catMaybes <$> mapM readNote nuuids
 
 createNewNote :: (MonadIO m, MonadReader DataSettings m) => Note -> m NoteUuid

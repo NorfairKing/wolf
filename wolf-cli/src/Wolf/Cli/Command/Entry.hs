@@ -17,7 +17,6 @@ import Wolf.Data.Entry.Types
 import Wolf.Data.Git
 import Wolf.Data.Index
 import Wolf.Data.Init
-import Wolf.Data.Path
 import Wolf.Data.Types
 
 entry :: (MonadIO m, MonadReader Settings m) => Text -> m ()
@@ -162,3 +161,12 @@ stripWhitespace :: String -> String
 stripWhitespace = reverse . dropWhite . reverse . dropWhite
   where
     dropWhite = dropWhile (\c -> c == ' ' || c == '\t')
+
+tmpPersonEntryFile ::
+       (MonadReader DataSettings m, MonadIO m)
+    => PersonUuid
+    -> m (Path Abs File)
+tmpPersonEntryFile personUuid = do
+    td <- liftIO getTempDir
+    liftIO $
+        resolveFile td $ T.unpack (personUuidText personUuid) ++ "-entry.wolf"

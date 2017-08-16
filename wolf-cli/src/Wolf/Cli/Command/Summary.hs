@@ -33,16 +33,15 @@ summary person =
                 pns <- getPersonNotes personUuid
                 liftIO $ putStr $ renderReport $ summaryReport now mpe pns
 
-summaryReport :: UTCTime -> Maybe PersonEntry -> [PersonNote] -> Report
+summaryReport :: UTCTime -> Maybe PersonEntry -> [Note] -> Report
 summaryReport now mpe pns =
     mconcat
         [ mconcat $
           flip map pns $ \pn ->
               unlinesReport
                   [ colored [SetColor Foreground Dull Blue] $
-                    T.unpack $
-                    formatMomentNicely now (personNoteTimestamp pn) <> ":"
-                  , fromString $ T.unpack $ personNoteContents pn
+                    T.unpack $ formatMomentNicely now (noteTimestamp pn) <> ":"
+                  , fromString $ T.unpack $ noteContents pn
                   ]
         , case mpe of
               Nothing -> "No person entry."
