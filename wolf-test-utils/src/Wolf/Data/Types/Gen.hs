@@ -31,12 +31,3 @@ instance GenUnchecked PersonUuid
 
 instance GenValid PersonUuid where
     genValid = PersonUuid <$> genValid
-
-instance GenUnchecked NoteIndex
-
-instance GenValid NoteIndex
-
-instance GenUnchecked NoteUuid
-
-instance GenValid NoteUuid where
-    genValid = NoteUuid <$> genValid

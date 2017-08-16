@@ -2,7 +2,11 @@
 
 module Wolf.Data.NoteIndex
     ( NoteIndex(..)
+    , newNoteIndex
     , NoteUuid
+    , nextRandomNoteUuid
+    , noteUuidText
+    , noteUuidString
     -- * Manipulating indices purely
     , addToNoteIndex
     , containsNoteUuid
@@ -27,6 +31,7 @@ import Import
 
 import Wolf.Data.JSONUtils
 import Wolf.Data.Note
+import Wolf.Data.NoteIndex.Types
 import Wolf.Data.Path
 import Wolf.Data.Types
 

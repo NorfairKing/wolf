@@ -14,6 +14,7 @@ library
     exposed-modules:
         Wolf.Data.Entry.Types.Gen
         Wolf.Data.Note.Types.Gen
+        Wolf.Data.NoteIndex.Types.Gen
         Wolf.Data.TestUtils
         Wolf.Data.Types.Gen
     build-depends:
@@ -84,6 +85,7 @@ test-suite wolf-data-test
         Wolf.Data.EntrySpec
         Wolf.Data.IndexSpec
         Wolf.Data.Note.TypesSpec
+        Wolf.Data.NoteIndex.TypesSpec
         Wolf.Data.NoteIndexSpec
         Wolf.Data.NoteSpec
         Wolf.Data.TypesSpec

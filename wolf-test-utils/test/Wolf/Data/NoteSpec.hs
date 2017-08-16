@@ -9,6 +9,7 @@ import Wolf.Data.Note
 import Wolf.Data.TestUtils
 
 import Wolf.Data.Note.Types.Gen ()
+import Wolf.Data.NoteIndex.Types.Gen ()
 import Wolf.Data.Types.Gen ()
 
 spec :: Spec

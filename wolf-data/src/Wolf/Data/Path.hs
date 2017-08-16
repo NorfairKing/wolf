@@ -21,6 +21,7 @@ import Import
 
 import qualified Data.Text as T
 
+import Wolf.Data.NoteIndex.Types
 import Wolf.Data.Types
 
 wolfDir :: MonadReader DataSettings m => m (Path Abs Dir)
