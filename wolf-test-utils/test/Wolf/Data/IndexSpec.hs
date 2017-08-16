@@ -5,7 +5,8 @@ module Wolf.Data.IndexSpec
 import TestImport
 
 import Wolf.Data.Index
-import Wolf.Data.Types
+
+import Wolf.Data.TestUtils
 import Wolf.Data.Types.Gen ()
 
 spec :: Spec
@@ -29,16 +30,3 @@ spec =
                                 putIndex index
                                 getIndex
                         index' `shouldBe` Just index
-
-withDataSetsGen :: SpecWith (Gen DataSettings) -> Spec
-withDataSetsGen = beforeAll mkGen . afterAll_ cleanup
-  where
-    resolveTestSandbox = resolveDir' "test-sandbox"
-    mkGen = do
-        sbd <- resolveTestSandbox
-        pure $ do
-            rd <- genValid
-            pure DataSettings {dataSetWolfDir = sbd </> rd}
-    cleanup = do
-        sbd <- resolveTestSandbox
-        removeDirRecur sbd
