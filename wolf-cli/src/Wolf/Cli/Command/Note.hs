@@ -5,7 +5,6 @@ module Wolf.Cli.Command.Note where
 
 import Import
 
-import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import Data.Time
 
@@ -19,13 +18,14 @@ import Wolf.Data.Note
 import Wolf.Data.NoteIndex
 import Wolf.Data.Types
 
-note :: (MonadIO m, MonadReader Settings m) => Text -> m ()
-note person =
+note :: (MonadIO m, MonadReader Settings m) => [Text] -> m ()
+note people =
     runData $
     withInitCheck $ do
         origIndex <- getIndexWithDefault
         tnf <- tmpNoteFile
-        (personUuid, index) <- lookupOrCreateNewPerson person origIndex
+        (peopleUuids, index) <-
+            getRelevantPeopleUuidsAndNewIndex people origIndex
         editingResult <- startEditorOn tnf
         case editingResult of
             EditingFailure reason ->
@@ -43,17 +43,28 @@ note person =
                         Note
                         { noteContents = contents
                         , noteTimestamp = now
-                        , noteRelevantPeople = [personUuid]
+                        , noteRelevantPeople = peopleUuids
                         }
                 putIndex index
                 noteUuid <- createNewNote n
                 makeGitCommit $
                     unwords
                         [ "Added note on"
-                        , T.unpack person
+                        , show people
                         , "with uuid"
                         , noteUuidString noteUuid
                         ]
+
+getRelevantPeopleUuidsAndNewIndex ::
+       (MonadIO m, MonadReader DataSettings m)
+    => [Text]
+    -> Index
+    -> m ([PersonUuid], Index)
+getRelevantPeopleUuidsAndNewIndex [] origIndex = pure ([], origIndex)
+getRelevantPeopleUuidsAndNewIndex (t:ts) origIndex = do
+    (personUuid, index) <- lookupOrCreateNewPerson t origIndex
+    (puuids, index') <- getRelevantPeopleUuidsAndNewIndex ts index
+    pure (personUuid : puuids, index')
 
 tmpNoteFile :: MonadIO m => m (Path Abs File)
 tmpNoteFile = do

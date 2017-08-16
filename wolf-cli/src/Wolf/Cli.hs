@@ -20,7 +20,7 @@ wolf = do
 
 dispatch :: (MonadIO m, MonadReader Settings m) => Dispatch -> m ()
 dispatch DispatchInit = init
-dispatch (DispatchNote person) = note person
+dispatch (DispatchNote people) = note people
 dispatch (DispatchAlias new old) = alias new old
 dispatch (DispatchSummary person) = summary person
 dispatch (DispatchEntry person) = entry person

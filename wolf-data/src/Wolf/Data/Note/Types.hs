@@ -27,7 +27,7 @@ instance FromJSON Note where
             ob <|>
         (withObject "Note" $ \o ->
              Note <$> o .: "contents" <*> o .: "timestamp" <*>
-             o .: "relevant-people")
+             o .:? "relevant-people" .!= [])
             ob
 
 instance ToJSON Note where
