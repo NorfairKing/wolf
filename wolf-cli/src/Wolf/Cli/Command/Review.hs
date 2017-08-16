@@ -11,11 +11,11 @@ import Data.Time
 import System.Console.ANSI as ANSI
 
 import Wolf.Cli.OptParse.Types
+import Wolf.Cli.Report
 import Wolf.Cli.Utils
 import Wolf.Data.Index
 import Wolf.Data.Init
 import Wolf.Data.NoteIndex
-import Wolf.Data.Report
 import Wolf.Data.Time
 import Wolf.Data.Types
 

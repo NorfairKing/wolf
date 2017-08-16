@@ -23,6 +23,7 @@ library
         Wolf.Cli.Editor
         Wolf.Cli.OptParse
         Wolf.Cli.OptParse.Types
+        Wolf.Cli.Report
         Wolf.Cli.Utils
     build-depends:
         base >=4.9 && <=5,

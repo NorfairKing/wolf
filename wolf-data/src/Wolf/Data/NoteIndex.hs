@@ -8,11 +8,13 @@ import Wolf.Data.JSONUtils
 import Wolf.Data.Path
 import Wolf.Data.Types
 
+-- | Retrieve a person's note index
 getNoteIndex ::
        (MonadIO m, MonadReader DataSettings m) => PersonUuid -> m NoteIndex
 getNoteIndex personUuid =
     noteIndexFile personUuid >>= readJSONWithDefault newNoteIndex
 
+-- | Save a person's note index
 putNoteIndex ::
        (MonadIO m, MonadReader DataSettings m)
     => PersonUuid
@@ -22,10 +24,13 @@ putNoteIndex personUuid noteIndex = do
     i <- noteIndexFile personUuid
     writeJSON i noteIndex
 
+-- | Look up a note in a note index
 lookupInNoteIndex :: PersonNoteUuid -> NoteIndex -> Maybe PersonNoteUuid
 lookupInNoteIndex noteUuid noteIndex =
     find (== noteUuid) $ noteIndexList noteIndex
 
+-- | Create a new note in a note index.
+-- The result is the new uuid and the new index
 createNewNote ::
        (MonadIO m, MonadReader DataSettings m)
     => PersonUuid
@@ -41,6 +46,7 @@ createNewNote person noteIndex = do
                   {noteIndexList = sort $ noteUuid : noteIndexList noteIndex})
         Just _ -> createNewNote person noteIndex -- Just try again
 
+-- | Retrieve a given note, if it exists
 readPersonNote ::
        (MonadIO m, MonadReader DataSettings m)
     => PersonUuid
@@ -48,14 +54,16 @@ readPersonNote ::
     -> m (Maybe PersonNote)
 readPersonNote personUuid personNoteUuid = do
     pnf <- personNoteFile personUuid personNoteUuid
-    readJSONWithDefault Nothing pnf
+    readJSONWithMaybe pnf
 
+-- | Get all notes' uuid's for a given person
 getPersonNoteUuids ::
        (MonadIO m, MonadReader DataSettings m)
     => PersonUuid
     -> m [PersonNoteUuid]
 getPersonNoteUuids personUuid = noteIndexList <$> getNoteIndex personUuid
 
+-- | Retrieve all notes for a given person
 getPersonNotes ::
        (MonadIO m, MonadReader DataSettings m) => PersonUuid -> m [PersonNote]
 getPersonNotes personUuid = do

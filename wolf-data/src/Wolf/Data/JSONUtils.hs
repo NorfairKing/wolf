@@ -35,6 +35,7 @@ readJSONWithDefault def path = fromMaybe def <$> readJSONWithMaybe path
 readJSONWithMaybe :: (MonadIO m, FromJSON a) => Path Abs File -> m (Maybe a)
 readJSONWithMaybe path = liftIO $ forgivingAbsence $ readJSON path
 
+-- | Write a JSON file, create the appropriate directories if necessary
 writeJSON :: (MonadIO m, ToJSON a) => Path Abs File -> a -> m ()
 writeJSON path value =
     liftIO $ do
