@@ -34,7 +34,9 @@ instance GenValid PersonUuid where
 
 instance GenUnchecked NoteIndex
 
-instance GenUnchecked PersonNoteUuid
+instance GenValid NoteIndex
 
-instance GenValid PersonNoteUuid where
-    genValid = PersonNoteUuid <$> genValid
+instance GenUnchecked NoteUuid
+
+instance GenValid NoteUuid where
+    genValid = NoteUuid <$> genValid

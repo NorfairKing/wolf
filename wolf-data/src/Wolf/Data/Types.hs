@@ -85,8 +85,10 @@ parsePersonUuid :: Text -> Maybe PersonUuid
 parsePersonUuid = fmap PersonUuid . UUID.fromText
 
 newtype NoteIndex = NoteIndex
-    { noteIndexList :: [PersonNoteUuid]
+    { noteIndexList :: [NoteUuid] -- TODO make this a set
     } deriving (Show, Eq, Ord, Generic)
+
+instance Validity NoteIndex
 
 instance FromJSON NoteIndex where
     parseJSON ob =
@@ -102,31 +104,31 @@ instance ToJSON NoteIndex where
 newNoteIndex :: NoteIndex
 newNoteIndex = NoteIndex {noteIndexList = []}
 
-newtype PersonNoteUuid = PersonNoteUuid
-    { unPersonNoteUuid :: UUID
+newtype NoteUuid = NoteUuid
+    { unNoteUuid :: UUID
     } deriving (Show, Eq, Ord, Generic)
 
-instance Validity PersonNoteUuid where
+instance Validity NoteUuid where
     isValid = const True
 
-instance FromJSON PersonNoteUuid where
+instance FromJSON NoteUuid where
     parseJSON =
-        withText "PersonNoteUuid" $ \t ->
+        withText "NoteUuid" $ \t ->
             case UUID.fromText t of
                 Nothing -> fail "Invalid Text when parsing UUID"
-                Just u -> pure $ PersonNoteUuid u
+                Just u -> pure $ NoteUuid u
 
-instance ToJSON PersonNoteUuid where
-    toJSON (PersonNoteUuid u) = JSON.String $ UUID.toText u
+instance ToJSON NoteUuid where
+    toJSON (NoteUuid u) = JSON.String $ UUID.toText u
 
-nextRandomPersonNoteUuid :: MonadIO m => m PersonNoteUuid
-nextRandomPersonNoteUuid = liftIO $ PersonNoteUuid <$> UUID.nextRandom
+nextRandomNoteUuid :: MonadIO m => m NoteUuid
+nextRandomNoteUuid = liftIO $ NoteUuid <$> UUID.nextRandom
 
-personNoteUuidText :: PersonNoteUuid -> Text
-personNoteUuidText (PersonNoteUuid uuid) = UUID.toText uuid
+noteUuidText :: NoteUuid -> Text
+noteUuidText (NoteUuid uuid) = UUID.toText uuid
 
-personNoteUuidString :: PersonNoteUuid -> String
-personNoteUuidString (PersonNoteUuid uuid) = UUID.toString uuid
+noteUuidString :: NoteUuid -> String
+noteUuidString (NoteUuid uuid) = UUID.toString uuid
 
 data EditingResult
     = EditingSuccess

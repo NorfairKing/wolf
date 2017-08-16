@@ -9,26 +9,31 @@ import Import
 import Data.Aeson as JSON
 import Data.Time
 
-data PersonNote = PersonNote
-    { personNoteContents :: Text
-    , personNoteTimestamp :: UTCTime
+import Wolf.Data.Types -- TODO refactor PersonUuid so that this is no longer necessary
+
+data Note = Note
+    { noteContents :: Text
+    , noteTimestamp :: UTCTime
+    , noteRelevantPeople :: [PersonUuid] -- TODO make this a set
     } deriving (Show, Eq, Ord, Generic)
 
-instance Validity PersonNote
+instance Validity Note
 
-instance FromJSON PersonNote where
+instance FromJSON Note where
     parseJSON ob =
-        (withObject "PersonNote" $ \o ->
-             PersonNote <$> o .: "personNoteContents" <*>
-             o .: "personNoteTimestamp")
+        (withObject "Note" $ \o ->
+             Note <$> o .: "personNoteContents" <*> o .: "personNoteTimestamp" <*>
+             pure [])
             ob <|>
-        (withObject "PersonNote" $ \o ->
-             PersonNote <$> o .: "contents" <*> o .: "timestamp")
+        (withObject "Note" $ \o ->
+             Note <$> o .: "contents" <*> o .: "timestamp" <*>
+             o .: "relevant-people")
             ob
 
-instance ToJSON PersonNote where
-    toJSON PersonNote {..} =
+instance ToJSON Note where
+    toJSON Note {..} =
         object
-            [ "contents" .= personNoteContents
-            , "timestamp" .= personNoteTimestamp
+            [ "contents" .= noteContents
+            , "timestamp" .= noteTimestamp
+            , "relevant-people" .= noteRelevantPeople
             ]

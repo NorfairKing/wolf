@@ -12,5 +12,5 @@ import Wolf.Data.Note.Types.Gen ()
 
 spec :: Spec
 spec = do
-    genValidSpec @PersonNote
-    jsonSpecOnValid @PersonNote
+    genValidSpec @Note
+    jsonSpecOnValid @Note
