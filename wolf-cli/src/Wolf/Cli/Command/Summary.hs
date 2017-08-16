@@ -48,7 +48,7 @@ summaryReport now mpe pns =
               Nothing -> "No person entry."
               Just pe ->
                   unlinesReport $
-                  flip map (personEntryProperties pe) $ \(prop, val) ->
+                  flip map (personEntryTuples pe) $ \(prop, val) ->
                       fromString $
                       unwords
                           [ T.unpack prop ++ ":"

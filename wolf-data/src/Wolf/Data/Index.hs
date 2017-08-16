@@ -82,6 +82,6 @@ putPersonEntry ::
     => PersonUuid
     -> PersonEntry
     -> m ()
-putPersonEntry personUuid personEntry = do
+putPersonEntry personUuid pe = do
     pef <- personEntryFile personUuid
-    writeJSON pef personEntry
+    writeJSON pef pe

@@ -68,9 +68,9 @@ serveGetPersonEntry personUuid = do
         Just pe -> pure pe
 
 servePostNewPerson :: PersonEntry -> WolfHandler PersonUuid
-servePostNewPerson personEntry = do
+servePostNewPerson pe = do
     personUuid <- liftIO nextRandomPersonUuid
-    runData $ putPersonEntry personUuid personEntry
+    runData $ putPersonEntry personUuid pe
     pure personUuid
 
 serveGetPerson :: Text -> WolfHandler PersonUuid

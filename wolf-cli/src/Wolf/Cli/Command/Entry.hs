@@ -34,17 +34,12 @@ entry person =
                     now <- liftIO getCurrentTime
                     pure $
                         (,) newPersonEntry $
-                        case parseFirstnameLastname person of
-                            Nothing -> newPersonEntry
-                            Just (fn, ln) ->
-                                PersonEntry
-                                { personEntryProperties =
-                                      [ ( "first name"
-                                        , PersonPropertyValue fn now)
-                                      , ( "last name"
-                                        , PersonPropertyValue ln now)
-                                      ]
-                                }
+                        fromMaybe newPersonEntry $ do
+                            (fn, ln) <- parseFirstnameLastname person
+                            personEntry
+                                [ ("first name", PersonPropertyValue fn now)
+                                , ("last name", PersonPropertyValue ln now)
+                                ]
                 Just pe -> pure (pe, pe)
         ensureDir $ parent tmpFile
         let tmpFileContents =
@@ -69,32 +64,38 @@ entry person =
                         unwords ["Unable to parse entry file:", T.unpack err]
                     Right personEntryMap -> do
                         now <- liftIO getCurrentTime
-                        let personEntry =
-                                reconstructPersonEntry
-                                    now
-                                    origPersonEntry
-                                    personEntryMap
-                        unless (personEntry == origPersonEntry) $ do
-                            putPersonEntry personUuid personEntry
-                            putIndex index
-                            makeGitCommit $
+                        case reconstructPersonEntry
+                                 now
+                                 origPersonEntry
+                                 personEntryMap of
+                            Nothing ->
+                                liftIO $
+                                die $
                                 unwords
-                                    ["Added/changed entry for", T.unpack person]
+                                    [ "Failed to reconstruct a person entry: edit resulted in an invalid person entry"
+                                    ]
+                            Just pe ->
+                                unless (pe == origPersonEntry) $ do
+                                    putPersonEntry personUuid pe
+                                    putIndex index
+                                    makeGitCommit $
+                                        unwords
+                                            [ "Added/changed entry for"
+                                            , T.unpack person
+                                            ]
 
 reconstructPersonEntry ::
-       UTCTime -> PersonEntry -> [(Text, Text)] -> PersonEntry
+       UTCTime -> PersonEntry -> [(Text, Text)] -> Maybe PersonEntry
 reconstructPersonEntry now old newMap =
-    if map (second personPropertyValueContents) (personEntryProperties old) ==
+    if map (second personPropertyValueContents) (personEntryTuples old) ==
        newMap
-        then old -- If there is no difference, don't change the last changed timestamp.
-        else PersonEntry
-             { personEntryProperties =
-                   map (\(k, v) -> (k, go k v)) $ nubBy ((==) `on` fst) newMap
-             }
+        then Just old -- If there is no difference, don't change the last changed timestamp.
+        else personEntry $
+             map (\(k, v) -> (k, go k v)) $ nubBy ((==) `on` fst) newMap
   where
     go :: Text -> Text -> PersonPropertyValue
     go key value =
-        case lookup key (personEntryProperties old) of
+        case lookup key (personEntryTuples old) of
             Nothing -- Key did not exist before, therefore it was created here.
              ->
                 PersonPropertyValue
@@ -120,7 +121,7 @@ parseFirstnameLastname s =
 tmpEntryFileContents :: Text -> PersonUuid -> PersonEntry -> Text
 tmpEntryFileContents person personUuid pe =
     T.unlines $
-    map (uncurry toLineStr) (personEntryProperties pe) ++
+    map (uncurry toLineStr) (personEntryTuples pe) ++
     separator ++
     map (uncurry toLineStr')
         [("uuid", personUuidText personUuid), ("reference used", person)]

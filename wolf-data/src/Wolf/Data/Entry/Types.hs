@@ -2,7 +2,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 
-module Wolf.Data.Entry.Types where
+module Wolf.Data.Entry.Types
+    ( PersonEntry
+    , personEntry
+    , personEntryTuples
+    , newPersonEntry
+    , PersonPropertyValue(..)
+    ) where
 
 import Import
 
@@ -18,6 +24,15 @@ newtype PersonEntry = PersonEntry
     { personEntryProperties :: [(Text, PersonPropertyValue)]
     } deriving (Show, Eq, Ord, Generic)
 
+-- | Make a person entry, return 'Nothing' if it wouldn't be valid.
+personEntry :: [(Text, PersonPropertyValue)] -> Maybe PersonEntry
+personEntry = constructValid . PersonEntry
+
+-- | Get the individual entry list out of a person entry.
+personEntryTuples :: PersonEntry -> [(Text, PersonPropertyValue)]
+personEntryTuples = personEntryProperties
+
+-- | A 'PersonEntry' is valid if it does not have duplicate keys.
 instance Validity PersonEntry where
     isValid PersonEntry {..} =
         and

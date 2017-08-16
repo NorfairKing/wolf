@@ -79,7 +79,8 @@ test-suite wolf-data-test
     hs-source-dirs: test/
     other-modules:
         TestImport
-        Wolf.Data.TypesSpec
         Wolf.Data.Entry.TypesSpec
+        Wolf.Data.EntrySpec
         Wolf.Data.IndexSpec
+        Wolf.Data.TypesSpec
     ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall

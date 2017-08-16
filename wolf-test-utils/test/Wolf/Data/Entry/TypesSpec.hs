@@ -12,5 +12,7 @@ import Wolf.Data.Entry.Types.Gen ()
 
 spec :: Spec
 spec = do
+    genValidSpec @PersonEntry
     jsonSpecOnValid @PersonEntry
+    genValidSpec @PersonPropertyValue
     jsonSpecOnValid @PersonPropertyValue

@@ -20,7 +20,6 @@ import Brick.Widgets.List
 import Graphics.Vty as V
 
 import Wolf.Data.Entry
-import Wolf.Data.Entry.Types
 import Wolf.Data.Index
 import Wolf.Data.Types
 
