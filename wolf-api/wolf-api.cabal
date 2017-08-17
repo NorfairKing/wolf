@@ -35,3 +35,37 @@ library
         Import
     ghc-options: -Wall
 
+test-suite wolf-api-test
+    type: exitcode-stdio-1.0
+    main-is: Spec.hs
+    build-depends:
+        base >=4.9 && <=5,
+        QuickCheck -any,
+        bytestring -any,
+        containers -any,
+        genvalidity -any,
+        genvalidity-containers -any,
+        genvalidity-hspec -any,
+        genvalidity-hspec-aeson -any,
+        genvalidity-text -any,
+        genvalidity-time -any,
+        hspec -any,
+        http-client >=0.5 && <0.6,
+        mtl -any,
+        path -any,
+        path-io -any,
+        servant -any,
+        text -any,
+        wai -any,
+        warp -any,
+        wolf-api -any,
+        wolf-test-utils -any,
+        wolf-data -any
+    default-language: Haskell2010
+    default-extensions: NoImplicitPrelude
+    hs-source-dirs: test/
+    other-modules:
+        TestImport
+        Wolf.API.Gen
+        Wolf.APISpec
+    ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
