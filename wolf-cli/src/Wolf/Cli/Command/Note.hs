@@ -24,6 +24,7 @@ note people =
     withInitCheck $ do
         origIndex <- getIndexWithDefault
         tnf <- tmpNoteFile
+        liftIO $ ignoringAbsence $ removeFile tnf
         (peopleUuids, index) <-
             getRelevantPeopleUuidsAndNewIndex people origIndex
         editingResult <- startEditorOn tnf
