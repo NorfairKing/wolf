@@ -26,10 +26,9 @@ module Wolf.API
 
 import Import
 
-import Data.Aeson
+import Data.Aeson as JSON
 import Data.UUID as UUID
 import Data.UUID.V4 as UUID
-
 
 import Servant.API
 
@@ -43,23 +42,22 @@ type WolfAPI = AccountAPI :<|> PersonAPI
 
 type AccountAPI = PostRegister
 
-type PostRegister
-     = "account" :> "register" :> ReqBody '[ JSON] Register :> Post '[ JSON] ()
-
-data Register = Register
-    { registerUsername :: Text
-    , registerPassword :: Text
-    } deriving (Show, Eq, Generic)
-
-instance Validity Register
-
-instance FromJSON Register
-
-instance ToJSON Register
-
 newtype AccountUUID = AccountUUID
     { unAccountUUID :: UUID
     } deriving (Show, Eq, Generic)
+
+instance Validity AccountUUID where
+    isValid = const True
+
+instance FromJSON AccountUUID where
+    parseJSON =
+        withText "AccountUUID" $ \t ->
+            case UUID.fromText t of
+                Nothing -> fail "Invalid Text when parsing UUID"
+                Just u -> pure $ AccountUUID u
+
+instance ToJSON AccountUUID where
+    toJSON (AccountUUID u) = JSON.String $ UUID.toText u
 
 newAccountUUID :: IO AccountUUID
 newAccountUUID = AccountUUID <$> UUID.nextRandom
@@ -75,6 +73,22 @@ data Account = Account
     , accountUsername :: Text
     , accountPasswordHash :: ByteString
     } deriving (Show, Eq, Generic)
+
+instance Validity Account
+
+type PostRegister
+     = "account" :> "register" :> ReqBody '[ JSON] Register :> Post '[ JSON] AccountUUID
+
+data Register = Register
+    { registerUsername :: Text
+    , registerPassword :: Text
+    } deriving (Show, Eq, Generic)
+
+instance Validity Register
+
+instance FromJSON Register
+
+instance ToJSON Register
 
 type Protected = BasicAuth "master" Account
 

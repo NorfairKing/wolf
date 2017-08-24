@@ -28,5 +28,5 @@ import Wolf.Server.Utils
 accountServer :: ServerT AccountAPI WolfHandler
 accountServer = servePostRegister
 
-servePostRegister :: Register -> WolfHandler ()
-servePostRegister _ = pure ()
+servePostRegister :: Register -> WolfHandler AccountUUID
+servePostRegister = undefined

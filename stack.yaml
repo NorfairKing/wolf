@@ -7,7 +7,8 @@ packages:
 - wolf-server
 - wolf-test-utils
 extra-deps:
-- genvalidity-0.3.1.0
+- genvalidity-0.3.2.0
+- genvalidity-bytestring-0.0.0.1
 - genvalidity-containers-0.2.0.1
 - genvalidity-hspec-0.3.1.0
 - genvalidity-hspec-aeson-0.0.1.1

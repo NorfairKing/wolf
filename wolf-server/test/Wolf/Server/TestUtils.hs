@@ -6,21 +6,28 @@ module Wolf.Server.TestUtils
     ( withWolfServer
     , runClient
     , runClientOrError
+    , withValidNewUser
     ) where
 
 import TestImport
 
+import qualified Data.Text.Encoding as TE
+
 import qualified Network.HTTP.Client as HTTP
 
 import Servant
+import Servant.API
 import Servant.Client
 
 import Network.Wai.Handler.Warp (withApplication)
 
 import Wolf.API
+import Wolf.Client
 import Wolf.Data.Types
 import Wolf.Server.Serve
 import Wolf.Server.Types
+
+import Wolf.API.Gen ()
 
 withWolfServer :: SpecWith ClientEnv -> Spec
 withWolfServer specFunc = do
@@ -73,3 +80,15 @@ runClientOrError cenv func = do
             expectationFailure $ show err
             undefined -- Won't get here anyway ^
         Right res -> pure res
+
+withValidNewUser ::
+       ClientEnv -> (BasicAuthData -> IO()) -> Property
+withValidNewUser cenv func =
+    forAll genValid $ \register -> do
+        uuid <- runClientOrError cenv $ clientPostRegister register
+        let basicAuthData =
+                BasicAuthData
+                { basicAuthUsername = TE.encodeUtf8 $ registerUsername register
+                , basicAuthPassword = TE.encodeUtf8 $ registerPassword register
+                }
+        func basicAuthData

@@ -69,6 +69,7 @@ test-suite wolf-server-test
         bytestring -any,
         containers -any,
         genvalidity -any,
+        genvalidity-bytestring -any,
         genvalidity-containers -any,
         genvalidity-hspec -any,
         genvalidity-hspec-aeson -any,
@@ -79,6 +80,7 @@ test-suite wolf-server-test
         mtl -any,
         path -any,
         path-io -any,
+        servant -any,
         servant-client -any,
         servant-server -any,
         text -any,
@@ -93,7 +95,8 @@ test-suite wolf-server-test
     hs-source-dirs: test/
     other-modules:
         TestImport
-        Wolf.Server.PropertiesSpec
+        Wolf.API.Gen
         Wolf.Server.PersonServerSpec
+        Wolf.Server.PropertiesSpec
         Wolf.Server.TestUtils
     ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
