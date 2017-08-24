@@ -2,8 +2,6 @@ module Wolf.Server.OptParse.Types where
 
 import Import
 
-
-
 type Arguments = (Command, Flags)
 
 type Instructions = (Dispatch, Settings)

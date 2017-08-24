@@ -7,8 +7,9 @@ module Wolf.Server.Serve where
 
 import Import
 
+import qualified Data.Text.Encoding as TE
+
 import Control.Monad.Except
-import Control.Monad.Reader
 
 import Servant
 import qualified Servant.Server as Servant (serve)
@@ -20,6 +21,7 @@ import qualified Network.Wai.Handler.Warp as Warp
 import Wolf.API
 
 import Wolf.Server.AccountServer
+import Wolf.Server.Accounts
 import Wolf.Server.OptParse
 import Wolf.Server.PersonServer
 import Wolf.Server.Types
@@ -30,7 +32,8 @@ serve ServeSettings {..} Settings = do
     Warp.run serveSetPort $ wolfApp env
 
 wolfApp :: WolfServerEnv -> Wai.Application
-wolfApp = Servant.serveWithContext wolfAPI authContext . makeWolfServer
+wolfApp se =
+    Servant.serveWithContext wolfAPI (authContext se) (makeWolfServer se)
 
 makeWolfServer :: WolfServerEnv -> Server WolfAPI
 makeWolfServer cfg = enter (readerToEither cfg) wolfServer
@@ -41,10 +44,27 @@ makeWolfServer cfg = enter (readerToEither cfg) wolfServer
 wolfServer :: ServerT WolfAPI WolfHandler
 wolfServer = accountServer :<|> personServer
 
-authContext :: Context (BasicAuthCheck Account ': '[])
-authContext = authCheck :. EmptyContext
+authContext :: WolfServerEnv -> Context (BasicAuthCheck Account ': '[])
+authContext se = authCheck se :. EmptyContext
 
-authCheck :: BasicAuthCheck Account
-authCheck =
-    let check (BasicAuthData username password) = undefined
+authCheck :: WolfServerEnv -> BasicAuthCheck Account
+authCheck se =
+    let check (BasicAuthData username password) =
+            flip runReaderT se $
+            case TE.decodeUtf8' username of
+                Left _ -> pure Unauthorized
+                Right usernameText -> do
+                    muuid <- lookupAccountUUID usernameText
+                    case muuid of
+                        Nothing -> pure NoSuchUser
+                        Just uuid -> do
+                            ma <- getAccount uuid
+                            case ma of
+                                Nothing -> pure NoSuchUser
+                                Just acc@Account {..} ->
+                                    if validatePassword
+                                           accountPasswordHash
+                                           password
+                                        then pure $ Authorized acc
+                                        else pure BadPassword
     in BasicAuthCheck check

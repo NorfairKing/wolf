@@ -7,7 +7,6 @@ module Wolf.Server.OptParse
 
 import Import
 
-
 import System.Environment (getArgs)
 
 import Options.Applicative

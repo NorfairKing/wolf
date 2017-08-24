@@ -42,7 +42,7 @@ withWolfServer specFunc = do
         withApp func (dd, man) = do
             let wolfEnv = WolfServerEnv {wseDataDir = dd}
             let getServer = pure $ makeWolfServer wolfEnv
-            withServantServerAndContext wolfAPI authContext getServer $ \burl ->
+            withServantServerAndContext wolfAPI (authContext wolfEnv) getServer $ \burl ->
                 let cenv = ClientEnv man burl
                 in func cenv
     let cleanup = do
@@ -81,14 +81,18 @@ runClientOrError cenv func = do
             undefined -- Won't get here anyway ^
         Right res -> pure res
 
-withValidNewUser ::
-       ClientEnv -> (BasicAuthData -> IO()) -> Property
+withValidNewUser :: ClientEnv -> (BasicAuthData -> IO ()) -> Property
 withValidNewUser cenv func =
     forAll genValid $ \register -> do
-        uuid <- runClientOrError cenv $ clientPostRegister register
-        let basicAuthData =
-                BasicAuthData
-                { basicAuthUsername = TE.encodeUtf8 $ registerUsername register
-                , basicAuthPassword = TE.encodeUtf8 $ registerPassword register
-                }
-        func basicAuthData
+        errOrUuid <- runClient cenv $ clientPostRegister register
+        case errOrUuid of
+            Left _ -> pure () -- Username already exists, just stop here then.
+            Right uuid -> do
+                let basicAuthData =
+                        BasicAuthData
+                        { basicAuthUsername =
+                              TE.encodeUtf8 $ registerUsername register
+                        , basicAuthPassword =
+                              TE.encodeUtf8 $ registerPassword register
+                        }
+                func basicAuthData

@@ -7,8 +7,6 @@ module Wolf.Server.Types
 
 import Import
 
-import Control.Monad.Reader
-
 import Servant
 
 type WolfHandler = ReaderT WolfServerEnv Handler

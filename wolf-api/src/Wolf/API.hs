@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeOperators #-}
 
@@ -6,13 +7,15 @@ module Wolf.API
     ( wolfAPI
     , WolfAPI
     , AccountAPI
-    , PersonAPI
     , PostRegister
     , Register(..)
     , AccountUUID
     , newAccountUUID
     , accountUUIDString
     , accountUUIDText
+    , PasswordHash
+    , hashPassword
+    , validatePassword
     , Account(..)
     , PersonAPI
     , GetPersonEntry
@@ -27,8 +30,12 @@ module Wolf.API
 import Import
 
 import Data.Aeson as JSON
+import qualified Data.ByteString.Base16 as Base16
+import qualified Data.Text.Encoding as TE
 import Data.UUID as UUID
 import Data.UUID.V4 as UUID
+
+import qualified Crypto.BCrypt as BCrypt
 
 import Servant.API
 
@@ -68,13 +75,48 @@ accountUUIDString = UUID.toString . unAccountUUID
 accountUUIDText :: AccountUUID -> Text
 accountUUIDText = UUID.toText . unAccountUUID
 
+newtype PasswordHash =
+    PasswordHash ByteString
+    deriving (Show, Eq, Generic)
+
+instance Validity PasswordHash
+
+instance FromJSON PasswordHash where
+    parseJSON =
+        withText "PasswordHash" $ \t ->
+            case Base16.decode $ TE.encodeUtf8 t of
+                (h, "") -> pure $ PasswordHash h
+                _ ->
+                    fail
+                        "Invalid password hash in JSON: could not decode from hex string"
+
+instance ToJSON PasswordHash where
+    toJSON (PasswordHash bs) =
+        case TE.decodeUtf8' $ Base16.encode bs of
+            Left _ ->
+                error "Failed to decode hex string to text, should not happen."
+            Right t -> JSON.String t
+
+hashPassword :: Text -> IO (Maybe PasswordHash)
+hashPassword =
+    fmap (fmap PasswordHash) .
+    BCrypt.hashPasswordUsingPolicy BCrypt.fastBcryptHashingPolicy .
+    TE.encodeUtf8
+
+validatePassword :: PasswordHash -> ByteString -> Bool
+validatePassword (PasswordHash h) = BCrypt.validatePassword h
+
 data Account = Account
     { accountUUID :: AccountUUID
     , accountUsername :: Text
-    , accountPasswordHash :: ByteString
+    , accountPasswordHash :: PasswordHash
     } deriving (Show, Eq, Generic)
 
 instance Validity Account
+
+instance FromJSON Account
+
+instance ToJSON Account
 
 type PostRegister
      = "account" :> "register" :> ReqBody '[ JSON] Register :> Post '[ JSON] AccountUUID

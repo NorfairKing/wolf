@@ -10,6 +10,10 @@ instance GenUnchecked AccountUUID
 
 instance GenValid AccountUUID
 
+instance GenUnchecked PasswordHash
+
+instance GenValid PasswordHash
+
 instance GenUnchecked Account
 
 instance GenValid Account

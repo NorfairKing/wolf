@@ -4,6 +4,7 @@
 
 module Wolf.Server.Path
     ( dataDir
+    , accountsFile
     , accountsDir
     , accountDir
     , accountDataDir
@@ -12,14 +13,14 @@ module Wolf.Server.Path
 
 import Import
 
-import Control.Monad.Reader
-
-import Wolf.Data.Types
-import Wolf.Server.Types
 import Wolf.API
+import Wolf.Server.Types
 
 dataDir :: MonadReader WolfServerEnv m => m (Path Abs Dir)
 dataDir = asks wseDataDir
+
+accountsFile :: MonadReader WolfServerEnv m => m (Path Abs File)
+accountsFile = (</> $(mkRelFile "accounts.json")) <$> dataDir
 
 accountsDir :: MonadReader WolfServerEnv m => m (Path Abs Dir)
 accountsDir = (</> $(mkRelDir "accounts")) <$> dataDir

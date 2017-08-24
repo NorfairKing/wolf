@@ -36,7 +36,8 @@ spec =
                             (uuid, uuid') <-
                                 runClientOrError cenv $ do
                                     uuid <- clientPostNewPerson ad pe
-                                    clientPostSetPersonAlias ad
+                                    clientPostSetPersonAlias
+                                        ad
                                         SetPersonAlias
                                         { setPersonAliasPersonUuid = uuid
                                         , setPersonAliasAlias = alias
