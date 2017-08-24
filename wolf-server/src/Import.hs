@@ -15,3 +15,6 @@ import Data.Text as X (Text)
 import Data.ByteString as X (ByteString)
 
 import Control.Monad as X
+
+import Path as X
+import Path.IO as X

@@ -26,17 +26,16 @@ withWolfServer :: SpecWith ClientEnv -> Spec
 withWolfServer specFunc = do
     let getDataDir :: IO (Path Abs Dir)
         getDataDir = resolveDir' "test-sandbox"
-    let setupDSAndMan :: IO (DataSettings, HTTP.Manager)
+    let setupDSAndMan :: IO (Path Abs Dir, HTTP.Manager)
         setupDSAndMan = do
             wd <- resolveDir' "test-sandbox"
-            let ds = DataSettings {dataSetWolfDir = wd}
             man <- HTTP.newManager HTTP.defaultManagerSettings
-            pure (ds, man)
-    let withApp :: (ClientEnv -> IO ()) -> (DataSettings, HTTP.Manager) -> IO ()
-        withApp func (ds, man) = do
-            let wolfEnv = WolfServerEnv {wseDataSettings = ds}
+            pure (wd, man)
+    let withApp :: (ClientEnv -> IO ()) -> (Path Abs Dir, HTTP.Manager) -> IO ()
+        withApp func (dd, man) = do
+            let wolfEnv = WolfServerEnv {wseDataDir = dd}
             let getServer = pure $ makeWolfServer wolfEnv
-            withServantServer wolfAPI getServer $ \burl ->
+            withServantServerAndContext wolfAPI authContext getServer $ \burl ->
                 let cenv = ClientEnv man burl
                 in func cenv
     let cleanup = do

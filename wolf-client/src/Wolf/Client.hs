@@ -26,11 +26,11 @@ import Wolf.Data.Types
 clientPostRegister :: Register -> ClientM ()
 clientPostRegister = accountClient
 
-clientGetPersonEntry :: PersonUuid -> ClientM PersonEntry
-clientPostNewPerson :: PersonEntry -> ClientM PersonUuid
-clientGetPersonByAlias :: Text -> ClientM PersonUuid
-clientPostSetPersonAlias :: SetPersonAlias -> ClientM ()
-clientGetPersonQuery :: PersonQuery -> ClientM [PersonUuid]
+clientGetPersonEntry ::BasicAuthData -> PersonUuid -> ClientM PersonEntry
+clientPostNewPerson :: BasicAuthData ->PersonEntry -> ClientM PersonUuid
+clientGetPersonByAlias :: BasicAuthData ->Text -> ClientM PersonUuid
+clientPostSetPersonAlias :: BasicAuthData ->SetPersonAlias -> ClientM ()
+clientGetPersonQuery :: BasicAuthData ->PersonQuery -> ClientM [PersonUuid]
 clientGetPersonEntry :<|> clientPostNewPerson :<|> clientGetPersonByAlias :<|> clientPostSetPersonAlias :<|> clientGetPersonQuery =
     personClient
 

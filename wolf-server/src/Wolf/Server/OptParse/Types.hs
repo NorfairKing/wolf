@@ -2,9 +2,7 @@ module Wolf.Server.OptParse.Types where
 
 import Import
 
-import Wolf.Data.Types
 
-import qualified Wolf.Cli.OptParse.Types as Cli
 
 type Arguments = (Command, Flags)
 
@@ -14,13 +12,14 @@ newtype Command =
     CommandServe ServeFlags
     deriving (Show, Eq)
 
-newtype ServeFlags = ServeFlags
+data ServeFlags = ServeFlags
     { serveFlagPort :: Maybe Int
+    , serveFlagDataDir :: Maybe FilePath
     } deriving (Show, Eq)
 
-newtype Flags = Flags
-    { flagDataFlags :: Cli.DataFlags
-    } deriving (Show, Eq)
+data Flags =
+    Flags
+    deriving (Show, Eq)
 
 data Configuration =
     Configuration
@@ -30,10 +29,11 @@ newtype Dispatch =
     DispatchServe ServeSettings
     deriving (Show, Eq)
 
-newtype Settings = Settings
-    { setDataSettings :: DataSettings
-    } deriving (Show, Eq)
+data Settings =
+    Settings
+    deriving (Show, Eq)
 
-newtype ServeSettings = ServeSettings
+data ServeSettings = ServeSettings
     { serveSetPort :: Int
+    , serveSetDataDir :: Path Abs Dir
     } deriving (Show, Eq)

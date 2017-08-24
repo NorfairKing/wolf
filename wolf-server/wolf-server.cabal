@@ -16,6 +16,7 @@ library
         Wolf.Server.AccountServer
         Wolf.Server.OptParse
         Wolf.Server.OptParse.Types
+        Wolf.Server.Path
         Wolf.Server.PersonServer
         Wolf.Server.Serve
         Wolf.Server.Types
@@ -32,6 +33,7 @@ library
         servant-server >=0.9 && <0.10,
         text >=1.2 && <1.3,
         unordered-containers >=0.2 && <0.3,
+        uuid >= 1.3 && < 1.4,
         validity >=0.3 && <0.4,
         validity-containers >=0.1 && <0.2,
         validity-text >=0.1 && <0.2,

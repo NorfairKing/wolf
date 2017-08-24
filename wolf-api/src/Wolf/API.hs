@@ -2,11 +2,34 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeOperators #-}
 
-module Wolf.API where
+module Wolf.API
+    ( wolfAPI
+    , WolfAPI
+    , AccountAPI
+    , PersonAPI
+    , PostRegister
+    , Register(..)
+    , AccountUUID
+    , newAccountUUID
+    , accountUUIDString
+    , accountUUIDText
+    , Account(..)
+    , PersonAPI
+    , GetPersonEntry
+    , PostNewPerson
+    , GetPersonByAlias
+    , PostPersonSetAlias
+    , SetPersonAlias(..)
+    , GetPersonQuery
+    , PersonQuery(..)
+    ) where
 
 import Import
 
 import Data.Aeson
+import Data.UUID as UUID
+import Data.UUID.V4 as UUID
+
 
 import Servant.API
 
@@ -20,7 +43,8 @@ type WolfAPI = AccountAPI :<|> PersonAPI
 
 type AccountAPI = PostRegister
 
-type PostRegister = "account" :> "register" :> ReqBody '[JSON] Register :> Post '[ JSON] ()
+type PostRegister
+     = "account" :> "register" :> ReqBody '[ JSON] Register :> Post '[ JSON] ()
 
 data Register = Register
     { registerUsername :: Text
@@ -33,20 +57,41 @@ instance FromJSON Register
 
 instance ToJSON Register
 
+newtype AccountUUID = AccountUUID
+    { unAccountUUID :: UUID
+    } deriving (Show, Eq, Generic)
+
+newAccountUUID :: IO AccountUUID
+newAccountUUID = AccountUUID <$> UUID.nextRandom
+
+accountUUIDString :: AccountUUID -> String
+accountUUIDString = UUID.toString . unAccountUUID
+
+accountUUIDText :: AccountUUID -> Text
+accountUUIDText = UUID.toText . unAccountUUID
+
+data Account = Account
+    { accountUUID :: AccountUUID
+    , accountUsername :: Text
+    , accountPasswordHash :: ByteString
+    } deriving (Show, Eq, Generic)
+
+type Protected = BasicAuth "master" Account
+
 type PersonAPI
      = GetPersonEntry :<|> PostNewPerson :<|> GetPersonByAlias :<|> PostPersonSetAlias :<|> GetPersonQuery
 
 type GetPersonEntry
-     = "person" :> "entry" :> Capture "person-uuid" PersonUuid :> Get '[ JSON] PersonEntry
+     = Protected :> "person" :> "entry" :> Capture "person-uuid" PersonUuid :> Get '[ JSON] PersonEntry
 
 type PostNewPerson
-     = "person" :> "new" :> ReqBody '[ JSON] PersonEntry :> Post '[ JSON] PersonUuid
+     = Protected :> "person" :> "new" :> ReqBody '[ JSON] PersonEntry :> Post '[ JSON] PersonUuid
 
 type GetPersonByAlias
-     = "person" :> "by-alias" :> ReqBody '[ JSON] Text :> Get '[ JSON] PersonUuid
+     = Protected :> "person" :> "by-alias" :> ReqBody '[ JSON] Text :> Get '[ JSON] PersonUuid
 
 type PostPersonSetAlias
-     = "person" :> "alias" :> ReqBody '[ JSON] SetPersonAlias :> Post '[ JSON] ()
+     = Protected :> "person" :> "alias" :> ReqBody '[ JSON] SetPersonAlias :> Post '[ JSON] ()
 
 data SetPersonAlias = SetPersonAlias
     { setPersonAliasPersonUuid :: PersonUuid
@@ -60,7 +105,7 @@ instance FromJSON SetPersonAlias
 instance ToJSON SetPersonAlias
 
 type GetPersonQuery
-     = "person" :> "by-entry-query" :> ReqBody '[ JSON] PersonQuery :> Get '[ JSON] [PersonUuid]
+     = Protected :> "person" :> "by-entry-query" :> ReqBody '[ JSON] PersonQuery :> Get '[ JSON] [PersonUuid]
 
 data PersonQuery
     = EntryValue Text
