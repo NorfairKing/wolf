@@ -15,3 +15,5 @@ type WolfHandler = ReaderT WolfServerEnv Handler
 newtype WolfServerEnv = WolfServerEnv
     { wseDataSettings :: DataSettings
     } deriving (Show, Eq, Generic)
+
+data Account = Account { accountUsername :: Text, accountPasswordHash :: ByteString } deriving (Show,Eq,Generic)

@@ -26,7 +26,7 @@ import Wolf.API
 import Wolf.Server.Types
 import Wolf.Server.Utils
 
-personServer :: ServerT WolfAPI WolfHandler
+personServer :: ServerT PersonAPI WolfHandler
 personServer =
     serveGetPersonEntry :<|> servePostNewPerson :<|> serveGetPersonByAlias :<|>
     servePostPersonSetAlias :<|>

@@ -13,6 +13,7 @@ author: Tom Sydney Kerckhove
 library
     exposed-modules:
         Wolf.Server
+        Wolf.Server.AccountServer
         Wolf.Server.OptParse
         Wolf.Server.OptParse.Types
         Wolf.Server.PersonServer

@@ -13,10 +13,25 @@ import Servant.API
 import Wolf.Data.Entry.Types
 import Wolf.Data.Types
 
-type WolfAPI = PersonAPI
-
 wolfAPI :: Proxy WolfAPI
 wolfAPI = Proxy
+
+type WolfAPI = AccountAPI :<|> PersonAPI
+
+type AccountAPI = PostRegister
+
+type PostRegister = "account" :> "register" :> ReqBody '[JSON] Register :> Post '[ JSON] ()
+
+data Register = Register
+    { registerUsername :: Text
+    , registerPassword :: Text
+    } deriving (Show, Eq, Generic)
+
+instance Validity Register
+
+instance FromJSON Register
+
+instance ToJSON Register
 
 type PersonAPI
      = GetPersonEntry :<|> PostNewPerson :<|> GetPersonByAlias :<|> PostPersonSetAlias :<|> GetPersonQuery

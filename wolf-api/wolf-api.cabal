@@ -24,6 +24,7 @@ library
         servant >=0.9 && <0.10,
         text >=1.2 && <1.3,
         validity >=0.3 && <0.4,
+        validity-bytestring >=0.1 && <0.2,
         validity-containers >=0.1 && <0.2,
         validity-text >=0.1 && <0.2,
         validity-time >=0.0 && <0.1,

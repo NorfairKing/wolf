@@ -11,6 +11,7 @@ import Control.Monad.Reader
 
 import qualified Servant.Server as Servant (serve)
 import Servant.Server
+import Servant
 
 import qualified Network.Wai as Wai
 import qualified Network.Wai.Handler.Warp as Warp
@@ -19,6 +20,7 @@ import Wolf.API
 
 import Wolf.Server.OptParse
 import Wolf.Server.PersonServer
+import Wolf.Server.AccountServer
 import Wolf.Server.Types
 
 serve :: ServeSettings -> Settings -> IO ()
@@ -36,4 +38,4 @@ makeWolfServer cfg = enter (readerToEither cfg) wolfServer
     readerToEither env = Nat $ \x -> runReaderT x env
 
 wolfServer :: ServerT WolfAPI WolfHandler
-wolfServer = personServer
+wolfServer = accountServer :<|> personServer
