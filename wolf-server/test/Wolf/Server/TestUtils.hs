@@ -14,16 +14,15 @@ import TestImport
 import qualified Data.Text.Encoding as TE
 
 import qualified Network.HTTP.Client as HTTP
+import Network.HTTP.Types
 
 import Servant
-import Servant.API
 import Servant.Client
 
 import Network.Wai.Handler.Warp (withApplication)
 
 import Wolf.API
 import Wolf.Client
-import Wolf.Data.Types
 import Wolf.Server.Serve
 import Wolf.Server.Types
 
@@ -49,12 +48,6 @@ withWolfServer specFunc = do
             wd <- getDataDir -- FIXME could go wrong if the server makes any symbolic links
             ignoringAbsence $ removeDirRecur wd
     afterAll_ cleanup $ beforeAll setupDSAndMan $ aroundWith withApp specFunc
-
--- | Start a servant application on an open port, run the provided function,
--- then stop the application.
-withServantServer ::
-       HasServer a '[] => Proxy a -> IO (Server a) -> (BaseUrl -> IO r) -> IO r
-withServantServer api = withServantServerAndContext api EmptyContext
 
 -- | Like 'withServantServer', but allows passing in a 'Context' to the
 -- application.
@@ -86,8 +79,17 @@ withValidNewUser cenv func =
     forAll genValid $ \register -> do
         errOrUuid <- runClient cenv $ clientPostRegister register
         case errOrUuid of
-            Left _ -> pure () -- Username already exists, just stop here then.
-            Right uuid -> do
+            Left err ->
+                let snf =
+                        expectationFailure $
+                        "Registration should not fail with error: " <> show err
+                in case err of
+                       FailureResponse {} ->
+                           if statusCode (responseStatus err) == 409
+                               then pure () -- Username already exists, just stop here then.
+                               else snf
+                       _ -> snf
+            Right _ -> do
                 let basicAuthData =
                         BasicAuthData
                         { basicAuthUsername =

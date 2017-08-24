@@ -78,6 +78,7 @@ test-suite wolf-server-test
         genvalidity-time -any,
         hspec -any,
         http-client >=0.5 && <0.6,
+        http-types >=0.9 && <0.10,
         mtl -any,
         path -any,
         path-io -any,
@@ -97,6 +98,7 @@ test-suite wolf-server-test
     other-modules:
         TestImport
         Wolf.API.Gen
+        Wolf.Server.AccountServerSpec
         Wolf.Server.PersonServerSpec
         Wolf.Server.PropertiesSpec
         Wolf.Server.TestUtils

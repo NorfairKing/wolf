@@ -12,8 +12,6 @@ import qualified Data.Text.Encoding as TE
 import Control.Monad.Except
 
 import Servant
-import qualified Servant.Server as Servant (serve)
-import Servant.Server
 
 import qualified Network.Wai as Wai
 import qualified Network.Wai.Handler.Warp as Warp

@@ -75,4 +75,4 @@ servePostPersonSetAlias acc SetPersonAlias {..} =
         putIndex index'
 
 serveGetPersonQuery :: Account -> PersonQuery -> WolfHandler [PersonUuid]
-serveGetPersonQuery acc = undefined
+serveGetPersonQuery _ = undefined
