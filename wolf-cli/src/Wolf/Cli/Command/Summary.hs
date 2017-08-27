@@ -37,7 +37,7 @@ summaryReport :: UTCTime -> Maybe PersonEntry -> [Note] -> Report
 summaryReport now mpe pns =
     mconcat
         [ mconcat $
-          flip map pns $ \pn ->
+          flip map (sortOn noteTimestamp pns) $ \pn ->
               unlinesReport
                   [ colored [SetColor Foreground Dull Blue] $
                     T.unpack $ formatMomentNicely now (noteTimestamp pn) <> ":"
