@@ -1,4 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleContexts #-}
 
 module Wolf.Cli.Command.Summary where
@@ -31,19 +33,47 @@ summary person =
                 now <- liftIO getCurrentTime
                 mpe <- getPersonEntry personUuid
                 pns <- getPersonNotes personUuid
-                liftIO $ putStr $ renderReport $ summaryReport now mpe pns
+                liftIO $
+                    putStr $
+                    renderReport $
+                    summaryReportReport $ summaryReport now mpe pns
 
-summaryReport :: UTCTime -> Maybe PersonEntry -> [Note] -> Report
+summaryReport :: UTCTime -> Maybe PersonEntry -> [Note] -> SummaryReport
 summaryReport now mpe pns =
+    SummaryReport
+    { summaryReportTimestamp = now
+    , summaryReportPersonEntry = mpe
+    , summaryReportNotes = sortOn noteTimestamp pns
+    }
+
+data SummaryReport = SummaryReport
+    { summaryReportTimestamp :: UTCTime
+    , summaryReportPersonEntry :: Maybe PersonEntry
+    , summaryReportNotes :: [Note]
+    } deriving (Show, Eq, Generic)
+
+instance Validity SummaryReport where
+    isValid SummaryReport {..} =
+        and
+            [ isValid summaryReportTimestamp
+            , isValid summaryReportPersonEntry
+            , isValid summaryReportNotes
+            , sortOn noteTimestamp summaryReportNotes == summaryReportNotes
+            ]
+
+summaryReportReport :: SummaryReport -> Report
+summaryReportReport SummaryReport {..} =
     mconcat
         [ mconcat $
-          flip map (sortOn noteTimestamp pns) $ \pn ->
+          flip map summaryReportNotes $ \pn ->
               unlinesReport
                   [ colored [SetColor Foreground Dull Blue] $
-                    T.unpack $ formatMomentNicely now (noteTimestamp pn) <> ":"
+                    T.unpack $
+                    formatMomentNicely summaryReportTimestamp (noteTimestamp pn) <>
+                    ":"
                   , fromString $ T.unpack $ noteContents pn
                   ]
-        , case mpe of
+        , case summaryReportPersonEntry of
               Nothing -> "No person entry."
               Just pe ->
                   unlinesReport $
