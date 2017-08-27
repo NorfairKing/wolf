@@ -9,6 +9,7 @@ import Wolf.Cli.Command.Entry
 import Wolf.Cli.Command.Git
 import Wolf.Cli.Command.Init
 import Wolf.Cli.Command.Note
+import Wolf.Cli.Command.RandomPerson
 import Wolf.Cli.Command.Review
 import Wolf.Cli.Command.Summary
 import Wolf.Cli.OptParse
@@ -26,3 +27,4 @@ dispatch (DispatchSummary person) = summary person
 dispatch (DispatchEntry person) = entry person
 dispatch (DispatchGit cmds) = git cmds
 dispatch DispatchReview = review
+dispatch DispatchRandomPerson = randomPerson

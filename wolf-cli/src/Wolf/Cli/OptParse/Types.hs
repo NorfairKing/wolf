@@ -18,6 +18,7 @@ data Command
     | CommandAlias Text
                    Text
     | CommandReview
+    | CommandRandomPerson
     deriving (Show, Eq)
 
 newtype Flags = Flags
@@ -41,6 +42,7 @@ data Dispatch
     | DispatchAlias Text
                     Text
     | DispatchReview
+    | DispatchRandomPerson
     deriving (Show, Eq)
 
 newtype Settings = Settings

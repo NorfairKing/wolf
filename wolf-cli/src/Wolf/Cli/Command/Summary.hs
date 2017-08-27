@@ -3,7 +3,14 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleContexts #-}
 
-module Wolf.Cli.Command.Summary where
+module Wolf.Cli.Command.Summary
+    ( summary
+    , printSummaryReportFor
+    , summaryReportFor
+    , summaryReport
+    , SummaryReport(..)
+    , summaryReportReport
+    ) where
 
 import Import
 
@@ -20,6 +27,7 @@ import Wolf.Data.Init
 import Wolf.Data.Note.Types
 import Wolf.Data.NoteIndex
 import Wolf.Data.Time
+import Wolf.Data.Types
 
 summary :: (MonadIO m, MonadReader Settings m) => Text -> m ()
 summary person =
@@ -29,14 +37,21 @@ summary person =
         case lookupInIndex person index of
             Nothing ->
                 liftIO $ die $ unwords ["No person found for", show person]
-            Just personUuid -> do
-                now <- liftIO getCurrentTime
-                mpe <- getPersonEntry personUuid
-                pns <- getPersonNotes personUuid
-                liftIO $
-                    putStr $
-                    renderReport $
-                    summaryReportReport $ summaryReport now mpe pns
+            Just personUuid -> printSummaryReportFor personUuid
+
+printSummaryReportFor ::
+       (MonadReader DataSettings m, MonadIO m) => PersonUuid -> m ()
+printSummaryReportFor personUuid = do
+    sr <- summaryReportFor personUuid
+    liftIO $ putStr $ renderReport $ summaryReportReport sr
+
+summaryReportFor ::
+       (MonadReader DataSettings m, MonadIO m) => PersonUuid -> m SummaryReport
+summaryReportFor personUuid = do
+    now <- liftIO getCurrentTime
+    mpe <- getPersonEntry personUuid
+    pns <- getPersonNotes personUuid
+    pure $ summaryReport now mpe pns
 
 summaryReport :: UTCTime -> Maybe PersonEntry -> [Note] -> SummaryReport
 summaryReport now mpe pns =

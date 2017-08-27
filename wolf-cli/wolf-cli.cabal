@@ -18,6 +18,7 @@ library
         Wolf.Cli.Command.Git
         Wolf.Cli.Command.Init
         Wolf.Cli.Command.Note
+        Wolf.Cli.Command.RandomPerson
         Wolf.Cli.Command.Review
         Wolf.Cli.Command.Summary
         Wolf.Cli.Editor
@@ -38,6 +39,7 @@ library
         path >=0.5 && <0.6,
         path-io >=1.2 && <1.3,
         process >=1.4 && <1.5,
+        random >=1.1 && <1.2,
         text >=1.2 && <1.3,
         time >=1.6 && <1.7,
         unordered-containers >=0.2 && <0.3,

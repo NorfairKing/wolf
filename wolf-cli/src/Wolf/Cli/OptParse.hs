@@ -42,6 +42,7 @@ combineToInstructions cmd Flags {..} Configuration = do
             CommandGit args -> pure $ DispatchGit args
             CommandAlias old new -> pure $ DispatchAlias old new
             CommandReview -> pure DispatchReview
+            CommandRandomPerson -> pure DispatchRandomPerson
     pure (disp, Settings {setDataSets = ds})
 
 defaultWolfDir :: MonadIO m => m (Path Abs Dir)
@@ -108,6 +109,7 @@ parseCommand =
             , command "git" parseCommandGit
             , command "alias" $ runReaderT parseCommandAlias env
             , command "review" parseCommandReview
+            , command "random" parseCommandRandomPerson
             ]
 
 parseCommandInit :: ParserInfo Command
@@ -212,6 +214,12 @@ parseCommandReview :: ParserInfo Command
 parseCommandReview =
     let parser = pure CommandReview
         modifier = fullDesc <> progDesc "Review notes."
+    in info parser modifier
+
+parseCommandRandomPerson :: ParserInfo Command
+parseCommandRandomPerson =
+    let parser = pure CommandRandomPerson
+        modifier = fullDesc <> progDesc "Summarise a random person."
     in info parser modifier
 
 peopleMap :: ParserEnv -> [String]
