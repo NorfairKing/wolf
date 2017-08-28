@@ -22,23 +22,27 @@ import Wolf.Server.Types
 
 -- | Retrieve global accounts data
 getAccounts ::
-       (MonadIO m, MonadReader WolfServerEnv m) => m (Map Text AccountUUID)
+       (MonadIO m, MonadReader WolfServerEnv m) => m (Map Username AccountUUID)
 getAccounts = do
     af <- accountsFile
     readJSONWithDefault M.empty af
 
 -- | Store global accounts data
 storeAccounts ::
-       (MonadIO m, MonadReader WolfServerEnv m) => Map Text AccountUUID -> m ()
+       (MonadIO m, MonadReader WolfServerEnv m)
+    => Map Username AccountUUID
+    -> m ()
 storeAccounts accs = do
     af <- accountsFile
     writeJSON af accs
 
 lookupAccountUUID ::
-       (MonadIO m, MonadReader WolfServerEnv m) => Text -> m (Maybe AccountUUID)
-lookupAccountUUID username = do
+       (MonadIO m, MonadReader WolfServerEnv m)
+    => Username
+    -> m (Maybe AccountUUID)
+lookupAccountUUID un = do
     as <- getAccounts
-    pure $ M.lookup username as
+    pure $ M.lookup un as
 
 -- | Tries to add a new account with the given username.
 --
@@ -46,14 +50,16 @@ lookupAccountUUID username = do
 -- If the username does not exist yet, this returns 'Just' with a new 'AccountUUID'.
 -- This also adds the new 'AccountUUID' to the global accounts file.
 tryToAddNewAccount ::
-       (MonadIO m, MonadReader WolfServerEnv m) => Text -> m (Maybe AccountUUID)
-tryToAddNewAccount username = do
+       (MonadIO m, MonadReader WolfServerEnv m)
+    => Username
+    -> m (Maybe AccountUUID)
+tryToAddNewAccount un = do
     as <- getAccounts
-    case M.lookup username as of
+    case M.lookup un as of
         Just _ -> pure Nothing
         Nothing -> do
             uuid <- liftIO newAccountUUID
-            storeAccounts $ M.insert username uuid as
+            storeAccounts $ M.insert un uuid as
             pure $ Just uuid
 
 -- | Retrieve account data

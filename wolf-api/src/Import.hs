@@ -3,7 +3,7 @@ module Import
     ) where
 
 import Debug.Trace as X
-import Prelude as X hiding (head, init, last, tail)
+import Prelude as X hiding (fail, head, init, last, tail)
 
 import GHC.Generics as X
 
@@ -19,8 +19,9 @@ import Data.String as X
 
 import Control.Applicative as X
 import Control.Arrow as X
-import Control.Monad as X
-import Control.Monad.Reader as X
+import Control.Monad as X hiding (fail)
+import Control.Monad.Fail as X
+import Control.Monad.Reader as X hiding (fail)
 
 import Path as X
 import Path.IO as X

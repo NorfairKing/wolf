@@ -47,17 +47,18 @@ authContext se = authCheck se :. EmptyContext
 
 authCheck :: WolfServerEnv -> BasicAuthCheck Account
 authCheck se =
-    BasicAuthCheck $ \(BasicAuthData username password) ->
+    BasicAuthCheck $ \(BasicAuthData usernameBs password) ->
         flip runReaderT se $
-        short (either (const Nothing) Just $ TE.decodeUtf8' username) $ \usernameText -> do
-            muuid <- lookupAccountUUID usernameText
-            short muuid $ \uuid -> do
-                ma <- getAccount uuid
-                short ma $ \acc@Account {..} ->
-                    pure $
-                    if validatePassword accountPasswordHash password
-                        then Authorized acc
-                        else BadPassword
+        short (either (const Nothing) Just $ TE.decodeUtf8' usernameBs) $ \usernameText ->
+            short (username usernameText) $ \un -> do
+                muuid <- lookupAccountUUID un
+                short muuid $ \uuid -> do
+                    ma <- getAccount uuid
+                    short ma $ \acc@Account {..} ->
+                        pure $
+                        if validatePassword accountPasswordHash password
+                            then Authorized acc
+                            else BadPassword
   where
     short mt func =
         case mt of

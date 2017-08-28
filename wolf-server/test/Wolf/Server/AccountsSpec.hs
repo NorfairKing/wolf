@@ -56,16 +56,16 @@ spec =
                                     ]
         describe "tryToAddNewAccount" $
             it "successfully adds a new account to an empty state" $ \env ->
-                forAll genValid $ \username -> do
-                    m <- withEnv env $ tryToAddNewAccount username
+                forAll genValid $ \un -> do
+                    m <- withEnv env $ tryToAddNewAccount un
                     m `shouldSatisfy` isJust
         describe "lookupAccountUUID" $
             it "succesfully looks up newly registered accounts" $ \env ->
-                forAll genValid $ \username -> do
+                forAll genValid $ \un -> do
                     mm <-
                         withEnv env $ do
-                            m1 <- tryToAddNewAccount username
-                            m2 <- lookupAccountUUID username
+                            m1 <- tryToAddNewAccount un
+                            m2 <- lookupAccountUUID un
                             pure (m1, m2)
                     case mm of
                         (Nothing, _) ->

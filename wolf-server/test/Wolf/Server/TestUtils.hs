@@ -111,7 +111,8 @@ withValidNewUser cenv func =
                 let basicAuthData =
                         BasicAuthData
                         { basicAuthUsername =
-                              TE.encodeUtf8 $ registerUsername register
+                              TE.encodeUtf8 $
+                              usernameText $ registerUsername register
                         , basicAuthPassword =
                               TE.encodeUtf8 $ registerPassword register
                         }

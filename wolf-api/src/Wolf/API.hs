@@ -13,6 +13,10 @@ module Wolf.API
     , newAccountUUID
     , accountUUIDString
     , accountUUIDText
+    , Username
+    , validUsernameChar
+    , username
+    , usernameText
     , PasswordHash
     , hashPassword
     , validatePassword
@@ -30,7 +34,10 @@ module Wolf.API
 import Import
 
 import Data.Aeson as JSON
+import Data.Aeson.Types as JSON (toJSONKeyText)
 import qualified Data.ByteString.Base16 as Base16
+import Data.Char as Char
+import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 import Data.UUID as UUID
 import Data.UUID.V4 as UUID
@@ -75,9 +82,41 @@ accountUUIDString = UUID.toString . unAccountUUID
 accountUUIDText :: AccountUUID -> Text
 accountUUIDText = UUID.toText . unAccountUUID
 
+newtype Username = Username
+    { usernameText :: Text
+    } deriving (Show, Eq, Ord, Generic)
+
+instance Validity Username where
+    isValid (Username t) = T.all validUsernameChar t
+
+validUsernameChar :: Char -> Bool
+validUsernameChar c =
+    not (Char.isControl c) && Char.isAlphaNum c && Char.isLatin1 c
+
+instance FromJSONKey Username where
+    fromJSONKey = FromJSONKeyTextParser parseUsername
+
+instance ToJSONKey Username where
+    toJSONKey = toJSONKeyText (\(Username t) -> t)
+
+instance FromJSON Username where
+    parseJSON = withText "Username" parseUsername
+
+parseUsername :: MonadFail m => Text -> m Username
+parseUsername t =
+    case constructValid t of
+        Nothing -> fail "Invalid username in JSON"
+        Just un -> pure $ Username un
+
+instance ToJSON Username where
+    toJSON (Username un) = toJSON un
+
 newtype PasswordHash =
     PasswordHash ByteString
     deriving (Show, Eq, Generic)
+
+username :: Text -> Maybe Username
+username t = Username <$> constructValid t
 
 instance Validity PasswordHash
 
@@ -108,7 +147,7 @@ validatePassword (PasswordHash h) = BCrypt.validatePassword h
 
 data Account = Account
     { accountUUID :: AccountUUID
-    , accountUsername :: Text
+    , accountUsername :: Username
     , accountPasswordHash :: PasswordHash
     } deriving (Show, Eq, Generic)
 
@@ -122,7 +161,7 @@ type PostRegister
      = "account" :> "register" :> ReqBody '[ JSON] Register :> Post '[ JSON] AccountUUID
 
 data Register = Register
-    { registerUsername :: Text
+    { registerUsername :: Username
     , registerPassword :: Text
     } deriving (Show, Eq, Generic)
 
