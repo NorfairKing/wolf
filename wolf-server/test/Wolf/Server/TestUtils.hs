@@ -18,7 +18,7 @@ import Servant.Client
 import Network.Wai.Handler.Warp (withApplication)
 
 import Wolf.API
-import Wolf.Data.Types
+import Wolf.Data
 import Wolf.Server.Serve
 import Wolf.Server.Types
 

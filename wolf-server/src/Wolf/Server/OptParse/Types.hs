@@ -2,7 +2,7 @@ module Wolf.Server.OptParse.Types where
 
 import Import
 
-import Wolf.Data.Types
+import Wolf.Data
 
 import qualified Wolf.Cli.OptParse.Types as Cli
 

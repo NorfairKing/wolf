@@ -13,9 +13,7 @@ import System.Random
 import Wolf.Cli.Command.Summary
 import Wolf.Cli.OptParse
 import Wolf.Cli.Utils
-import Wolf.Data.Index
-import Wolf.Data.Init
-import Wolf.Data.Types
+import Wolf.Data
 
 randomPerson :: (MonadIO m, MonadReader Settings m) => m ()
 randomPerson =

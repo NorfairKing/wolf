@@ -6,31 +6,24 @@ import Import
 
 import Wolf.Cli.OptParse.Types
 import Wolf.Cli.Utils
+import Wolf.Data
 import Wolf.Data.Git
-import Wolf.Data.Init
-import Wolf.Data.JSONUtils
-import Wolf.Data.Path
-import Wolf.Data.Types
 
 init :: (MonadIO m, MonadReader Settings m) => m ()
 init = do
-    dir <- runData wolfDir
-    iFile <- runData initFile
-    mex <- readJSONWithMaybe iFile
-    case mex of
+    mid <- runData getInitData
+    case mid of
         Just d ->
             liftIO $
             die $
             unwords
                 [ "A wolf repository has already been initialised in"
-                , toFilePath dir
+                , toFilePath $ initDataDir d
                 , "on"
                 , show $ initTimestamp d
                 ]
-        Nothing -> do
-            ensureDir dir
-            d <- genInitData
-            writeJSON iFile d
+        Nothing ->
             runData $ do
+                initWolf
                 gitInit
                 makeGitCommit "Initial commit"

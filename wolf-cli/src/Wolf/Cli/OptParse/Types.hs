@@ -2,7 +2,7 @@ module Wolf.Cli.OptParse.Types where
 
 import Import
 
-import Wolf.Data.Types
+import Wolf.Data
 
 type Arguments = (Command, Flags)
 

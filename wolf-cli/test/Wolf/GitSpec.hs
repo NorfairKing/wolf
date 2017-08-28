@@ -5,9 +5,10 @@ module Wolf.GitSpec
 import TestImport
 import TestUtils
 
+import Wolf.Data
+
 import Wolf.Cli.Command.Git
 import Wolf.Cli.OptParse.Types
-import Wolf.Data.Types
 
 import Wolf.Data.Types.Gen ()
 

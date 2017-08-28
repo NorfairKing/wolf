@@ -11,12 +11,8 @@ import Data.Time
 import Wolf.Cli.Editor
 import Wolf.Cli.OptParse.Types
 import Wolf.Cli.Utils
+import Wolf.Data
 import Wolf.Data.Git
-import Wolf.Data.Index
-import Wolf.Data.Init
-import Wolf.Data.Note
-import Wolf.Data.NoteIndex
-import Wolf.Data.Types
 
 note :: (MonadIO m, MonadReader Settings m) => [Text] -> m ()
 note people =

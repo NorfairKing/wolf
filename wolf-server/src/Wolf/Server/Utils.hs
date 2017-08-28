@@ -4,7 +4,7 @@ import Import
 
 import Control.Monad.Reader
 
-import Wolf.Data.Types
+import Wolf.Data
 
 import Wolf.Server.Types
 

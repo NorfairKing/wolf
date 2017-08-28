@@ -20,8 +20,7 @@ import Servant.API
 import Servant.Client
 
 import Wolf.API
-import Wolf.Data.Entry.Types
-import Wolf.Data.Types
+import Wolf.Data
 
 clientGetPersonEntry :: PersonUuid -> ClientM PersonEntry
 clientPostNewPerson :: PersonEntry -> ClientM PersonUuid
