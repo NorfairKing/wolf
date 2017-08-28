@@ -25,19 +25,19 @@ combineToInstructions (CommandServe ServeFlags {..}) Flags Configuration = do
     pure
         ( DispatchServe
               ServeSettings
-              { serveSetPort = fromMaybe 8000 serveFlagPort
+              { serveSetPort = fromMaybe defaultPort serveFlagPort
               , serveSetDataDir = dd
               }
         , Settings)
+
+defaultPort :: Int
+defaultPort = 8000
 
 getConfiguration :: Command -> Flags -> IO Configuration
 getConfiguration _ _ = pure Configuration
 
 getArguments :: IO Arguments
-getArguments = do
-    args <- getArgs
-    let result = runArgumentsParser args
-    handleParseResult result
+getArguments = runArgumentsParser <$> getArgs >>= handleParseResult
 
 runArgumentsParser :: [String] -> ParserResult Arguments
 runArgumentsParser = execParserPure prefs_ argParser

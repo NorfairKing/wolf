@@ -9,6 +9,7 @@ import GHC.Generics as X hiding (Selector)
 
 import System.Exit as X
 
+import Data.Function as X
 import Data.List as X hiding (head, init, last, tail)
 import Data.Maybe as X
 import Data.Monoid as X

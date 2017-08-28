@@ -11,12 +11,13 @@ import TestImport
 import Network.HTTP.Types
 import Servant.Client
 
+import Wolf.API
 import Wolf.Client
 
+import Wolf.API.Gen ()
 import Wolf.Data.Entry.Types.Gen ()
 import Wolf.Data.Types.Gen ()
 
-import Wolf.API.Gen ()
 import Wolf.Server.TestUtils
 
 spec :: Spec
@@ -40,8 +41,12 @@ spec =
                     Right uuid -> uuid `shouldSatisfy` isValid
         it "returns a 409 error if the username already exists" $ \cenv ->
             forAll genValid $ \register ->
-                withValidNewUser cenv $ \_ -> do
-                    errOrUuid <- runClient cenv $ clientPostRegister register
+                forAll genValid $ \secondPassword -> do
+                    void $ runClientOrError cenv $ clientPostRegister register
+                    errOrUuid <-
+                        runClient cenv $
+                        clientPostRegister $
+                        register {registerPassword = secondPassword}
                     case errOrUuid of
                         Left err ->
                             let snf =

@@ -2,6 +2,7 @@
 
 module Wolf.Server.Accounts
     ( getAccounts
+    , storeAccounts
     , lookupAccountUUID
     , tryToAddNewAccount
     , getAccount
@@ -19,11 +20,19 @@ import Wolf.Data.JSONUtils
 import Wolf.Server.Path
 import Wolf.Server.Types
 
+-- | Retrieve global accounts data
 getAccounts ::
        (MonadIO m, MonadReader WolfServerEnv m) => m (Map Text AccountUUID)
 getAccounts = do
     af <- accountsFile
     readJSONWithDefault M.empty af
+
+-- | Store global accounts data
+storeAccounts ::
+       (MonadIO m, MonadReader WolfServerEnv m) => Map Text AccountUUID -> m ()
+storeAccounts accs = do
+    af <- accountsFile
+    writeJSON af accs
 
 lookupAccountUUID ::
        (MonadIO m, MonadReader WolfServerEnv m) => Text -> m (Maybe AccountUUID)
@@ -31,18 +40,23 @@ lookupAccountUUID username = do
     as <- getAccounts
     pure $ M.lookup username as
 
+-- | Tries to add a new account with the given username.
+--
+-- If the username already exists, this returns 'Nothing'.
+-- If the username does not exist yet, this returns 'Just' with a new 'AccountUUID'.
+-- This also adds the new 'AccountUUID' to the global accounts file.
 tryToAddNewAccount ::
        (MonadIO m, MonadReader WolfServerEnv m) => Text -> m (Maybe AccountUUID)
 tryToAddNewAccount username = do
-    af <- accountsFile
     as <- getAccounts
     case M.lookup username as of
         Just _ -> pure Nothing
         Nothing -> do
             uuid <- liftIO newAccountUUID
-            writeJSON af $ M.insert username uuid as
+            storeAccounts $ M.insert username uuid as
             pure $ Just uuid
 
+-- | Retrieve account data
 getAccount ::
        (MonadIO m, MonadReader WolfServerEnv m)
     => AccountUUID
@@ -51,6 +65,9 @@ getAccount uuid = do
     adf <- accountDataFile uuid
     readJSONWithMaybe adf
 
+-- | Store account data
+--
+-- WARNING: this does not store the account in the global accounts file.
 storeAccount :: (MonadIO m, MonadReader WolfServerEnv m) => Account -> m ()
 storeAccount acc = do
     adf <- accountDataFile $ accountUUID acc

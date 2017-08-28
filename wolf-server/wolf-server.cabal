@@ -99,6 +99,7 @@ test-suite wolf-server-test
         TestImport
         Wolf.API.Gen
         Wolf.Server.AccountServerSpec
+        Wolf.Server.AccountsSpec
         Wolf.Server.PersonServerSpec
         Wolf.Server.PropertiesSpec
         Wolf.Server.TestUtils
