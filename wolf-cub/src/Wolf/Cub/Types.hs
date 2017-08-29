@@ -13,9 +13,13 @@ import Wolf.Data.Entry.Types
 import Wolf.Data.Types
 
 data CubState = CubState
-    { cubStatePersonList :: List ResourceName (Text, PersonUuid)
-    , cubStatePopupUuid :: Maybe (PersonUuid, Maybe PersonEntry)
+    { cubStateShown :: CubShown
     , cubStateDataSettings :: DataSettings
+    } deriving (Show, Generic)
+
+data CubShown = CubShown
+    { cubShownPersonList :: List ResourceName (Text, PersonUuid)
+    , cubShownPopupUuid :: Maybe (PersonUuid, Maybe PersonEntry)
     } deriving (Show, Generic)
 
 newtype ResourceName =
