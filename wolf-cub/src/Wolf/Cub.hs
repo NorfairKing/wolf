@@ -35,14 +35,12 @@ runWolfCub = do
 initialState :: Index -> DataSettings -> CubState
 initialState i ds =
     CubState
-    { cubStateShown =
-          CubShown
-          { cubShownPersonList =
-                list "person-list" (V.fromList $ indexTuples i) 1
-          , cubShownPopupUuid = Nothing
-          }
+    { cubStateShown = CubShowPersonList $ makePersonList i
     , cubStateDataSettings = ds
     }
+
+makePersonList :: Index -> List ResourceName (Text, PersonUuid)
+makePersonList i = list "person-list" (V.fromList $ indexTuples i) 1
 
 cubApp :: App CubState () ResourceName
 cubApp =
@@ -56,18 +54,23 @@ cubApp =
 
 drawUI :: CubState -> [Widget ResourceName]
 drawUI CubState {..} =
-    (case cubShownPopupUuid of
-         Nothing -> []
-         Just personUuid -> [popup personUuid]) ++
-    [listUi]
+    case cubStateShown of
+        CubShowPersonList l -> drawPersonList l
+        CubShowPerson puuid mpe -> drawPerson puuid mpe
+
+drawPersonList :: List ResourceName (Text, PersonUuid) -> [Widget ResourceName]
+drawPersonList personList = [listUi]
   where
-    CubShown {..} = cubStateShown
     listUi =
         borderWithLabel (txt "[Wolf Cub]") $
-        renderList renderElement True cubShownPersonList
+        renderList renderElement True personList
     renderElement :: Bool -> (Text, PersonUuid) -> Widget ResourceName
     renderElement _ (name, _) = padLeftRight 1 $ txt name
-    popup (personUuid, mpe) =
+
+drawPerson :: PersonUuid -> Maybe PersonEntry -> [Widget n]
+drawPerson personUuid mpe = [popup]
+  where
+    popup =
         centerLayer $
         borderWithLabel (str $ personUuidString personUuid) $
         padAll 1 $
@@ -112,43 +115,46 @@ appEvent ::
     -> BrickEvent ResourceName ()
     -> EventM ResourceName (Next CubState)
 appEvent state e =
-    let cs@CubShown {..} = cubStateShown state
-    in do nshown <-
-              case e of
-                  (VtyEvent ve) ->
-                      case cubShownPopupUuid of
-                          Nothing ->
-                              case ve of
-                                  (EvKey V.KEsc []) -> halt cs
-                                  (EvKey (V.KChar 'q') []) -> halt cs
-                                  (EvKey V.KEnter []) -> do
-                                      let msel =
-                                              listSelectedElement
-                                                  cubShownPersonList
-                                      case msel of
-                                          Nothing -> continue cs
-                                          Just (_, (_, personUuid)) -> do
-                                              mpe <-
-                                                  liftIO $
-                                                  runReaderT
-                                                      (getPersonEntry personUuid) $
-                                                  cubStateDataSettings state
-                                              continue $
-                                                  cs
-                                                  { cubShownPopupUuid =
-                                                        Just (personUuid, mpe)
-                                                  }
-                                  _ -> do
-                                      nl <-
-                                          handleListEvent ve cubShownPersonList
-                                      continue $ cs {cubShownPersonList = nl}
-                          Just _ ->
-                              let unpop =
-                                      continue $
-                                      cs {cubShownPopupUuid = Nothing}
-                              in case ve of
-                                     (EvKey V.KEsc []) -> unpop
-                                     (EvKey (V.KChar 'q') []) -> unpop
-                                     _ -> continue cs
-                  _ -> continue cs
-          pure $ (\shown -> state {cubStateShown = shown}) <$> nshown
+    case cubStateShown state of
+        CubShowPersonList personList ->
+            case e of
+                (VtyEvent ve) ->
+                    case ve of
+                        (EvKey V.KEsc []) -> halt state
+                        (EvKey (V.KChar 'q') []) -> halt state
+                        (EvKey V.KEnter []) -> do
+                            let msel = listSelectedElement personList
+                            case msel of
+                                Nothing -> continue state
+                                Just (_, (_, personUuid)) -> do
+                                    mpe <-
+                                        liftIO $
+                                        runReaderT (getPersonEntry personUuid) $
+                                        cubStateDataSettings state
+                                    continue $
+                                        state
+                                        { cubStateShown =
+                                              CubShowPerson personUuid mpe
+                                        }
+                        _ -> do
+                            nl <- handleListEvent ve personList
+                            continue $
+                                state {cubStateShown = CubShowPersonList nl}
+                _ -> continue state
+        CubShowPerson _ _ ->
+            case e of
+                (VtyEvent ve) ->
+                    let unpop = do
+                            index <-
+                                runReaderT getIndexWithDefault $
+                                cubStateDataSettings state
+                            continue $
+                                state
+                                { cubStateShown =
+                                      CubShowPersonList $ makePersonList index
+                                }
+                    in case ve of
+                           (EvKey V.KEsc []) -> unpop
+                           (EvKey (V.KChar 'q') []) -> unpop
+                           _ -> continue state
+                _ -> continue state

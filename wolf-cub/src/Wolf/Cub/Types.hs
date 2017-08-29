@@ -17,10 +17,11 @@ data CubState = CubState
     , cubStateDataSettings :: DataSettings
     } deriving (Show, Generic)
 
-data CubShown = CubShown
-    { cubShownPersonList :: List ResourceName (Text, PersonUuid)
-    , cubShownPopupUuid :: Maybe (PersonUuid, Maybe PersonEntry)
-    } deriving (Show, Generic)
+data CubShown
+    = CubShowPersonList (List ResourceName (Text, PersonUuid))
+    | CubShowPerson PersonUuid
+                    (Maybe PersonEntry)
+    deriving (Show, Generic)
 
 newtype ResourceName =
     ResourceName String
