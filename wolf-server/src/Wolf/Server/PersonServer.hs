@@ -26,15 +26,15 @@ import Wolf.API
 import Wolf.Server.Types
 import Wolf.Server.Utils
 
-personServer :: ServerT WolfAPI WolfHandler
+personServer :: ServerT PersonAPI WolfHandler
 personServer =
     serveGetPersonEntry :<|> servePostNewPerson :<|> serveGetPersonByAlias :<|>
     servePostPersonSetAlias :<|>
     serveGetPersonQuery
 
-serveGetPersonEntry :: PersonUuid -> WolfHandler PersonEntry
-serveGetPersonEntry personUuid = do
-    mpe <- runData $ getPersonEntry personUuid
+serveGetPersonEntry :: Account -> PersonUuid -> WolfHandler PersonEntry
+serveGetPersonEntry acc personUuid = do
+    mpe <- runDataForAccount acc $ getPersonEntry personUuid
     case mpe of
         Nothing ->
             throwError $
@@ -46,15 +46,15 @@ serveGetPersonEntry personUuid = do
             }
         Just pe -> pure pe
 
-servePostNewPerson :: PersonEntry -> WolfHandler PersonUuid
-servePostNewPerson pe = do
+servePostNewPerson :: Account -> PersonEntry -> WolfHandler PersonUuid
+servePostNewPerson acc pe = do
     personUuid <- liftIO nextRandomPersonUuid
-    runData $ putPersonEntry personUuid pe
+    runDataForAccount acc $ putPersonEntry personUuid pe
     pure personUuid
 
-serveGetPersonByAlias :: Text -> WolfHandler PersonUuid
-serveGetPersonByAlias key = do
-    mPersonUuid <- runData $ (>>= lookupInIndex key) <$> getIndex
+serveGetPersonByAlias :: Account -> Text -> WolfHandler PersonUuid
+serveGetPersonByAlias acc key = do
+    mPersonUuid <- runDataForAccount acc $ (>>= lookupInIndex key) <$> getIndex
     case mPersonUuid of
         Nothing ->
             throwError $
@@ -66,13 +66,13 @@ serveGetPersonByAlias key = do
             }
         Just personUuid -> pure personUuid
 
-servePostPersonSetAlias :: SetPersonAlias -> WolfHandler ()
-servePostPersonSetAlias SetPersonAlias {..} =
-    runData $ do
+servePostPersonSetAlias :: Account -> SetPersonAlias -> WolfHandler ()
+servePostPersonSetAlias acc SetPersonAlias {..} =
+    runDataForAccount acc $ do
         index <- getIndexWithDefault
         let index' =
                 addIndexEntry setPersonAliasAlias setPersonAliasPersonUuid index
         putIndex index'
 
-serveGetPersonQuery :: PersonQuery -> WolfHandler [PersonUuid]
-serveGetPersonQuery = undefined
+serveGetPersonQuery :: Account -> PersonQuery -> WolfHandler [PersonUuid]
+serveGetPersonQuery _ = undefined

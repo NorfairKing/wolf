@@ -1,16 +1,24 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE LiberalTypeSynonyms #-}
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE DataKinds #-}
 
 module Wolf.Server.TestUtils
-    ( withWolfServer
+    ( withEnv
+    , withTestSandbox
+    , withWolfServer
     , runClient
     , runClientOrError
+    , withValidNewUser
     ) where
 
 import TestImport
 
+import qualified Data.Text.Encoding as TE
+
 import qualified Network.HTTP.Client as HTTP
+import Network.HTTP.Types
 
 import Servant
 import Servant.Client
@@ -18,37 +26,46 @@ import Servant.Client
 import Network.Wai.Handler.Warp (withApplication)
 
 import Wolf.API
-import Wolf.Data.Types
+import Wolf.Client
 import Wolf.Server.Serve
 import Wolf.Server.Types
 
+import Wolf.API.Gen ()
+
+testSandbox :: MonadIO m => m (Path Abs Dir)
+testSandbox = liftIO $ resolveDir' "test-sandbox"
+
+withEnv :: WolfServerEnv -> ReaderT WolfServerEnv IO a -> IO a
+withEnv = flip runReaderT
+
+withTestSandbox :: SpecWith WolfServerEnv -> Spec
+withTestSandbox = around withSandbox
+  where
+    withSandbox :: ActionWith WolfServerEnv -> IO ()
+    withSandbox func = do
+        sb <- testSandbox
+        let clear = ignoringAbsence $ removeDirRecur sb
+        clear
+        let env = WolfServerEnv sb
+        func env
+        clear
+
 withWolfServer :: SpecWith ClientEnv -> Spec
 withWolfServer specFunc = do
-    let getDataDir :: IO (Path Abs Dir)
-        getDataDir = resolveDir' "test-sandbox"
-    let setupDSAndMan :: IO (DataSettings, HTTP.Manager)
-        setupDSAndMan = do
-            wd <- resolveDir' "test-sandbox"
-            let ds = DataSettings {dataSetWolfDir = wd}
-            man <- HTTP.newManager HTTP.defaultManagerSettings
-            pure (ds, man)
-    let withApp :: (ClientEnv -> IO ()) -> (DataSettings, HTTP.Manager) -> IO ()
-        withApp func (ds, man) = do
-            let wolfEnv = WolfServerEnv {wseDataSettings = ds}
+    let setupMan :: IO HTTP.Manager
+        setupMan = HTTP.newManager HTTP.defaultManagerSettings
+    let withApp :: (ClientEnv -> IO ()) -> HTTP.Manager -> IO ()
+        withApp func man = do
+            dd <- testSandbox
+            let clear = ignoringAbsence $ removeDirRecur dd
+            clear
+            let wolfEnv = WolfServerEnv {wseDataDir = dd}
             let getServer = pure $ makeWolfServer wolfEnv
-            withServantServer wolfAPI getServer $ \burl ->
+            withServantServerAndContext wolfAPI (authContext wolfEnv) getServer $ \burl ->
                 let cenv = ClientEnv man burl
                 in func cenv
-    let cleanup = do
-            wd <- getDataDir -- FIXME could go wrong if the server makes any symbolic links
-            ignoringAbsence $ removeDirRecur wd
-    afterAll_ cleanup $ beforeAll setupDSAndMan $ aroundWith withApp specFunc
-
--- | Start a servant application on an open port, run the provided function,
--- then stop the application.
-withServantServer ::
-       HasServer a '[] => Proxy a -> IO (Server a) -> (BaseUrl -> IO r) -> IO r
-withServantServer api = withServantServerAndContext api EmptyContext
+            clear
+    beforeAll setupMan $ aroundWith withApp specFunc
 
 -- | Like 'withServantServer', but allows passing in a 'Context' to the
 -- application.
@@ -74,3 +91,29 @@ runClientOrError cenv func = do
             expectationFailure $ show err
             undefined -- Won't get here anyway ^
         Right res -> pure res
+
+withValidNewUser :: ClientEnv -> (BasicAuthData -> IO ()) -> Property
+withValidNewUser cenv func =
+    forAll genValid $ \register -> do
+        errOrUuid <- runClient cenv $ clientPostRegister register
+        case errOrUuid of
+            Left err ->
+                let snf =
+                        expectationFailure $
+                        "Registration should not fail with error: " <> show err
+                in case err of
+                       FailureResponse {} ->
+                           if statusCode (responseStatus err) == 409
+                               then pure () -- Username already exists, just stop here then.
+                               else snf
+                       _ -> snf
+            Right _ -> do
+                let basicAuthData =
+                        BasicAuthData
+                        { basicAuthUsername =
+                              TE.encodeUtf8 $
+                              usernameText $ registerUsername register
+                        , basicAuthPassword =
+                              TE.encodeUtf8 $ registerPassword register
+                        }
+                func basicAuthData

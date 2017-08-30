@@ -7,13 +7,10 @@ module Wolf.Server.OptParse
 
 import Import
 
-import Control.Monad.Reader
-
 import System.Environment (getArgs)
 
 import Options.Applicative
 
-import qualified Wolf.Cli.OptParse as Cli
 import Wolf.Server.OptParse.Types
 
 getInstructions :: IO Instructions
@@ -23,25 +20,27 @@ getInstructions = do
     combineToInstructions cmd flags config
 
 combineToInstructions :: Command -> Flags -> Configuration -> IO Instructions
-combineToInstructions (CommandServe ServeFlags {..}) Flags {..} Configuration = do
-    ds <- Cli.deriveDataSettings flagDataFlags
+combineToInstructions (CommandServe ServeFlags {..}) Flags Configuration = do
+    dd <- resolveDir' $ fromMaybe "." serveFlagDataDir
     pure
         ( DispatchServe
-              ServeSettings {serveSetPort = fromMaybe 8000 serveFlagPort}
-        , Settings {setDataSettings = ds})
+              ServeSettings
+              { serveSetPort = fromMaybe defaultPort serveFlagPort
+              , serveSetDataDir = dd
+              }
+        , Settings)
+
+defaultPort :: Int
+defaultPort = 8000
 
 getConfiguration :: Command -> Flags -> IO Configuration
 getConfiguration _ _ = pure Configuration
 
 getArguments :: IO Arguments
-getArguments = do
-    args <- getArgs
-    env <- Cli.getParserEnv
-    let result = runArgumentsParser env args
-    handleParseResult result
+getArguments = runArgumentsParser <$> getArgs >>= handleParseResult
 
-runArgumentsParser :: Cli.ParserEnv -> [String] -> ParserResult Arguments
-runArgumentsParser pe = execParserPure prefs_ $ argParser pe
+runArgumentsParser :: [String] -> ParserResult Arguments
+runArgumentsParser = execParserPure prefs_ argParser
   where
     prefs_ =
         ParserPrefs
@@ -53,14 +52,14 @@ runArgumentsParser pe = execParserPure prefs_ $ argParser pe
         , prefColumns = 80
         }
 
-argParser :: Cli.ParserEnv -> ParserInfo Arguments
-argParser pEnv = info (helper <*> parseArgs pEnv) help_
+argParser :: ParserInfo Arguments
+argParser = info (helper <*> parseArgs) help_
   where
     help_ = fullDesc <> progDesc description
     description = "Wolf server"
 
-parseArgs :: Cli.ParserEnv -> Parser Arguments
-parseArgs pEnv = (,) <$> parseCommand <*> parseFlags pEnv
+parseArgs :: Parser Arguments
+parseArgs = (,) <$> parseCommand <*> parseFlags
 
 parseCommand :: Parser Command
 parseCommand = hsubparser $ mconcat [command "serve" parseCommandServe]
@@ -73,8 +72,15 @@ parseCommandServe = info parser modifier
         (ServeFlags <$>
          option
              (Just <$> auto)
-             (mconcat [value Nothing, help "the port to serve on"]))
+             (mconcat [long "port", value Nothing, help "the port to serve on"]) <*>
+         option
+             (Just <$> str)
+             (mconcat
+                  [ long "data-dir"
+                  , value Nothing
+                  , help "the data directory to store data in"
+                  ]))
     modifier = fullDesc <> progDesc "Command example."
 
-parseFlags :: Cli.ParserEnv -> Parser Flags
-parseFlags pEnv = Flags <$> runReaderT Cli.parseDataFlags pEnv
+parseFlags :: Parser Flags
+parseFlags = pure Flags

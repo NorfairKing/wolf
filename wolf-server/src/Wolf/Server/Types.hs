@@ -1,17 +1,16 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module Wolf.Server.Types where
+module Wolf.Server.Types
+    ( WolfHandler
+    , WolfServerEnv(..)
+    ) where
 
 import Import
 
-import Control.Monad.Reader
-
 import Servant
-
-import Wolf.Data.Types
 
 type WolfHandler = ReaderT WolfServerEnv Handler
 
 newtype WolfServerEnv = WolfServerEnv
-    { wseDataSettings :: DataSettings
+    { wseDataDir :: Path Abs Dir
     } deriving (Show, Eq, Generic)

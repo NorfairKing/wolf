@@ -1,14 +1,22 @@
-module Wolf.Server.Utils where
+module Wolf.Server.Utils
+    ( runDataForAccount
+    , runDataForAccountUUID
+    ) where
 
 import Import
 
-import Control.Monad.Reader
-
 import Wolf.Data.Types
 
+import Wolf.API
+import Wolf.Server.Path
 import Wolf.Server.Types
 
-runData :: ReaderT DataSettings IO a -> WolfHandler a
-runData func = do
-    ds <- asks wseDataSettings
+runDataForAccount :: Account -> ReaderT DataSettings IO a -> WolfHandler a
+runDataForAccount acc = runDataForAccountUUID (accountUUID acc)
+
+runDataForAccountUUID ::
+       AccountUUID -> ReaderT DataSettings IO a -> WolfHandler a
+runDataForAccountUUID uuid func = do
+    dd <- accountDataDir uuid
+    let ds = DataSettings {dataSetWolfDir = dd}
     liftIO $ runReaderT func ds

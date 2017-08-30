@@ -13,8 +13,11 @@ author: Tom Sydney Kerckhove
 library
     exposed-modules:
         Wolf.Server
+        Wolf.Server.AccountServer
+        Wolf.Server.Accounts
         Wolf.Server.OptParse
         Wolf.Server.OptParse.Types
+        Wolf.Server.Path
         Wolf.Server.PersonServer
         Wolf.Server.Serve
         Wolf.Server.Types
@@ -31,6 +34,7 @@ library
         servant-server >=0.9 && <0.10,
         text >=1.2 && <1.3,
         unordered-containers >=0.2 && <0.3,
+        uuid >=1.3 && <1.4,
         validity >=0.3 && <0.4,
         validity-containers >=0.1 && <0.2,
         validity-text >=0.1 && <0.2,
@@ -66,6 +70,7 @@ test-suite wolf-server-test
         bytestring -any,
         containers -any,
         genvalidity -any,
+        genvalidity-bytestring -any,
         genvalidity-containers -any,
         genvalidity-hspec -any,
         genvalidity-hspec-aeson -any,
@@ -73,9 +78,11 @@ test-suite wolf-server-test
         genvalidity-time -any,
         hspec -any,
         http-client >=0.5 && <0.6,
+        http-types >=0.9 && <0.10,
         mtl -any,
         path -any,
         path-io -any,
+        servant -any,
         servant-client -any,
         servant-server -any,
         text -any,
@@ -90,7 +97,10 @@ test-suite wolf-server-test
     hs-source-dirs: test/
     other-modules:
         TestImport
-        Wolf.Server.PropertiesSpec
+        Wolf.API.Gen
+        Wolf.Server.AccountServerSpec
+        Wolf.Server.AccountsSpec
         Wolf.Server.PersonServerSpec
+        Wolf.Server.PropertiesSpec
         Wolf.Server.TestUtils
     ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
