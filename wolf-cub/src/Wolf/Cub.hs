@@ -35,10 +35,12 @@ runWolfCub = do
 initialState :: Index -> DataSettings -> CubState
 initialState i ds =
     CubState
-    { cubStatePersonList = list "person-list" (V.fromList $ indexTuples i) 1
-    , cubStatePopupUuid = Nothing
+    { cubStateShown = CubShowPersonList $ makePersonList i
     , cubStateDataSettings = ds
     }
+
+makePersonList :: Index -> List ResourceName (Text, PersonUuid)
+makePersonList i = list "person-list" (V.fromList $ indexTuples i) 1
 
 cubApp :: App CubState () ResourceName
 cubApp =
@@ -52,17 +54,23 @@ cubApp =
 
 drawUI :: CubState -> [Widget ResourceName]
 drawUI CubState {..} =
-    (case cubStatePopupUuid of
-         Nothing -> []
-         Just personUuid -> [popup personUuid]) ++
-    [listUi]
+    case cubStateShown of
+        CubShowPersonList l -> drawPersonList l
+        CubShowPerson puuid mpe -> drawPerson puuid mpe
+
+drawPersonList :: List ResourceName (Text, PersonUuid) -> [Widget ResourceName]
+drawPersonList personList = [listUi]
   where
     listUi =
         borderWithLabel (txt "[Wolf Cub]") $
-        renderList renderElement True cubStatePersonList
+        renderList renderElement True personList
     renderElement :: Bool -> (Text, PersonUuid) -> Widget ResourceName
     renderElement _ (name, _) = padLeftRight 1 $ txt name
-    popup (personUuid, mpe) =
+
+drawPerson :: PersonUuid -> Maybe PersonEntry -> [Widget n]
+drawPerson personUuid mpe = [popup]
+  where
+    popup =
         centerLayer $
         borderWithLabel (str $ personUuidString personUuid) $
         padAll 1 $
@@ -106,36 +114,47 @@ appEvent ::
        CubState
     -> BrickEvent ResourceName ()
     -> EventM ResourceName (Next CubState)
-appEvent cs e =
-    case e of
-        (VtyEvent ve) ->
-            case cubStatePopupUuid cs of
-                Nothing ->
+appEvent state e =
+    case cubStateShown state of
+        CubShowPersonList personList ->
+            case e of
+                (VtyEvent ve) ->
                     case ve of
-                        (EvKey V.KEsc []) -> halt cs
-                        (EvKey (V.KChar 'q') []) -> halt cs
+                        (EvKey V.KEsc []) -> halt state
+                        (EvKey (V.KChar 'q') []) -> halt state
                         (EvKey V.KEnter []) -> do
-                            let msel =
-                                    listSelectedElement $ cubStatePersonList cs
+                            let msel = listSelectedElement personList
                             case msel of
-                                Nothing -> continue cs
+                                Nothing -> continue state
                                 Just (_, (_, personUuid)) -> do
                                     mpe <-
                                         liftIO $
                                         runReaderT (getPersonEntry personUuid) $
-                                        cubStateDataSettings cs
+                                        cubStateDataSettings state
                                     continue $
-                                        cs
-                                        { cubStatePopupUuid =
-                                              Just (personUuid, mpe)
+                                        state
+                                        { cubStateShown =
+                                              CubShowPerson personUuid mpe
                                         }
                         _ -> do
-                            nl <- handleListEvent ve $ cubStatePersonList cs
-                            continue $ cs {cubStatePersonList = nl}
-                Just _ ->
-                    let unpop = continue $ cs {cubStatePopupUuid = Nothing}
+                            nl <- handleListEvent ve personList
+                            continue $
+                                state {cubStateShown = CubShowPersonList nl}
+                _ -> continue state
+        CubShowPerson _ _ ->
+            case e of
+                (VtyEvent ve) ->
+                    let unpop = do
+                            index <-
+                                runReaderT getIndexWithDefault $
+                                cubStateDataSettings state
+                            continue $
+                                state
+                                { cubStateShown =
+                                      CubShowPersonList $ makePersonList index
+                                }
                     in case ve of
                            (EvKey V.KEsc []) -> unpop
                            (EvKey (V.KChar 'q') []) -> unpop
-                           _ -> continue cs
-        _ -> continue cs
+                           _ -> continue state
+                _ -> continue state
