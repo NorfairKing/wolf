@@ -5,9 +5,9 @@ module Wolf.Server.Utils
 
 import Import
 
-import Wolf.Data.Types
-
 import Wolf.API
+import Wolf.Data
+
 import Wolf.Server.Path
 import Wolf.Server.Types
 

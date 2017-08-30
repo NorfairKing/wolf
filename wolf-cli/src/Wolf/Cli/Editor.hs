@@ -8,8 +8,6 @@ import qualified Data.Text as T
 import System.Environment
 import System.Process
 
-import Wolf.Data.Types
-
 startEditorOn :: MonadIO m => Path Abs File -> m EditingResult
 startEditorOn path = do
     ensureDir $ parent path
@@ -49,3 +47,8 @@ startEditorOn path = do
                          , editor
                          ]
                 else EditingSuccess
+
+data EditingResult
+    = EditingSuccess
+    | EditingFailure Text
+    deriving (Show, Eq)

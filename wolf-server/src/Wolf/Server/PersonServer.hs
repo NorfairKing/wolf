@@ -17,11 +17,8 @@ import Control.Monad.Except
 import Servant.API
 import Servant.Server
 
-import Wolf.Data.Entry.Types
-import Wolf.Data.Index
-import Wolf.Data.Types
-
 import Wolf.API
+import Wolf.Data
 
 import Wolf.Server.Types
 import Wolf.Server.Utils

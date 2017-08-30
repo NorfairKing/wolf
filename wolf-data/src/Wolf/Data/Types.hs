@@ -17,8 +17,9 @@ import Servant
 
 {-# ANN module ("HLint: ignore Use &&" :: Text) #-}
 
-newtype InitData = InitData
-    { initTimestamp :: UTCTime
+data InitData = InitData
+    { initDataDir :: Path Abs Dir
+    , initTimestamp :: UTCTime
     } deriving (Show, Eq, Ord, Generic)
 
 instance Validity InitData
@@ -83,11 +84,6 @@ personUuidText (PersonUuid uuid) = UUID.toText uuid
 
 parsePersonUuid :: Text -> Maybe PersonUuid
 parsePersonUuid = fmap PersonUuid . UUID.fromText
-
-data EditingResult
-    = EditingSuccess
-    | EditingFailure Text
-    deriving (Show, Eq, Generic)
 
 newtype DataSettings = DataSettings
     { dataSetWolfDir :: Path Abs Dir

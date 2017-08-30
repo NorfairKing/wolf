@@ -5,9 +5,10 @@ module Wolf.ReviewSpec
 import TestImport
 import TestUtils
 
+import Wolf.Data
+
 import Wolf.Cli.Command.Review
 import Wolf.Cli.OptParse.Types
-import Wolf.Data.Types
 
 import Wolf.Data.Types.Gen ()
 

@@ -27,11 +27,11 @@ newtype Dispatch =
     DispatchServe ServeSettings
     deriving (Show, Eq)
 
-data Settings =
-    Settings
-    deriving (Show, Eq)
-
 data ServeSettings = ServeSettings
     { serveSetPort :: Int
     , serveSetDataDir :: Path Abs Dir
     } deriving (Show, Eq)
+
+data Settings =
+    Settings
+    deriving (Show, Eq)

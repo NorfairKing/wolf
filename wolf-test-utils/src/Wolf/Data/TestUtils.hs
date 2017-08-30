@@ -2,7 +2,7 @@ module Wolf.Data.TestUtils where
 
 import Import
 
-import Wolf.Data.Types
+import Wolf.Data
 
 withDataSetsGen :: SpecWith (Gen DataSettings) -> Spec
 withDataSetsGen = beforeAll mkGen . afterAll_ cleanup

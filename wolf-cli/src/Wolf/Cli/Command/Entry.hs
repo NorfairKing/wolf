@@ -13,11 +13,8 @@ import Data.Time
 import Wolf.Cli.Editor
 import Wolf.Cli.OptParse.Types
 import Wolf.Cli.Utils
-import Wolf.Data.Entry.Types
+import Wolf.Data
 import Wolf.Data.Git
-import Wolf.Data.Index
-import Wolf.Data.Init
-import Wolf.Data.Types
 
 entry :: (MonadIO m, MonadReader Settings m) => Text -> m ()
 entry person =

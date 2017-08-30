@@ -16,8 +16,7 @@ import System.Environment (getArgs)
 import Options.Applicative
 
 import Wolf.Cli.OptParse.Types
-import Wolf.Data.Index
-import Wolf.Data.Types
+import Wolf.Data
 
 getInstructions :: IO Instructions
 getInstructions = do

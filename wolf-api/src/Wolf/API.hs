@@ -46,8 +46,7 @@ import qualified Crypto.BCrypt as BCrypt
 
 import Servant.API
 
-import Wolf.Data.Entry.Types
-import Wolf.Data.Types
+import Wolf.Data
 
 wolfAPI :: Proxy WolfAPI
 wolfAPI = Proxy

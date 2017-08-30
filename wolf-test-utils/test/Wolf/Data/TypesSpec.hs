@@ -6,7 +6,7 @@ module Wolf.Data.TypesSpec
 
 import TestImport
 
-import Wolf.Data.Types
+import Wolf.Data
 
 import Wolf.Data.Types.Gen ()
 

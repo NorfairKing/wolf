@@ -5,9 +5,10 @@ module Wolf.SummarySpec
 import TestImport
 import TestUtils
 
+import Wolf.Data
+
 import Wolf.Cli.Command.Summary
 import Wolf.Cli.OptParse.Types
-import Wolf.Data.Types
 
 import Wolf.Data.Entry.Types.Gen ()
 import Wolf.Data.Note.Types.Gen ()

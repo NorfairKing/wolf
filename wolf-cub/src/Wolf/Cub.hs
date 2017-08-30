@@ -19,9 +19,7 @@ import Brick.Widgets.Core
 import Brick.Widgets.List
 import Graphics.Vty as V
 
-import Wolf.Data.Entry
-import Wolf.Data.Index
-import Wolf.Data.Types
+import Wolf.Data
 
 import Wolf.Cub.OptParse
 import Wolf.Cub.Types

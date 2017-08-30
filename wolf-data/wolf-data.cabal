@@ -12,6 +12,7 @@ author: Tom Sydney Kerckhove
 
 library
     exposed-modules:
+        Wolf.Data
         Wolf.Data.Entry
         Wolf.Data.Entry.Types
         Wolf.Data.Git
@@ -40,6 +41,7 @@ library
         time >=1.6 && <1.7,
         validity >=0.3 && <0.4,
         validity-containers >=0.1 && <0.2,
+        validity-path >=0.1 && <0.2,
         validity-text >=0.1 && <0.2,
         validity-time >=0.0 && <0.1,
         unordered-containers >=0.2 && <0.3,

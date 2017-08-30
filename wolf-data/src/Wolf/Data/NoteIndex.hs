@@ -96,6 +96,12 @@ getPersonNotes personUuid = do
     nuuids <- getPersonNoteUuids personUuid
     catMaybes <$> mapM readNote nuuids
 
+-- | Create a new note, end to end.
+--
+-- This does all the relevant work:
+-- - Generating a new UUID
+-- - Adding the note uuid to the global note index
+-- - Adding the note uuid to the right people's note indices
 createNewNote :: (MonadIO m, MonadReader DataSettings m) => Note -> m NoteUuid
 createNewNote n = do
     gni <- getNoteIndex
