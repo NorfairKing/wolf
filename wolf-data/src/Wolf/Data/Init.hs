@@ -22,6 +22,7 @@ initWolf = do
     d <- genInitData
     writeInitData d
 
+-- | Retrieve the 'InitData'
 getInitData :: (MonadIO m, MonadReader DataSettings m) => m (Maybe InitData)
 getInitData = initFile >>= readJSONWithMaybe
 
@@ -30,7 +31,7 @@ writeInitData d = do
     iFile <- initFile
     writeJSON iFile d
 
--- | Retrieve the 'InitData'
+-- | Generate a new 'InitData'
 genInitData :: (MonadIO m, MonadReader DataSettings m) => m InitData
 genInitData = do
     dir <- wolfDir
