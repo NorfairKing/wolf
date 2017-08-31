@@ -6,6 +6,7 @@ module Wolf.Cub.Types where
 import Import
 
 import Data.String
+import Data.Time
 
 import Brick.Widgets.List (List)
 
@@ -13,6 +14,7 @@ import Wolf.Data
 
 data CubState = CubState
     { cubStateShown :: CubShown
+    , cubStateNow :: UTCTime
     , cubStateDataSettings :: DataSettings
     } deriving (Show, Generic)
 
@@ -24,6 +26,7 @@ data CubShown
 data PersonState = PersonState
     { personStateUuid :: PersonUuid
     , personStateEntry :: Maybe PersonEntry
+    , personStateNotes :: List ResourceName (NoteUuid, Note)
     } deriving (Show, Generic)
 
 newtype ResourceName =

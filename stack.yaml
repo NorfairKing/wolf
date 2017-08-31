@@ -22,4 +22,7 @@ extra-deps:
 - validity-time-0.0.0.1
 - validity-text-0.1.2.1
 - servant-quickcheck-0.0.2.4
+- brick-0.24.2
+- data-clist-0.1.2.0
+- word-wrap-0.4.1
 resolver: lts-8.17

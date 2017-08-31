@@ -7,6 +7,7 @@ import Import
 
 import Control.Monad.Reader
 
+import Data.Time
 import qualified Data.Vector as V
 
 import Brick.AttrMap as A
@@ -20,6 +21,7 @@ import Brick.Widgets.List
 import Graphics.Vty as V
 
 import Wolf.Data
+import Wolf.Data.Time
 
 import Wolf.Cub.OptParse
 import Wolf.Cub.Types
@@ -28,12 +30,16 @@ runWolfCub :: IO ()
 runWolfCub = do
     (DispatchRun RunSettings {..}, Settings) <- getInstructions
     index <- runReaderT getIndexWithDefault runSetDataSettings
-    void $ Brick.Main.defaultMain cubApp $ initialState index runSetDataSettings
+    now <- getCurrentTime
+    void $
+        Brick.Main.defaultMain cubApp $
+        initialState now index runSetDataSettings
 
-initialState :: Index -> DataSettings -> CubState
-initialState i ds =
+initialState :: UTCTime -> Index -> DataSettings -> CubState
+initialState now i ds =
     CubState
     { cubStateShown = CubShowPersonList $ makePersonList i
+    , cubStateNow = now
     , cubStateDataSettings = ds
     }
 
@@ -54,7 +60,7 @@ drawUI :: CubState -> [Widget ResourceName]
 drawUI CubState {..} =
     case cubStateShown of
         CubShowPersonList l -> drawPersonList l
-        CubShowPerson ps -> drawPerson ps
+        CubShowPerson ps -> drawPerson cubStateNow ps
 
 drawPersonList :: List ResourceName (Text, PersonUuid) -> [Widget ResourceName]
 drawPersonList personList = [listUi]
@@ -65,17 +71,17 @@ drawPersonList personList = [listUi]
     renderElement :: Bool -> (Text, PersonUuid) -> Widget ResourceName
     renderElement _ (name, _) = padLeftRight 1 $ txt name
 
-drawPerson :: PersonState -> [Widget n]
-drawPerson PersonState {..} = [popup]
+drawPerson :: UTCTime -> PersonState -> [Widget ResourceName]
+drawPerson now PersonState {..} = [popup]
   where
     popup =
-        centerLayer $
-        borderWithLabel (str $ personUuidString personStateUuid) $
-        padAll 1 $
+        borderWithLabel (str $ "[" ++ personUuidString personStateUuid ++ "]") $
+        personEntryPart <=> hBorder <=> personNotesPart
+    personEntryPart =
         case personStateEntry of
             Nothing ->
                 let str_ = "No entry found."
-                in vLimit 3 $ hLimit (length str_ + 2) $ str str_
+                in str str_
             Just pe ->
                 let tups = personEntryTuples pe
                     keys =
@@ -90,11 +96,21 @@ drawPerson PersonState {..} = [popup]
                         vBox $
                         withAttr headerAttr (txt "Last Updated") :
                         map
-                            (str .
-                             show .
+                            (txt .
+                             formatMomentNicely now .
                              personPropertyValueLastUpdatedTimestamp . snd)
                             tups
-                in keys <+> padLeftRight 1 values <+> lastChangeds
+                in padLeftRight 1 $
+                   keys <+> padLeftRight 1 values <+> lastChangeds
+    personNotesPart =
+        vLimit 1 (center (withAttr headerAttr $ txt "Notes")) <=>
+        renderList renderElement True personStateNotes
+      where
+        renderElement :: Bool -> (NoteUuid, Note) -> Widget ResourceName
+        renderElement _ (_, Note {..}) =
+            borderWithLabel
+                (txt $ "[" <> formatMomentNicely now noteTimestamp <> "]") $
+            txtWrap noteContents
 
 headerAttr :: AttrName
 headerAttr = "header"
@@ -103,10 +119,7 @@ theMap :: A.AttrMap
 theMap =
     A.attrMap
         V.defAttr
-        [ (listAttr, fg V.white)
-        , (listSelectedAttr, fg V.blue)
-        , (headerAttr, fg V.brightWhite)
-        ]
+        [(listSelectedAttr, fg V.brightWhite), (headerAttr, fg V.white)]
 
 appEvent ::
        CubState
@@ -125,10 +138,21 @@ appEvent state e =
                             case msel of
                                 Nothing -> continue state
                                 Just (_, (_, personUuid)) -> do
-                                    mpe <-
+                                    (mpe, ns) <-
                                         liftIO $
-                                        runReaderT (getPersonEntry personUuid) $
-                                        cubStateDataSettings state
+                                        flip
+                                            runReaderT
+                                            (cubStateDataSettings state) $ do
+                                            mpe <- getPersonEntry personUuid
+                                            nuuids <-
+                                                getPersonNoteUuids personUuid
+                                            ns <-
+                                                fmap catMaybes $
+                                                forM nuuids $ \uuid -> do
+                                                    n <- readNote uuid
+                                                    pure $ (,) uuid <$> n
+                                            pure (mpe, ns)
+                                    let nl = list "notes" (V.fromList ns) 1
                                     continue $
                                         state
                                         { cubStateShown =
@@ -136,6 +160,7 @@ appEvent state e =
                                                   PersonState
                                                   { personStateUuid = personUuid
                                                   , personStateEntry = mpe
+                                                  , personStateNotes = nl
                                                   }
                                         }
                         _ -> do
@@ -143,7 +168,7 @@ appEvent state e =
                             continue $
                                 state {cubStateShown = CubShowPersonList nl}
                 _ -> continue state
-        CubShowPerson _ ->
+        CubShowPerson person ->
             case e of
                 (VtyEvent ve) ->
                     let unpop = do
@@ -158,5 +183,13 @@ appEvent state e =
                     in case ve of
                            (EvKey V.KEsc []) -> unpop
                            (EvKey (V.KChar 'q') []) -> unpop
-                           _ -> continue state
+                           _ -> do
+                               nl <-
+                                   handleListEvent ve $ personStateNotes person
+                               continue $
+                                   state
+                                   { cubStateShown =
+                                         CubShowPerson $
+                                         person {personStateNotes = nl}
+                                   }
                 _ -> continue state

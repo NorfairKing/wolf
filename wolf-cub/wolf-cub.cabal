@@ -18,14 +18,15 @@ library
         Wolf.Cub.OptParse.Types
     build-depends:
         base >=4.9 && <=5,
-        wolf-cli -any,
-        wolf-data -any,
+        brick >=0.24 && <0.25,
         mtl -any,
         optparse-applicative -any,
-        brick >=0.17 && <0.18,
-        vty >=5.15 && <5.16,
         text >=1.2 && <1.3,
-        vector >=0.11 && <0.12
+        time >=1.6 && <1.7,
+        vector >=0.11 && <0.12,
+        vty >=5.15 && <5.16,
+        wolf-cli -any,
+        wolf-data -any
     default-language: Haskell2010
     default-extensions: NoImplicitPrelude
     hs-source-dirs: src/
