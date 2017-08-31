@@ -18,9 +18,13 @@ data CubState = CubState
 
 data CubShown
     = CubShowPersonList (List ResourceName (Text, PersonUuid))
-    | CubShowPerson PersonUuid
-                    (Maybe PersonEntry)
+    | CubShowPerson PersonState
     deriving (Show, Generic)
+
+data PersonState = PersonState
+    { personStateUuid :: PersonUuid
+    , personStateEntry :: Maybe PersonEntry
+    } deriving (Show, Generic)
 
 newtype ResourceName =
     ResourceName String

@@ -54,7 +54,7 @@ drawUI :: CubState -> [Widget ResourceName]
 drawUI CubState {..} =
     case cubStateShown of
         CubShowPersonList l -> drawPersonList l
-        CubShowPerson puuid mpe -> drawPerson puuid mpe
+        CubShowPerson ps -> drawPerson ps
 
 drawPersonList :: List ResourceName (Text, PersonUuid) -> [Widget ResourceName]
 drawPersonList personList = [listUi]
@@ -65,14 +65,14 @@ drawPersonList personList = [listUi]
     renderElement :: Bool -> (Text, PersonUuid) -> Widget ResourceName
     renderElement _ (name, _) = padLeftRight 1 $ txt name
 
-drawPerson :: PersonUuid -> Maybe PersonEntry -> [Widget n]
-drawPerson personUuid mpe = [popup]
+drawPerson :: PersonState -> [Widget n]
+drawPerson PersonState {..} = [popup]
   where
     popup =
         centerLayer $
-        borderWithLabel (str $ personUuidString personUuid) $
+        borderWithLabel (str $ personUuidString personStateUuid) $
         padAll 1 $
-        case mpe of
+        case personStateEntry of
             Nothing ->
                 let str_ = "No entry found."
                 in vLimit 3 $ hLimit (length str_ + 2) $ str str_
@@ -132,14 +132,18 @@ appEvent state e =
                                     continue $
                                         state
                                         { cubStateShown =
-                                              CubShowPerson personUuid mpe
+                                              CubShowPerson
+                                                  PersonState
+                                                  { personStateUuid = personUuid
+                                                  , personStateEntry = mpe
+                                                  }
                                         }
                         _ -> do
                             nl <- handleListEvent ve personList
                             continue $
                                 state {cubStateShown = CubShowPersonList nl}
                 _ -> continue state
-        CubShowPerson _ _ ->
+        CubShowPerson _ ->
             case e of
                 (VtyEvent ve) ->
                     let unpop = do
