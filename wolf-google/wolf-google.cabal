@@ -1,0 +1,47 @@
+name: wolf-google
+version: 0.0.0.0
+cabal-version: >=1.10
+build-type: Simple
+license: AllRightsReserved
+license-file: LICENSE
+copyright: Copyright: (c) 2017 Tom Sydney Kerckhove
+maintainer: syd.kerckhove@gmail.com
+homepage: http://cs-syd.eu
+category: CsSyd
+author: Tom Sydney Kerckhove
+
+library
+    exposed-modules:
+        Import
+        Wolf.Google
+        Wolf.Google.OptParse
+        Wolf.Google.OptParse.Types
+        Wolf.Google.Types
+    build-depends:
+        base >=4.9 && <=5,
+        optparse-applicative >=0.13
+    default-language: Haskell2010
+    default-extensions: NoImplicitPrelude
+    hs-source-dirs: src/
+    ghc-options: -Wall
+
+executable wolf-google
+    main-is: Main.hs
+    build-depends:
+        base >=4.9 && <=5,
+        wolf-google -any
+    default-language: Haskell2010
+    hs-source-dirs: app/
+    ghc-options: -threaded -rtsopts -with-rtsopts=-N
+
+test-suite wolf-google-test
+    type: exitcode-stdio-1.0
+    main-is: Spec.hs
+    build-depends:
+        base >=4.9 && <=5,
+        wolf-google -any,
+        hspec -any
+    default-language: Haskell2010
+    default-extensions: NoImplicitPrelude
+    hs-source-dirs: test/
+    ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall

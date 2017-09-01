@@ -4,6 +4,7 @@ packages:
 - wolf-client
 - wolf-cub
 - wolf-data
+- wolf-google
 - wolf-server
 - wolf-test-utils
 extra-deps:
