@@ -1,6 +1,8 @@
 module Wolf.Google.OptParse
-    ( module Wolf.Google.OptParse
-    , module Wolf.Google.OptParse.Types
+    ( getInstructions
+    , Instructions
+    , Dispatch(..)
+    , Settings(..)
     ) where
 
 import Import
@@ -18,7 +20,8 @@ getInstructions = do
     combineToInstructions cmd flags config
 
 combineToInstructions :: Command -> Flags -> Configuration -> IO Instructions
-combineToInstructions Command Flags Configuration = pure (Dispatch, Settings)
+combineToInstructions CommandSuggest Flags Configuration =
+    pure (DispatchSuggest, Settings)
 
 getConfiguration :: Command -> Flags -> IO Configuration
 getConfiguration _ _ = pure Configuration
@@ -52,13 +55,13 @@ parseArgs :: Parser Arguments
 parseArgs = (,) <$> parseCommand <*> parseFlags
 
 parseCommand :: Parser Command
-parseCommand = hsubparser $ mconcat [command "command" parseCommandCommand]
+parseCommand = hsubparser $ mconcat [command "suggest" parseCommandSuggest]
 
-parseCommandCommand :: ParserInfo Command
-parseCommandCommand = info parser modifier
+parseCommandSuggest :: ParserInfo Command
+parseCommandSuggest = info parser modifier
   where
-    parser = pure Command
-    modifier = fullDesc <> progDesc "Command example."
+    parser = pure CommandSuggest
+    modifier = fullDesc <> progDesc "Suggest from google contacts."
 
 parseFlags :: Parser Flags
 parseFlags = pure Flags

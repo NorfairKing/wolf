@@ -7,7 +7,7 @@ type Arguments = (Command, Flags)
 type Instructions = (Dispatch, Settings)
 
 data Command =
-    Command
+    CommandSuggest
     deriving (Show, Eq)
 
 data Flags =
@@ -19,7 +19,7 @@ data Configuration =
     deriving (Show, Eq)
 
 data Dispatch =
-    Dispatch
+    DispatchSuggest
     deriving (Show, Eq)
 
 data Settings =
