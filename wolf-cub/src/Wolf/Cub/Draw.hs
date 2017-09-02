@@ -28,20 +28,27 @@ drawUI CubState {..} =
         CubShowPerson ps -> drawPerson cubStateNow ps
 
 drawPersonList :: PersonListState -> [Widget ResourceName]
-drawPersonList PersonListState {..} = [listUi]
+drawPersonList PersonListState {..} =
+    [helpUI | personListStateShowHelp] ++ [listUi]
   where
     listUi =
         borderWithLabel (txt "[Wolf Cub]") $
         renderList renderElement True personListStatePeople
     renderElement :: Bool -> (Text, PersonUuid) -> Widget ResourceName
     renderElement _ (name, _) = padLeftRight 1 $ txt name
+    helpUI =
+        centerLayer $
+        borderWithLabel (txt "[Help]") $ vBox $ map txt ["q: Exit", "h: Help"]
 
 drawPerson :: UTCTime -> PersonState -> [Widget ResourceName]
-drawPerson now PersonState {..} = [popup]
+drawPerson now PersonState {..} = [helpUI | personStateShowHelp] ++ [personUI]
   where
-    popup =
+    personUI =
         borderWithLabel (str $ "[" ++ personUuidString personStateUuid ++ "]") $
         personEntryPart <=> hBorder <=> personNotesPart
+    helpUI =
+        centerLayer $
+        borderWithLabel (txt "[Help]") $ vBox $ map txt ["q: Exit", "h: Help"]
     personEntryPart =
         case personStateEntry of
             Nothing ->

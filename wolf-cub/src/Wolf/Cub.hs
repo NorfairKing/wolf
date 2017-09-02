@@ -32,7 +32,10 @@ initialState now i ds =
     CubState
     { cubStateShown =
           CubShowPersonList
-              PersonListState {personListStatePeople = makePersonList i}
+              PersonListState
+              { personListStatePeople = makePersonList i
+              , personListStateShowHelp = False
+              }
     , cubStateNow = now
     , cubStateDataSettings = ds
     }

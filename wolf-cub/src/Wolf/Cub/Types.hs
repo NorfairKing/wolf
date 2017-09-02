@@ -23,14 +23,16 @@ data CubShown
     | CubShowPerson PersonState
     deriving (Show, Generic)
 
-newtype PersonListState = PersonListState
+data PersonListState = PersonListState
     { personListStatePeople :: List ResourceName (Text, PersonUuid)
+    , personListStateShowHelp :: Bool
     } deriving (Show, Generic)
 
 data PersonState = PersonState
     { personStateUuid :: PersonUuid
     , personStateEntry :: Maybe PersonEntry
     , personStateNotes :: List ResourceName (NoteUuid, Note)
+    , personStateShowHelp :: Bool
     } deriving (Show, Generic)
 
 newtype ResourceName =
