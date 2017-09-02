@@ -8,8 +8,10 @@ import TestUtils
 import Wolf.Data
 
 import Wolf.Cli.Command.Entry
+import Wolf.Cli.Command.Entry.Internal
 import Wolf.Cli.OptParse.Types
 
+import Wolf.Command.Entry.Gen ()
 import Wolf.Data.Entry.Types.Gen ()
 import Wolf.Data.Types.Gen ()
 
@@ -65,7 +67,3 @@ spec = do
                         "Failed to parse contents: " <> show err
                     Right (ForEditor ry) ->
                         ry `shouldBe` toRawYaml (personEntryProperties pe)
-
-instance GenUnchecked RawYaml
-
-instance GenValid RawYaml

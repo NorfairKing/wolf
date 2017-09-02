@@ -15,6 +15,7 @@ library
         Wolf.Cli
         Wolf.Cli.Command.Alias
         Wolf.Cli.Command.Entry
+        Wolf.Cli.Command.Entry.Internal
         Wolf.Cli.Command.Git
         Wolf.Cli.Command.Init
         Wolf.Cli.Command.Note
@@ -98,6 +99,7 @@ test-suite wolf-cli-test
     other-modules:
         TestImport
         TestUtils
+        Wolf.Command.Entry.Gen
         Wolf.EntrySpec
         Wolf.GitSpec
         Wolf.InitSpec
