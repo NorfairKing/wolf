@@ -50,19 +50,15 @@ spec = do
             forAll genValid $ \(alias, uuid, pe) -> do
                 let contents = tmpEntryFileContents alias uuid pe
                 case parseEntryFileContents contents of
-                    Left err ->
-                        expectationFailure $
-                        "Failed to parse contents: " <> show err
-                    Right _ -> pure () -- Fine
+                    Nothing -> expectationFailure "Failed to parse contents."
+                    Just _ -> pure () -- Fine
         it
             "successfully parses unchanged file contents from 'tmpEntryFileContents' with the right properties" $
             forAll genValid $ \(alias, uuid, pe) -> do
                 let contents = tmpEntryFileContents alias uuid pe
                 case parseEntryFileContents contents of
-                    Left err ->
-                        expectationFailure $
-                        "Failed to parse contents: " <> show err
-                    Right tups ->
+                    Nothing -> expectationFailure "Failed to parse contents."
+                    Just (ForEditor tups) ->
                         tups `shouldBe`
                         map
                             (second personPropertyValueContents)

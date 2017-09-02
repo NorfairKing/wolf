@@ -1,14 +1,22 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Wolf.Cli.Command.Entry where
 
 import Import
 
-import qualified Data.Text as T
-import qualified Data.Text.IO as T
+import System.IO.Unsafe (unsafePerformIO)
 
+import qualified Data.ByteString as SB
+import Data.Conduit
+import qualified Data.Text as T
 import Data.Time
+import Data.Yaml.Builder as Yaml
+import Data.Yaml.Parser as Yaml
+import Text.Libyaml as Yaml
+
+import Control.Monad.Trans.Resource
 
 import Wolf.Cli.Editor
 import Wolf.Cli.OptParse.Types
@@ -40,7 +48,7 @@ entry person =
         ensureDir $ parent tmpFile
         let tmpFileContents =
                 tmpEntryFileContents person personUuid inFilePersonEntry
-        liftIO $ T.writeFile (toFilePath tmpFile) tmpFileContents
+        liftIO $ SB.writeFile (toFilePath tmpFile) tmpFileContents
         editResult <- startEditorOn tmpFile
         case editResult of
             EditingFailure reason ->
@@ -52,13 +60,10 @@ entry person =
                     , ",not saving."
                     ]
             EditingSuccess -> do
-                contents <- liftIO $ T.readFile $ toFilePath tmpFile
+                contents <- liftIO $ SB.readFile $ toFilePath tmpFile
                 case parseEntryFileContents contents of
-                    Left err ->
-                        liftIO $
-                        die $
-                        unwords ["Unable to parse entry file:", T.unpack err]
-                    Right personEntryMap -> do
+                    Nothing -> liftIO $ die "Unable to parse entry file."
+                    Just (ForEditor personEntryMap) -> do
                         now <- liftIO getCurrentTime
                         case reconstructPersonEntry
                                  now
@@ -114,45 +119,33 @@ parseFirstnameLastname s =
         [fn, ln] -> Just (fn, ln)
         _ -> Nothing
 
-tmpEntryFileContents :: Text -> PersonUuid -> PersonEntry -> Text
-tmpEntryFileContents person personUuid pe =
-    T.unlines $
-    map (uncurry toLineStr) (personEntryTuples pe) ++
-    separator ++
-    map (uncurry toLineStr')
-        [("uuid", personUuidText personUuid), ("reference used", person)]
-  where
-    separator = ["", "", "", line, str, line]
-      where
-        str = "| Anything below this bar will be ignored. |"
-        line = T.pack $ replicate (T.length str) '-'
-    toLineStr k v = toLineStr' k $ personPropertyValueContents v
-    toLineStr' k v = T.unwords [k <> ":", v]
+tmpEntryFileContents :: Text -> PersonUuid -> PersonEntry -> ByteString
+tmpEntryFileContents _ _ pe = Yaml.toByteString $ ForEditor pe
 
-parseEntryFileContents :: Text -> Either Text [(Text, Text)]
-parseEntryFileContents str =
-    mapM
-        parseProperty
-        (filter (not . T.null) . takeWhile (not . T.isPrefixOf "---") . T.lines $
-         str)
-  where
-    parseProperty :: Text -> Either Text (Text, Text)
-    parseProperty s =
-        case break (== ':') $ T.unpack s of
-            (_, []) ->
-                Left $
-                T.pack $ unwords ["Could not parse a property from", show s]
-            (key, ':':val) ->
-                Right
-                    (T.pack $ stripWhitespace key, T.pack $ stripWhitespace val)
-            _ ->
-                Left $
-                T.pack $
-                unwords
-                    [ "Something really weird happened while parsing"
-                    , show s
-                    , "for a property"
-                    ]
+newtype ForEditor a =
+    ForEditor a
+
+instance ToYaml (ForEditor PersonEntry) where
+    toYaml (ForEditor pe) =
+        Yaml.mapping $
+        map
+            (second $ string . personPropertyValueContents)
+            (personEntryTuples pe)
+
+parseEntryFileContents :: ByteString -> Maybe (ForEditor [(Text, Text)])
+parseEntryFileContents bs =
+    let rawDoc =
+            unsafePerformIO $ runResourceT $ Yaml.decode bs $$ Yaml.sinkRawDoc
+    in parseRawDoc rawDoc
+
+{-# NOINLINE parseEntryFileContents #-}
+instance FromYaml (ForEditor [(Text, Text)]) where
+    fromYaml yv =
+        fmap ForEditor $
+        flip (withMapping "ForEditor [(Text, Text)]") yv $ \kvs ->
+            forM kvs $ \(k, vyv) -> do
+                v <- fromYaml vyv
+                pure (k, v)
 
 stripWhitespace :: String -> String
 stripWhitespace = reverse . dropWhite . reverse . dropWhite
@@ -166,4 +159,4 @@ tmpPersonEntryFile ::
 tmpPersonEntryFile personUuid = do
     td <- liftIO getTempDir
     liftIO $
-        resolveFile td $ T.unpack (personUuidText personUuid) ++ "-entry.wolf"
+        resolveFile td $ T.unpack (personUuidText personUuid) ++ "-entry.yaml"
