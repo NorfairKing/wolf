@@ -44,3 +44,26 @@ spec = do
                                 nub (map fst strs)
         it "produces valid PersonEntry's" $
             producesValidsOnValids3 reconstructPersonEntry
+    describe "parseEntryFileContents" $ do
+        it
+            "successfully parses unchanged file contents from 'tmpEntryFileContents'" $
+            forAll genValid $ \(alias, uuid, pe) -> do
+                let contents = tmpEntryFileContents alias uuid pe
+                case parseEntryFileContents contents of
+                    Left err ->
+                        expectationFailure $
+                        "Failed to parse contents: " <> show err
+                    Right _ -> pure () -- Fine
+        it
+            "successfully parses unchanged file contents from 'tmpEntryFileContents' with the right properties" $
+            forAll genValid $ \(alias, uuid, pe) -> do
+                let contents = tmpEntryFileContents alias uuid pe
+                case parseEntryFileContents contents of
+                    Left err ->
+                        expectationFailure $
+                        "Failed to parse contents: " <> show err
+                    Right tups ->
+                        tups `shouldBe`
+                        map
+                            (second personPropertyValueContents)
+                            (personEntryTuples pe)
