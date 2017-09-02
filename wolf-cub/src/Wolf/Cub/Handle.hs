@@ -40,13 +40,7 @@ handleEventShowPersonList state e pls@PersonListState {..} =
     case e of
         (VtyEvent ve) ->
             if personListStateShowHelp
-                then let unhelp =
-                             continue $
-                             state
-                             { cubStateShown =
-                                   CubShowPersonList $
-                                   pls {personListStateShowHelp = False}
-                             }
+                then let unhelp = setPersonListShowHelp state pls False
                      in case ve of
                             (EvKey V.KEsc []) -> unhelp
                             (EvKey (V.KChar 'q') []) -> unhelp
@@ -56,45 +50,14 @@ handleEventShowPersonList state e pls@PersonListState {..} =
                          (EvKey V.KEsc []) -> halt state
                          (EvKey (V.KChar 'q') []) -> halt state
                          (EvKey (V.KChar 'h') []) ->
-                             continue
-                                 state
-                                 { cubStateShown =
-                                       CubShowPersonList
-                                           pls {personListStateShowHelp = True}
-                                 }
+                             setPersonListShowHelp state pls True
                          (EvKey V.KEnter []) -> do
                              let msel =
                                      listSelectedElement personListStatePeople
                              case msel of
                                  Nothing -> continue state
-                                 Just (_, (_, personUuid)) -> do
-                                     (mpe, ns) <-
-                                         liftIO $
-                                         flip
-                                             runReaderT
-                                             (cubStateDataSettings state) $ do
-                                             mpe <- getPersonEntry personUuid
-                                             nuuids <-
-                                                 getPersonNoteUuids personUuid
-                                             ns <-
-                                                 fmap catMaybes $
-                                                 forM nuuids $ \uuid -> do
-                                                     n <- readNote uuid
-                                                     pure $ (,) uuid <$> n
-                                             pure (mpe, ns)
-                                     let nl = list "notes" (V.fromList ns) 1
-                                     continue $
-                                         state
-                                         { cubStateShown =
-                                               CubShowPerson
-                                                   PersonState
-                                                   { personStateUuid =
-                                                         personUuid
-                                                   , personStateEntry = mpe
-                                                   , personStateNotes = nl
-                                                   , personStateShowHelp = False
-                                                   }
-                                         }
+                                 Just (_, (_, personUuid)) ->
+                                     showPerson state personUuid
                          _ -> do
                              nl <- handleListEvent ve personListStatePeople
                              let ns = pls {personListStatePeople = nl}
@@ -102,58 +65,84 @@ handleEventShowPersonList state e pls@PersonListState {..} =
                                  state {cubStateShown = CubShowPersonList ns}
         _ -> continue state
 
+setPersonListShowHelp ::
+       CubState -> PersonListState -> Bool -> EventM n (Next CubState)
+setPersonListShowHelp state pls b =
+    continue
+        state
+        {cubStateShown = CubShowPersonList pls {personListStateShowHelp = b}}
+
 handleEventShowPerson ::
        CubState
     -> BrickEvent ResourceName ()
     -> PersonState
     -> EventM ResourceName (Next CubState)
-handleEventShowPerson state e person =
+handleEventShowPerson state e ps@PersonState {..} =
     case e of
         (VtyEvent ve) ->
-            if personStateShowHelp person
-                then let unhelp =
-                             continue $
-                             state
-                             { cubStateShown =
-                                   CubShowPerson $
-                                   person {personStateShowHelp = False}
-                             }
+            if personStateShowHelp
+                then let unhelp = setPersonShowHelp state ps False
                      in case ve of
                             (EvKey V.KEsc []) -> unhelp
                             (EvKey (V.KChar 'q') []) -> unhelp
                             (EvKey (V.KChar 'h') []) -> unhelp
                             _ -> continue state
-                else let unpop = do
-                             index <-
-                                 runReaderT getIndexWithDefault $
-                                 cubStateDataSettings state
-                             continue $
-                                 state
-                                 { cubStateShown =
-                                       CubShowPersonList
-                                           PersonListState
-                                           { personListStatePeople =
-                                                 makePersonList index
-                                           , personListStateShowHelp = False
-                                           }
-                                 }
+                else let unpop = showPersonList state
                      in case ve of
                             (EvKey V.KEsc []) -> unpop
                             (EvKey (V.KChar 'q') []) -> unpop
                             (EvKey (V.KChar 'h') []) ->
-                                continue $
-                                state
-                                { cubStateShown =
-                                      CubShowPerson $
-                                      person {personStateShowHelp = True}
-                                }
+                                setPersonShowHelp state ps True
                             _ -> do
-                                nl <-
-                                    handleListEvent ve $ personStateNotes person
+                                nl <- handleListEvent ve personStateNotes
                                 continue $
                                     state
                                     { cubStateShown =
                                           CubShowPerson $
-                                          person {personStateNotes = nl}
+                                          ps {personStateNotes = nl}
                                     }
         _ -> continue state
+
+setPersonShowHelp :: CubState -> PersonState -> Bool -> EventM n (Next CubState)
+setPersonShowHelp state ps b =
+    continue $
+    state {cubStateShown = CubShowPerson $ ps {personStateShowHelp = b}}
+
+showPerson :: CubState -> PersonUuid -> EventM ResourceName (Next CubState)
+showPerson state personUuid = do
+    (mpe, ns) <-
+        liftIO $
+        flip runReaderT (cubStateDataSettings state) $ do
+            mpe <- getPersonEntry personUuid
+            nuuids <- getPersonNoteUuids personUuid
+            ns <-
+                fmap catMaybes $
+                forM nuuids $ \uuid -> do
+                    n <- readNote uuid
+                    pure $ (,) uuid <$> n
+            pure (mpe, ns)
+    let nl = list "notes" (V.fromList ns) 1
+    continue $
+        state
+        { cubStateShown =
+              CubShowPerson
+                  PersonState
+                  { personStateUuid = personUuid
+                  , personStateEntry = mpe
+                  , personStateNotes = nl
+                  , personStateShowHelp = False
+                  }
+        }
+
+showPersonList :: CubState -> EventM n (Next CubState)
+showPersonList state = do
+    index <- runReaderT getIndexWithDefault $ cubStateDataSettings state
+    continue $
+        state
+        { cubStateShown =
+              CubShowPersonList
+                  PersonListState
+                  { personListStatePeople = makePersonList index
+                  , personListStateShowHelp = False
+                  }
+        }
