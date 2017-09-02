@@ -15,6 +15,7 @@ library
         Wolf.Cli
         Wolf.Cli.Command.Alias
         Wolf.Cli.Command.Entry
+        Wolf.Cli.Command.Entry.Internal
         Wolf.Cli.Command.Git
         Wolf.Cli.Command.Init
         Wolf.Cli.Command.Note
@@ -32,14 +33,17 @@ library
         aeson-pretty >=0.8 && <0.9,
         ansi-terminal >=0.6 && <0.7,
         bytestring >=0.10 && <0.11,
+        conduit >=1.2 && <1.3,
         configurator >=0.3 && <0.4,
         containers >=0.5 && <0.6,
+        exceptions >=0.8 && <0.9,
         mtl >=2.2 && <2.3,
         optparse-applicative >=0.13 && <0.14,
         path >=0.5 && <0.6,
         path-io >=1.2 && <1.3,
         process >=1.4 && <1.5,
         random >=1.1 && <1.2,
+        resourcet >=1.1 && <1.2,
         text >=1.2 && <1.3,
         time >=1.6 && <1.7,
         unordered-containers >=0.2 && <0.3,
@@ -48,7 +52,8 @@ library
         validity-containers >=0.1 && <0.2,
         validity-text >=0.1 && <0.2,
         validity-time >=0.0 && <0.1,
-        wolf-data >=0.0 && <0.1
+        wolf-data >=0.0 && <0.1,
+        yaml >=0.8 && <0.9
     default-language: Haskell2010
     default-extensions: NoImplicitPrelude
     hs-source-dirs: src/
@@ -94,6 +99,7 @@ test-suite wolf-cli-test
     other-modules:
         TestImport
         TestUtils
+        Wolf.Command.Entry.Gen
         Wolf.EntrySpec
         Wolf.GitSpec
         Wolf.InitSpec

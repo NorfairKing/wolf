@@ -13,5 +13,5 @@ spec = do
     describe "personEntry" $
         it "only generates valid PersonEntry's" $ producesValid personEntry
     describe "personEntryTuples" $
-        it "only generates valid lists" $
-        producesValidsOnValids personEntryTuples
+        it "only generates valid properties" $
+        producesValidsOnValids personEntryProperties

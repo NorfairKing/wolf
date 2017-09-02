@@ -1,8 +1,9 @@
 module Wolf.Data.Entry
     ( PersonEntry
     , personEntry
-    , personEntryTuples
+    , personEntryProperties
     , newPersonEntry
+    , PersonProperty(..)
     , PersonPropertyValue(..)
     ) where
 
