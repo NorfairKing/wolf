@@ -107,6 +107,7 @@ personEntryWidget now pe = go $ personEntryProperties pe
                             personPropertyValueLastUpdatedTimestamp))
             , txt ")"
             ]
+    go (PList vs) = vBox $ map ((txt "- " <+>) . go) vs
     go (PMap tups) =
         vBox $
         flip map tups $ \(k, v) ->

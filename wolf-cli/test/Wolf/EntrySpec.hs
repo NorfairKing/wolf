@@ -1,9 +1,13 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Wolf.EntrySpec
     ( spec
     ) where
 
 import TestImport
 import TestUtils
+
+import qualified Data.ByteString.Char8 as SB8
 
 import Wolf.Data
 
@@ -67,3 +71,35 @@ spec = do
                         "Failed to parse contents: " <> show err
                     Right (ForEditor ry) ->
                         ry `shouldBe` toRawYaml (personEntryProperties pe)
+    describe "parseEntryFileContents" $ do
+        let p ls c =
+                case parseEntryFileContents (SB8.unlines ls) of
+                    Left err ->
+                        expectationFailure $ "Parse failed: " <> show err
+                    Right (ForEditor r) -> r `shouldBe` c
+        it "parses this value correctly" $ p ["hi"] $ RVal "hi"
+        it "parses this list correctly" $
+            p ["- one", "- two", "- three"] $
+            RList [RVal "one", RVal "two", RVal "three"]
+        it "parses this map correctly" $
+            p ["hello: world"] $ RMap [("hello", RVal "world")]
+        it "parses this combination correctly" $
+            p
+                [ "first name: John"
+                , "last name: Random"
+                , "email:"
+                , " - john@random.com"
+                , " - contact@random.com"
+                , "address:"
+                , " street: First"
+                , " town: RandomVille"
+                ] $
+            RMap
+                [ ("first name", RVal "John")
+                , ("last name", RVal "Random")
+                , ( "email"
+                  , RList [RVal "john@random.com", RVal "contact@random.com"])
+                , ( "address"
+                  , RMap
+                        [("street", RVal "First"), ("town", RVal "RandomVille")])
+                ]

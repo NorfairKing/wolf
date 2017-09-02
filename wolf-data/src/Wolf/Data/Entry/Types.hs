@@ -58,24 +58,30 @@ newPersonEntry = PersonEntry {personEntryProperties = PMap []}
 
 data PersonProperty
     = PVal PersonPropertyValue
+    | PList [PersonProperty]
     | PMap [(Text, PersonProperty)]
     deriving (Show, Eq, Ord, Generic)
 
 instance Validity PersonProperty where
     isValid (PVal ppv) = isValid ppv
+    isValid (PList pl) = isValid pl
     isValid (PMap tups) =
         and
             [ isValid tups
+            , not (null tups)
             , let ls = map fst tups
               in nub ls == ls
             ]
 
 instance ToJSON PersonProperty where
     toJSON (PVal pv) = toJSON pv
+    toJSON (PList pl) = toJSON pl
     toJSON (PMap tups) = toJSON tups
 
 instance FromJSON PersonProperty where
-    parseJSON o = (PVal <$> parseJSON o) <|> (PMap <$> parseJSON o)
+    parseJSON o =
+        (PVal <$> parseJSON o) <|> (PList <$> parseJSON o) <|>
+        (PMap <$> parseJSON o)
 
 data PersonPropertyValue = PersonPropertyValue
     { personPropertyValueContents :: Text

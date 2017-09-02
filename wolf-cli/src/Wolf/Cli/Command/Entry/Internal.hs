@@ -33,7 +33,9 @@ reconstructPersonEntry now old new =
             { personPropertyValueContents = n
             , personPropertyValueLastUpdatedTimestamp = now
             }
+    fillWithNow (RList ns) = PList $ map fillWithNow ns
     fillWithNow (RMap tups) = PMap $ map (second fillWithNow) tups
+    go :: PersonProperty -> RawYaml -> PersonProperty
     go (PVal vo) (RVal vn) =
         PVal
             PersonPropertyValue
@@ -43,8 +45,14 @@ reconstructPersonEntry now old new =
                       then personPropertyValueLastUpdatedTimestamp vo
                       else now
             }
-    go (PMap _) r@(RVal _) = fillWithNow r
-    go (PVal _) r@(RMap _) = fillWithNow r
+    go (PList ol) (RList nl) =
+        PList $ zipWith f (map Just ol ++ repeat Nothing) nl
+      where
+        f :: Maybe PersonProperty -> RawYaml -> PersonProperty
+        f mov nv =
+            case mov of
+                Nothing -> fillWithNow nv
+                Just ov -> go ov nv
     go (PMap om) (RMap nm) =
         PMap $ map (\(k, v) -> (k, foo k v)) $ nubBy ((==) `on` fst) nm
       where
@@ -55,6 +63,7 @@ reconstructPersonEntry now old new =
                  -> fillWithNow value
                 Just oldValue -- Key existed before, have to recurse.
                  -> go oldValue value
+    go _ r = fillWithNow r
 
 parseFirstnameLastname :: Text -> Maybe (Text, Text)
 parseFirstnameLastname s =
@@ -67,16 +76,21 @@ tmpEntryFileContents pe = Yaml.toByteString $ ForEditor pe
 
 toRawYaml :: PersonProperty -> RawYaml
 toRawYaml (PVal c) = RVal $ personPropertyValueContents c
+toRawYaml (PList ls) = RList $ map toRawYaml ls
 toRawYaml (PMap tups) = RMap $ map (second toRawYaml) tups
 
 newtype ForEditor a =
     ForEditor a
+    deriving (Show, Eq, Generic)
+
+instance Validity a => Validity (ForEditor a)
 
 instance ToYaml (ForEditor PersonEntry) where
     toYaml (ForEditor pe) = go (personEntryProperties pe)
       where
         go :: PersonProperty -> YamlBuilder
         go (PVal ppv) = Yaml.string $ personPropertyValueContents ppv
+        go (PList ls) = Yaml.array $ map go ls
         go (PMap tups) = Yaml.mapping $ map (second go) tups
 
 parseEntryFileContents ::
@@ -89,20 +103,30 @@ parseEntryFileContents bs =
 {-# NOINLINE parseEntryFileContents #-}
 data RawYaml
     = RVal Text
+    | RList [RawYaml]
     | RMap [(Text, RawYaml)]
     deriving (Show, Eq, Generic)
 
 instance Validity RawYaml where
     isValid (RVal t) = isValid t
+    isValid (RList ls) = isValid ls
+    isValid (RMap []) = False
     isValid (RMap tups) =
         isValid tups &&
         (let ls = map fst tups
          in nub ls == ls)
 
 instance FromYaml (ForEditor RawYaml) where
-    fromYaml yv = ForEditor <$> (parseRVal yv <|> parseRMap yv)
+    fromYaml yv =
+        ForEditor <$> (parseRVal yv <|> parseRList yv <|> parseRMap yv)
       where
         parseRVal = withText "RVal" (pure . RVal)
+        parseRList =
+            withSequence "RList" $ \vs ->
+                fmap RList $
+                forM vs $ \y -> do
+                    ForEditor ry <- fromYaml y
+                    pure ry
         parseRMap =
             withMapping "RMap" $ \tups ->
                 fmap RMap $
