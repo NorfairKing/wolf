@@ -103,9 +103,9 @@ instance FromJSON Username where
 
 parseUsername :: MonadFail m => Text -> m Username
 parseUsername t =
-    case constructValid t of
+    case constructValid $ Username t of
         Nothing -> fail "Invalid username in JSON"
-        Just un -> pure $ Username un
+        Just un -> pure un
 
 instance ToJSON Username where
     toJSON (Username un) = toJSON un
@@ -115,7 +115,7 @@ newtype PasswordHash =
     deriving (Show, Eq, Generic)
 
 username :: Text -> Maybe Username
-username t = Username <$> constructValid t
+username t = constructValid $ Username t
 
 instance Validity PasswordHash
 
