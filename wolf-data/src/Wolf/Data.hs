@@ -24,9 +24,10 @@ module Wolf.Data
     -- * Person Entries
     , PersonEntry
     , personEntry
-    , personEntryTuples
+    , personEntryProperty
     , newPersonEntry
-    , PersonPropertyValue(..)
+    , PersonProperty(..)
+    , WithLastChanged(..)
     , getPersonEntry
     , putPersonEntry
     -- * Notes

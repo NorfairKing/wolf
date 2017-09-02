@@ -10,6 +10,10 @@ instance GenUnchecked PersonEntry
 
 instance GenValid PersonEntry
 
-instance GenUnchecked PersonPropertyValue
+instance GenUnchecked PersonProperty
 
-instance GenValid PersonPropertyValue
+instance GenValid PersonProperty
+
+instance GenUnchecked a => GenUnchecked (WithLastChanged a)
+
+instance GenValid a => GenValid (WithLastChanged a)

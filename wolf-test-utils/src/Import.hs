@@ -34,3 +34,4 @@ import Data.GenValidity.Containers as X
 import Data.GenValidity.Path as X ()
 import Data.GenValidity.Text as X
 import Data.GenValidity.Time as X ()
+import Data.GenValidity.Scientific as X ()

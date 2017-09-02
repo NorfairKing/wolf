@@ -14,5 +14,7 @@ spec :: Spec
 spec = do
     genValidSpec @PersonEntry
     jsonSpecOnValid @PersonEntry
-    genValidSpec @PersonPropertyValue
-    jsonSpecOnValid @PersonPropertyValue
+    genValidSpec @PersonProperty
+    jsonSpecOnValid @PersonProperty
+    genValidSpec @(WithLastChanged Int)
+    jsonSpecOnValid @(WithLastChanged Int)

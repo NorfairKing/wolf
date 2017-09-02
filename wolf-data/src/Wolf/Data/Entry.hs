@@ -1,9 +1,10 @@
 module Wolf.Data.Entry
     ( PersonEntry
     , personEntry
-    , personEntryTuples
+    , personEntryProperty
     , newPersonEntry
-    , PersonPropertyValue(..)
+    , PersonProperty(..)
+    , WithLastChanged(..)
     ) where
 
 import Wolf.Data.Entry.Types
