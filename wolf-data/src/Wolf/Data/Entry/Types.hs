@@ -5,8 +5,9 @@
 module Wolf.Data.Entry.Types
     ( PersonEntry
     , personEntry
-    , personEntryTuples
+    , personEntryProperties
     , newPersonEntry
+    , PersonProperty(..)
     , PersonPropertyValue(..)
     ) where
 
@@ -21,25 +22,15 @@ import Data.Time
 {-# ANN module ("HLint: ignore Use &&" :: Text) #-}
 
 newtype PersonEntry = PersonEntry
-    { personEntryProperties :: [(Text, PersonPropertyValue)]
+    { personEntryProperties :: PersonProperty -- ^ Get the individual entry list out of a person entry.
     } deriving (Show, Eq, Ord, Generic)
 
 -- | Make a person entry, return 'Nothing' if it wouldn't be valid.
-personEntry :: [(Text, PersonPropertyValue)] -> Maybe PersonEntry
+personEntry :: PersonProperty -> Maybe PersonEntry
 personEntry = constructValid . PersonEntry
 
--- | Get the individual entry list out of a person entry.
-personEntryTuples :: PersonEntry -> [(Text, PersonPropertyValue)]
-personEntryTuples = personEntryProperties
-
 -- | A 'PersonEntry' is valid if it does not have duplicate keys.
-instance Validity PersonEntry where
-    isValid PersonEntry {..} =
-        and
-            [ isValid personEntryProperties
-            , let ls = map fst personEntryProperties
-              in nub ls == ls
-            ]
+instance Validity PersonEntry
 
 instance FromJSON PersonEntry where
     parseJSON ob =
@@ -48,10 +39,12 @@ instance FromJSON PersonEntry where
              pure
                  PersonEntry
                  { personEntryProperties =
+                       PMap $
                        map
                            (second
-                                (`PersonPropertyValue` unsafePerformIO
-                                                           getCurrentTime))
+                                (PVal .
+                                 (`PersonPropertyValue` unsafePerformIO
+                                                            getCurrentTime)))
                            (M.toList strs)
                  })
             ob <|>
@@ -61,7 +54,28 @@ instance ToJSON PersonEntry where
     toJSON PersonEntry {..} = object ["properties" .= personEntryProperties]
 
 newPersonEntry :: PersonEntry
-newPersonEntry = PersonEntry {personEntryProperties = []}
+newPersonEntry = PersonEntry {personEntryProperties = PMap []}
+
+data PersonProperty
+    = PVal PersonPropertyValue
+    | PMap [(Text, PersonProperty)]
+    deriving (Show, Eq, Ord, Generic)
+
+instance Validity PersonProperty where
+    isValid (PVal ppv) = isValid ppv
+    isValid (PMap tups) =
+        and
+            [ isValid tups
+            , let ls = map fst tups
+              in nub ls == ls
+            ]
+
+instance ToJSON PersonProperty where
+    toJSON (PVal pv) = toJSON pv
+    toJSON (PMap tups) = toJSON tups
+
+instance FromJSON PersonProperty where
+    parseJSON o = (PVal <$> parseJSON o) <|> (PMap <$> parseJSON o)
 
 data PersonPropertyValue = PersonPropertyValue
     { personPropertyValueContents :: Text

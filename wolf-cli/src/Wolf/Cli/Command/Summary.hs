@@ -15,9 +15,11 @@ module Wolf.Cli.Command.Summary
 import Import
 
 import qualified Data.Text as T
+import qualified Data.Text.Encoding as TE
 import Data.Time
 import System.Console.ANSI as ANSI
 
+import Wolf.Cli.Command.Entry
 import Wolf.Cli.OptParse.Types
 import Wolf.Cli.Report
 import Wolf.Cli.Utils
@@ -86,11 +88,13 @@ summaryReportReport SummaryReport {..} =
         , case summaryReportPersonEntry of
               Nothing -> "No person entry."
               Just pe ->
-                  unlinesReport $
-                  flip map (personEntryTuples pe) $ \(prop, val) ->
-                      fromString $
-                      unwords
-                          [ T.unpack prop ++ ":"
-                          , T.unpack $ personPropertyValueContents val
-                          ]
+                  fromString $
+                  T.unpack $ TE.decodeUtf8 $ tmpEntryFileContents pe
+                  -- unlinesReport $
+                  -- flip map (personEntryTuples pe) $ \(prop, val) ->
+                  --     fromString $
+                  --     unwords
+                  --         [ T.unpack prop ++ ":"
+                  --         , T.unpack $ personPropertyValueContents val
+                  --         ]
         ]

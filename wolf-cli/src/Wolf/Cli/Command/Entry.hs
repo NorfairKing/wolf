@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -8,6 +9,7 @@ import Import
 
 import System.IO.Unsafe (unsafePerformIO)
 
+import Control.Monad.Catch
 import qualified Data.ByteString as SB
 import Data.Conduit
 import qualified Data.Text as T
@@ -40,14 +42,16 @@ entry person =
                         (,) newPersonEntry $
                         fromMaybe newPersonEntry $ do
                             (fn, ln) <- parseFirstnameLastname person
-                            personEntry
-                                [ ("first name", PersonPropertyValue fn now)
-                                , ("last name", PersonPropertyValue ln now)
-                                ]
+                            personEntry $
+                                PMap
+                                    [ ( "first name"
+                                      , PVal $ PersonPropertyValue fn now)
+                                    , ( "last name"
+                                      , PVal $ PersonPropertyValue ln now)
+                                    ]
                 Just pe -> pure (pe, pe)
         ensureDir $ parent tmpFile
-        let tmpFileContents =
-                tmpEntryFileContents person personUuid inFilePersonEntry
+        let tmpFileContents = tmpEntryFileContents inFilePersonEntry
         liftIO $ SB.writeFile (toFilePath tmpFile) tmpFileContents
         editResult <- startEditorOn tmpFile
         case editResult of
@@ -62,8 +66,10 @@ entry person =
             EditingSuccess -> do
                 contents <- liftIO $ SB.readFile $ toFilePath tmpFile
                 case parseEntryFileContents contents of
-                    Nothing -> liftIO $ die "Unable to parse entry file."
-                    Just (ForEditor personEntryMap) -> do
+                    Left err ->
+                        liftIO $
+                        die $ "Unable to parse entry file: " <> show err
+                    Right (ForEditor personEntryMap) -> do
                         now <- liftIO getCurrentTime
                         case reconstructPersonEntry
                                  now
@@ -85,33 +91,40 @@ entry person =
                                             , T.unpack person
                                             ]
 
-reconstructPersonEntry ::
-       UTCTime -> PersonEntry -> [(Text, Text)] -> Maybe PersonEntry
-reconstructPersonEntry now old newMap =
-    if map (second personPropertyValueContents) (personEntryTuples old) ==
-       newMap
-        then Just old -- If there is no difference, don't change the last changed timestamp.
-        else personEntry $
-             map (\(k, v) -> (k, go k v)) $ nubBy ((==) `on` fst) newMap
+reconstructPersonEntry :: UTCTime -> PersonEntry -> RawYaml -> Maybe PersonEntry
+reconstructPersonEntry now old new =
+    let oldProp = personEntryProperties old
+    in personEntry $ go oldProp new
   where
-    go :: Text -> Text -> PersonPropertyValue
-    go key value =
-        case lookup key (personEntryTuples old) of
-            Nothing -- Key did not exist before, therefore it was created here.
-             ->
-                PersonPropertyValue
-                { personPropertyValueContents = value
-                , personPropertyValueLastUpdatedTimestamp = now
-                }
-            Just oldValue -- Key did exist before, have to check if there's a difference.
-             ->
-                PersonPropertyValue
-                { personPropertyValueContents = value
-                , personPropertyValueLastUpdatedTimestamp =
-                      if value == personPropertyValueContents oldValue
-                          then personPropertyValueLastUpdatedTimestamp oldValue
-                          else now
-                }
+    fillWithNow :: RawYaml -> PersonProperty
+    fillWithNow (RVal n) =
+        PVal
+            PersonPropertyValue
+            { personPropertyValueContents = n
+            , personPropertyValueLastUpdatedTimestamp = now
+            }
+    fillWithNow (RMap tups) = PMap $ map (second fillWithNow) tups
+    go (PVal vo) (RVal vn) =
+        PVal
+            PersonPropertyValue
+            { personPropertyValueContents = vn
+            , personPropertyValueLastUpdatedTimestamp =
+                  if vn == personPropertyValueContents vo
+                      then personPropertyValueLastUpdatedTimestamp vo
+                      else now
+            }
+    go (PMap _) r@(RVal _) = fillWithNow r
+    go (PVal _) r@(RMap _) = fillWithNow r
+    go (PMap om) (RMap nm) =
+        PMap $ map (\(k, v) -> (k, foo k v)) $ nubBy ((==) `on` fst) nm
+      where
+        foo :: Text -> RawYaml -> PersonProperty
+        foo key value =
+            case lookup key om of
+                Nothing -- Key did not exist before, therefore it was created here.
+                 -> fillWithNow value
+                Just oldValue -- Key existed before, have to recurse.
+                 -> go oldValue value
 
 parseFirstnameLastname :: Text -> Maybe (Text, Text)
 parseFirstnameLastname s =
@@ -119,33 +132,53 @@ parseFirstnameLastname s =
         [fn, ln] -> Just (fn, ln)
         _ -> Nothing
 
-tmpEntryFileContents :: Text -> PersonUuid -> PersonEntry -> ByteString
-tmpEntryFileContents _ _ pe = Yaml.toByteString $ ForEditor pe
+tmpEntryFileContents :: PersonEntry -> ByteString
+tmpEntryFileContents pe = Yaml.toByteString $ ForEditor pe
+
+toRawYaml :: PersonProperty -> RawYaml
+toRawYaml (PVal c) = RVal $ personPropertyValueContents c
+toRawYaml (PMap tups) = RMap $ map (second toRawYaml) tups
 
 newtype ForEditor a =
     ForEditor a
 
 instance ToYaml (ForEditor PersonEntry) where
-    toYaml (ForEditor pe) =
-        Yaml.mapping $
-        map
-            (second $ string . personPropertyValueContents)
-            (personEntryTuples pe)
+    toYaml (ForEditor pe) = go (personEntryProperties pe)
+      where
+        go :: PersonProperty -> YamlBuilder
+        go (PVal ppv) = Yaml.string $ personPropertyValueContents ppv
+        go (PMap tups) = Yaml.mapping $ map (second go) tups
 
-parseEntryFileContents :: ByteString -> Maybe (ForEditor [(Text, Text)])
+parseEntryFileContents ::
+       ByteString -> Either YamlParseException (ForEditor RawYaml)
 parseEntryFileContents bs =
-    let rawDoc =
-            unsafePerformIO $ runResourceT $ Yaml.decode bs $$ Yaml.sinkRawDoc
-    in parseRawDoc rawDoc
+    unsafePerformIO $ do
+        rawDoc <- runResourceT $ Yaml.decode bs $$ Yaml.sinkRawDoc
+        (Right <$> parseRawDoc rawDoc) `catch` (pure . Left)
 
 {-# NOINLINE parseEntryFileContents #-}
-instance FromYaml (ForEditor [(Text, Text)]) where
-    fromYaml yv =
-        fmap ForEditor $
-        flip (withMapping "ForEditor [(Text, Text)]") yv $ \kvs ->
-            forM kvs $ \(k, vyv) -> do
-                v <- fromYaml vyv
-                pure (k, v)
+data RawYaml
+    = RVal Text
+    | RMap [(Text, RawYaml)]
+    deriving (Show, Eq, Generic)
+
+instance Validity RawYaml where
+    isValid (RVal t) = isValid t
+    isValid (RMap tups) =
+        isValid tups &&
+        (let ls = map fst tups
+         in nub ls == ls)
+
+instance FromYaml (ForEditor RawYaml) where
+    fromYaml yv = ForEditor <$> (parseRVal yv <|> parseRMap yv)
+      where
+        parseRVal = withText "RVal" (pure . RVal)
+        parseRMap =
+            withMapping "RMap" $ \tups ->
+                fmap RMap $
+                forM tups $ \(k, v) -> do
+                    (ForEditor ry) <- fromYaml v
+                    pure (k, ry)
 
 stripWhitespace :: String -> String
 stripWhitespace = reverse . dropWhite . reverse . dropWhite

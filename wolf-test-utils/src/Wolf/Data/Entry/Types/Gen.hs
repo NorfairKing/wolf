@@ -10,6 +10,10 @@ instance GenUnchecked PersonEntry
 
 instance GenValid PersonEntry
 
+instance GenUnchecked PersonProperty
+
+instance GenValid PersonProperty
+
 instance GenUnchecked PersonPropertyValue
 
 instance GenValid PersonPropertyValue
