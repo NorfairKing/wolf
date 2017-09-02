@@ -27,12 +27,12 @@ drawUI CubState {..} =
         CubShowPersonList l -> drawPersonList l
         CubShowPerson ps -> drawPerson cubStateNow ps
 
-drawPersonList :: List ResourceName (Text, PersonUuid) -> [Widget ResourceName]
-drawPersonList personList = [listUi]
+drawPersonList :: PersonListState -> [Widget ResourceName]
+drawPersonList PersonListState {..} = [listUi]
   where
     listUi =
         borderWithLabel (txt "[Wolf Cub]") $
-        renderList renderElement True personList
+        renderList renderElement True personListStatePeople
     renderElement :: Bool -> (Text, PersonUuid) -> Widget ResourceName
     renderElement _ (name, _) = padLeftRight 1 $ txt name
 

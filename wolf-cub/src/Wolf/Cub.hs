@@ -30,7 +30,9 @@ runWolfCub = do
 initialState :: UTCTime -> Index -> DataSettings -> CubState
 initialState now i ds =
     CubState
-    { cubStateShown = CubShowPersonList $ makePersonList i
+    { cubStateShown =
+          CubShowPersonList
+              PersonListState {personListStatePeople = makePersonList i}
     , cubStateNow = now
     , cubStateDataSettings = ds
     }
@@ -40,7 +42,7 @@ cubApp =
     App
     { appDraw = drawUI
     , appChooseCursor = showFirstCursor
-    , appHandleEvent = appEvent
+    , appHandleEvent = handleEvent
     , appStartEvent = return
     , appAttrMap = const theMap
     }
