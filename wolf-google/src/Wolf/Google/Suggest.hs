@@ -8,9 +8,13 @@ module Wolf.Google.Suggest where
 import Import
 
 import Control.Monad.Catch
+import Data.Aeson as JSON
+import Data.Aeson.Encode.Pretty as JSON
+import qualified Data.ByteString.Lazy.Char8 as LB8
 import Data.Proxy (Proxy(..))
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
+import qualified Data.Vector as V
 import GHC.TypeLits (Symbol)
 import Lens.Micro
 import Network.HTTP.Client (Manager)
@@ -23,6 +27,8 @@ import Network.Google
 import Network.Google.Auth
 import Network.Google.People
 
+import Wolf.Google.Types
+
 suggest :: IO ()
 suggest = do
     lgr <- newLogger Debug stdout
@@ -34,12 +40,43 @@ suggest = do
     resp <-
         runResourceT . runGoogle env $ send $ peopleConnectionsList "people/me" &
         pclRequestMaskIncludeField .~
-        Just "person.names"
+        Just "person.names,person.emailAddresses"
     forM_ (resp ^. lcrConnections) $ \p -> do
-        forM_ (p ^. perNames) $ \n -> do
-            print $ n ^. nGivenName
-            print $ n ^. nFamilyName
-        putStrLn ""
+        LB8.putStrLn $ JSON.encodePretty p
+        LB8.putStrLn $ JSON.encodePretty $ makeSuggestion p
+
+makeSuggestion :: Person -> Maybe PersonSuggestion
+makeSuggestion p =
+    case p ^. perNames of
+        [] -> Nothing
+        (n:_) -> do
+            firstName <- n ^. nGivenName
+            lastName <- n ^. nFamilyName
+            let ps =
+                    catMaybes
+                        [ case p ^. perEmailAddresses of
+                              [] -> Nothing
+                              [ea] -> do
+                                  v <- ea ^. eaValue
+                                  pure ("email", JSON.String v)
+                              eas ->
+                                  Just
+                                      ( "email"
+                                      , JSON.Array $ V.fromList $
+                                        flip mapMaybe eas $ \ea -> do
+                                            v <- ea ^. eaValue
+                                            pure $ JSON.String v)
+                        ]
+            pure
+                PersonSuggestion
+                { personSuggestionAlias = T.unwords [firstName, lastName]
+                , personSuggestionEntry =
+                      JSON.object $
+                      [ ("first name", JSON.String firstName)
+                      , ("last name", JSON.String lastName)
+                      ] ++
+                      ps
+                }
 
 type WolfScopes = '[ "https://www.googleapis.com/auth/contacts.readonly"]
 
