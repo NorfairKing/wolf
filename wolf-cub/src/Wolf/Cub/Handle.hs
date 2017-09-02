@@ -16,6 +16,7 @@ import Graphics.Vty as V
 
 import Wolf.Data
 
+import Wolf.Cub.PropertyEditor
 import Wolf.Cub.Types
 
 makePersonList :: Index -> List ResourceName (Text, PersonUuid)
@@ -27,9 +28,9 @@ handleEvent ::
     -> EventM ResourceName (Next CubState)
 handleEvent state e =
     case cubStateShown state of
-        CubShowPersonList personList ->
-            handleEventShowPersonList state e personList
-        CubShowPerson person -> handleEventShowPerson state e person
+        CubShowPersonList pls -> handleEventShowPersonList state e pls
+        CubShowPerson ps -> handleEventShowPerson state e ps
+        CubEditPerson eps -> handleEditPerson state e eps
 
 handleEventShowPersonList ::
        CubState
@@ -93,6 +94,8 @@ handleEventShowPerson state e ps@PersonState {..} =
                             (EvKey (V.KChar 'q') []) -> unpop
                             (EvKey (V.KChar 'h') []) ->
                                 setPersonShowHelp state ps True
+                            (EvKey (V.KChar 'e') []) ->
+                                editPerson state personStateUuid
                             _ -> do
                                 nl <- handleListEvent ve personStateNotes
                                 continue $
@@ -107,6 +110,31 @@ setPersonShowHelp :: CubState -> PersonState -> Bool -> EventM n (Next CubState)
 setPersonShowHelp state ps b =
     continue $
     state {cubStateShown = CubShowPerson $ ps {personStateShowHelp = b}}
+
+handleEditPerson ::
+       CubState
+    -> BrickEvent ResourceName ()
+    -> EditPersonState
+    -> EventM ResourceName (Next CubState)
+handleEditPerson state e eps@EditPersonState {..} =
+    case e of
+        (VtyEvent ve) ->
+            let unpop = showPerson state editPersonStateUuid
+            in case ve of
+                   (EvKey V.KEsc []) -> unpop
+                   (EvKey (V.KChar 'q') []) -> unpop
+                   _ -> do
+                       ne <-
+                           handlePropertyEditorEvent
+                               ve
+                               editPersonStatePropertyEditor
+                       continue $
+                           state
+                           { cubStateShown =
+                                 CubEditPerson $
+                                 eps {editPersonStatePropertyEditor = ne}
+                           }
+        _ -> continue state
 
 showPerson :: CubState -> PersonUuid -> EventM ResourceName (Next CubState)
 showPerson state personUuid = do
@@ -144,5 +172,23 @@ showPersonList state = do
                   PersonListState
                   { personListStatePeople = makePersonList index
                   , personListStateShowHelp = False
+                  }
+        }
+
+editPerson :: CubState -> PersonUuid -> EventM n (Next CubState)
+editPerson state personUuid = do
+    mpe <-
+        liftIO $
+        flip runReaderT (cubStateDataSettings state) $ getPersonEntry personUuid
+    continue $
+        state
+        { cubStateShown =
+              CubEditPerson
+                  EditPersonState
+                  { editPersonStateUuid = personUuid
+                  , editPersonStateStartingEntry = mpe
+                  , editPersonStatePropertyEditor =
+                        propertyEditor "edit-person" $
+                        personEntryProperties <$> mpe
                   }
         }

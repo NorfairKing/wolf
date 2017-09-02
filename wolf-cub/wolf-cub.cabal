@@ -15,9 +15,10 @@ library
         Wolf.Cub
         Wolf.Cub.Draw
         Wolf.Cub.Handle
-        Wolf.Cub.Types
         Wolf.Cub.OptParse
         Wolf.Cub.OptParse.Types
+        Wolf.Cub.PropertyEditor
+        Wolf.Cub.Types
     build-depends:
         base >=4.9 && <=5,
         brick >=0.24 && <0.25,

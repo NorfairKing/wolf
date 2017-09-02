@@ -10,6 +10,7 @@ import Data.Time
 
 import Brick.Widgets.List (List)
 
+import Wolf.Cub.PropertyEditor
 import Wolf.Data
 
 data CubState = CubState
@@ -21,6 +22,7 @@ data CubState = CubState
 data CubShown
     = CubShowPersonList PersonListState
     | CubShowPerson PersonState
+    | CubEditPerson EditPersonState
     deriving (Show, Generic)
 
 data PersonListState = PersonListState
@@ -33,6 +35,12 @@ data PersonState = PersonState
     , personStateEntry :: Maybe PersonEntry
     , personStateNotes :: List ResourceName (NoteUuid, Note)
     , personStateShowHelp :: Bool
+    } deriving (Show, Generic)
+
+data EditPersonState = EditPersonState
+    { editPersonStateUuid :: PersonUuid
+    , editPersonStateStartingEntry :: Maybe PersonEntry
+    , editPersonStatePropertyEditor :: PropertyEditor ResourceName
     } deriving (Show, Generic)
 
 newtype ResourceName =
