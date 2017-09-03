@@ -12,14 +12,16 @@ data PropertyCursor
     = ValC ValCursor
     | ListC ListCursor
     | MapC MapCursor
+    | LElC ListElCursor
+    | MKVC KeyValCursor
 
 cursor :: PersonProperty -> PropertyCursor
 cursor prop =
     case prop of
-        PVal v ->
-            ValC $ ValCursor {valCursorParent = Nothing, valCursorSelected = v}
+        PVal v -> ValC $ valCursor Nothing v
         PList ls -> ListC $ listCursor Nothing ls
         PMap ls -> MapC $ mapCursor Nothing ls
+
 
 data ParentCursor
     = ListElPC ListElCursor
@@ -29,6 +31,9 @@ data ValCursor = ValCursor
     { valCursorParent :: Maybe ParentCursor
     , valCursorSelected :: PersonPropertyValue
     }
+
+valCursor :: Maybe ParentCursor -> PersonPropertyValue -> ValCursor
+valCursor par val = ValCursor {valCursorParent = par, valCursorSelected = val}
 
 data ListCursor = ListCursor
     { listCursorParent :: Maybe ParentCursor
