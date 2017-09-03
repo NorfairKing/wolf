@@ -13,6 +13,8 @@ module Wolf.Cub.PropertyEditor
 
 import Import
 
+import Safe
+
 import Graphics.Vty as Vty
 import Graphics.Vty as V
 
@@ -92,47 +94,63 @@ handlePropertyEditorEvent e pe@PropertyEditor {..} =
                     pure pe {propertyEditorProperty = Just $ PMap []}
                 _ -> pure pe
         Just prop ->
-            case e of
-                (EvKey KDown []) ->
+            let modSel func =
                     pure
                         pe
                         { propertyEditorSelection =
-                              selectionDown propertyEditorSelection prop
+                              func propertyEditorSelection prop
                         }
-                (EvKey KUp []) ->
-                    pure
-                        pe
-                        { propertyEditorSelection =
-                              selectionUp propertyEditorSelection prop
-                        }
-                _ -> pure pe
+            in case e of
+                   (EvKey KDown []) -> modSel selectionDown
+                   (EvKey KUp []) -> modSel selectionUp
+                   (EvKey KLeft []) -> modSel selectionLeft
+                   (EvKey KRight []) -> modSel selectionRight
+                   _ -> pure pe
+
+data P a
+    = PV a
+    | PL [P a]
+
+toP :: PersonProperty -> P PersonPropertyValue
+toP (PVal a) = PV a
+toP (PList ls) = PL $ map toP ls
+toP (PMap ls) = PL $ map (toP . snd) ls
+
+-- Try to select a subtree of a 'P'
+--
+-- Returns 'Nothing' if the selection is invalid and 'Just' with the selection
+-- if the selection is valid.
+select :: Maybe [Int] -> P a -> Maybe (P a)
+select Nothing _ = Nothing
+select (Just []) p = Just p
+select (Just _) (PV _) = Nothing
+select (Just (i:is)) (PL ls) =
+    case ls `atMay` i of
+        Nothing -> Nothing
+        Just p -> select (Just is) p
+
+unsnocMay :: [a] -> Maybe ([a], a)
+unsnocMay as = (,) <$> initMay as <*> lastMay as
+
+makeNewSel ::
+       (([Int], Int) -> [Int]) -> Maybe [Int] -> PersonProperty -> Maybe [Int]
+makeNewSel func msel prop =
+    case msel of
+        Nothing -> Just [0]
+        Just sel ->
+            let newSel = func <$> unsnocMay sel
+            in case select newSel (toP prop) of
+                   Nothing -> msel
+                   Just _ -> newSel
 
 selectionUp :: Maybe [Int] -> PersonProperty -> Maybe [Int]
-selectionUp Nothing _ = Just [0]
-selectionUp (Just [i]) prop =
-    case prop of
-        PVal _ -> Just [i]
-        PList _ ->
-            if i > 0
-                then Just [i - 1]
-                else Just [i]
-        PMap _ ->
-            if i > 0
-                then Just [i - 1]
-                else Just [i]
-selectionUp msel _ = msel
+selectionUp = makeNewSel $ \(is, i) -> is ++ [i - 1]
 
 selectionDown :: Maybe [Int] -> PersonProperty -> Maybe [Int]
-selectionDown Nothing _ = Just [0]
-selectionDown (Just [i]) prop =
-    case prop of
-        PVal _ -> Just [i]
-        PList ps ->
-            if i + 1 < length ps
-                then Just [i + 1]
-                else Just [i]
-        PMap ps ->
-            if i + 1 < length ps
-                then Just [i + 1]
-                else Just [i]
-selectionDown msel _ = msel
+selectionDown = makeNewSel $ \(is, i) -> is ++ [i + 1]
+
+selectionLeft :: Maybe [Int] -> PersonProperty -> Maybe [Int]
+selectionLeft = makeNewSel fst
+
+selectionRight :: Maybe [Int] -> PersonProperty -> Maybe [Int]
+selectionRight = makeNewSel $ \(is, i) -> is ++ [i, 0]
