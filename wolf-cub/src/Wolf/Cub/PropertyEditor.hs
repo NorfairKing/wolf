@@ -17,8 +17,6 @@ import Import
 import qualified Data.Text as T
 import Data.Time
 
-import Safe
-
 import Graphics.Vty as Vty
 import Graphics.Vty as V
 
@@ -152,7 +150,7 @@ handlePropertyEditorEvent e pe@PropertyEditor {..} =
                 (EvKey (V.KChar 's') []) ->
                     pure pe {propertyEditorCursor = Just $ cursor emptyProperty}
                 _ -> pure pe
-        Just prop ->
+        Just _ ->
             case propertyEditorCurrentEditor of
                 Nothing ->
                     case e of
@@ -203,11 +201,11 @@ tryToQuitAndSaveEditor ::
 tryToQuitAndSaveEditor pe@PropertyEditor {..} ed =
     case propertyEditorCursor of
         Nothing -> pure pe
-        Just cur ->
+        Just cur -> do
+            let contents = T.concat $ getEditContents ed
             case cur of
                 APropC (ValC vc) -> do
                     now <- liftIO getCurrentTime
-                    let contents = T.concat $ getEditContents ed
                     let newValue =
                             PersonPropertyValue
                             { personPropertyValueLastUpdatedTimestamp = now
@@ -215,11 +213,19 @@ tryToQuitAndSaveEditor pe@PropertyEditor {..} ed =
                             }
                     pure $
                         pe
-                        { propertyEditorCursor =
+                        { propertyEditorCurrentEditor = Nothing
+                        , propertyEditorCursor =
                               Just $
                               APropC $
                               ValC $ valCursorModifyValue (const newValue) vc
                         }
+                AKC kc ->
+                    pure $
+                    pe
+                    { propertyEditorCurrentEditor = Nothing
+                    , propertyEditorCursor =
+                          Just $ AKC $ keyCursorModifyKey (const contents) kc
+                    }
                 _ -> pure pe
 
 moveUp :: PropertyEditor n -> EventM n (PropertyEditor n)

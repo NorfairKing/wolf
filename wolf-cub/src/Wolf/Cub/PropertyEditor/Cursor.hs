@@ -1,4 +1,5 @@
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Wolf.Cub.PropertyEditor.Cursor
     ( ACursor(..)
@@ -10,6 +11,7 @@ module Wolf.Cub.PropertyEditor.Cursor
     , valCursorSelected
     , valCursorModifyValue
     , keyCursorSelected
+    , keyCursorModifyKey
     , cursorUp
     , cursorDown
     , cursorLeft
@@ -69,6 +71,19 @@ data ParentCursor
     = ListElPC ListElCursor
     | KeyValPC KeyValCursor
 
+modifyParentCursor ::
+       (PropertyCursor -> PropertyCursor) -> ParentCursor -> ParentCursor
+modifyParentCursor func (ListElPC lec) =
+    ListElPC $ listElCursorModifyValue func lec
+modifyParentCursor func (KeyValPC kvc) =
+    KeyValPC $ keyValCursorModifyValue func kvc
+
+rebuildParentCursor ::
+       (PropertyCursor -> PropertyCursor)
+    -> Maybe ParentCursor
+    -> Maybe ParentCursor
+rebuildParentCursor func = fmap $ modifyParentCursor func
+
 instance Rebuild ParentCursor where
     rebuild (ListElPC lc) = rebuild lc
     rebuild (KeyValPC kvpc) = rebuild kvpc
@@ -83,7 +98,14 @@ valCursor par val = ValCursor {valCursorParent = par, valCursorSelected = val}
 
 valCursorModifyValue ::
        (PersonPropertyValue -> PersonPropertyValue) -> ValCursor -> ValCursor
-valCursorModifyValue = undefined
+valCursorModifyValue func ValCursor {..} = vc'
+  where
+    vc' =
+        ValCursor
+        { valCursorParent =
+              rebuildParentCursor (const $ ValC vc') valCursorParent
+        , valCursorSelected = func valCursorSelected
+        }
 
 instance Rebuild ValCursor where
     rebuild vc =
@@ -104,20 +126,18 @@ listCursor :: Maybe ParentCursor -> [PersonProperty] -> ListCursor
 listCursor par ls = lc
   where
     lc = ListCursor {listCursorParent = par, listCursorElems = els}
-    indexLs = zip [0 ..] ls
-    els = map (uncurry el) indexLs
-    el i v = vec
-      where
-        vec =
-            ListElCursor
-            { listElCursorParent = lc
-            , listElCursorPrevElems =
-                  reverse $ filter ((< i) . listElCursorIx) els
-            , listElCursorNextElems = filter ((> i) . listElCursorIx) els
-            , listElCursorIx = i
-            , listElCursorValue = pc
-            }
-        pc = propertyCursor (Just $ ListElPC vec) v
+    els = listElems lc ls
+
+listCursorModifyElems ::
+       ([ListElCursor] -> [ListElCursor]) -> ListCursor -> ListCursor
+listCursorModifyElems func ListCursor {..} = lc'
+  where
+    lc' =
+        ListCursor
+        { listCursorParent =
+              rebuildParentCursor (const $ ListC lc') listCursorParent
+        , listCursorElems = func listCursorElems
+        }
 
 instance Rebuild ListCursor where
     rebuild lc =
@@ -138,22 +158,18 @@ mapCursor :: Maybe ParentCursor -> [(Text, PersonProperty)] -> MapCursor
 mapCursor par ls = mc
   where
     mc = MapCursor {mapCursorParent = par, mapCursorElems = els}
-    indexLs = zip [0 ..] ls
-    els = map (uncurry el) indexLs
-    el i (k, v) = kvc
-      where
-        kvc =
-            KeyValCursor
-            { keyValCursorParent = mc
-            , keyValCursorPrevElems =
-                  reverse $ filter ((< i) . keyValCursorIx) els
-            , keyValCursorNextElems = filter ((> i) . keyValCursorIx) els
-            , keyValCursorIx = i
-            , keyValCursorKey = kc
-            , keyValCursorValue = pc
-            }
-        kc = keyCursor kvc k
-        pc = propertyCursor (Just $ KeyValPC kvc) v
+    els = mapElems mc ls
+
+mapCursorModifyElems ::
+       ([KeyValCursor] -> [KeyValCursor]) -> MapCursor -> MapCursor
+mapCursorModifyElems func MapCursor {..} = mc'
+  where
+    mc' =
+        MapCursor
+        { mapCursorParent =
+              rebuildParentCursor (const $ MapC mc') mapCursorParent
+        , mapCursorElems = func mapCursorElems
+        }
 
 instance Rebuild MapCursor where
     rebuild mc =
@@ -185,6 +201,38 @@ listElCursorSelectNext lec =
         [] -> Nothing
         (lec':_) -> Just lec'
 
+listElCursorModifyValue ::
+       (PropertyCursor -> PropertyCursor) -> ListElCursor -> ListElCursor
+listElCursorModifyValue func lec = els !! listElCursorIx lec
+  where
+    lecs =
+        reverse (listElCursorPrevElems lec) ++
+        [lec {listElCursorValue = func $ listElCursorValue lec}] ++
+        listElCursorNextElems lec
+    ls = map build lecs
+    els =
+        listElems
+            (listCursorModifyElems (const els) (listElCursorParent lec))
+            ls
+
+listElems :: ListCursor -> [PersonProperty] -> [ListElCursor]
+listElems lc ls = els
+  where
+    indexLs = zip [0 ..] ls
+    els = map (uncurry el) indexLs
+    el i v = vec
+      where
+        vec =
+            ListElCursor
+            { listElCursorParent = lc
+            , listElCursorPrevElems =
+                  reverse $ filter ((< i) . listElCursorIx) els
+            , listElCursorNextElems = filter ((> i) . listElCursorIx) els
+            , listElCursorIx = i
+            , listElCursorValue = pc
+            }
+        pc = propertyCursor (Just $ ListElPC vec) v
+
 instance Rebuild ListElCursor where
     rebuild = rebuild . listElCursorParent
 
@@ -201,6 +249,49 @@ data KeyValCursor = KeyValCursor
     , keyValCursorValue :: PropertyCursor
     }
 
+keyValCursorModifyKey ::
+       (KeyCursor -> KeyCursor) -> KeyValCursor -> KeyValCursor
+keyValCursorModifyKey func =
+    keyValCursorModify
+        (\kvc -> kvc {keyValCursorKey = func $ keyValCursorKey kvc})
+
+keyValCursorModifyValue ::
+       (PropertyCursor -> PropertyCursor) -> KeyValCursor -> KeyValCursor
+keyValCursorModifyValue func =
+    keyValCursorModify
+        (\kvc -> kvc {keyValCursorValue = func $ keyValCursorValue kvc})
+
+keyValCursorModify ::
+       (KeyValCursor -> KeyValCursor) -> KeyValCursor -> KeyValCursor
+keyValCursorModify func kvc = els !! keyValCursorIx kvc
+  where
+    kvcs =
+        reverse (keyValCursorPrevElems kvc) ++
+        [func kvc] ++ keyValCursorNextElems kvc
+    ls = map build kvcs
+    els =
+        mapElems (mapCursorModifyElems (const els) (keyValCursorParent kvc)) ls
+
+mapElems :: MapCursor -> [(Text, PersonProperty)] -> [KeyValCursor]
+mapElems mc ls = els
+  where
+    indexLs = zip [0 ..] ls
+    els = map (uncurry el) indexLs
+    el i (k, v) = kvc
+      where
+        kvc =
+            KeyValCursor
+            { keyValCursorParent = mc
+            , keyValCursorPrevElems =
+                  reverse $ filter ((< i) . keyValCursorIx) els
+            , keyValCursorNextElems = filter ((> i) . keyValCursorIx) els
+            , keyValCursorIx = i
+            , keyValCursorKey = kc
+            , keyValCursorValue = pc
+            }
+        kc = keyCursor kvc k
+        pc = propertyCursor (Just $ KeyValPC kvc) v
+
 instance Rebuild KeyValCursor where
     rebuild = rebuild . keyValCursorParent
 
@@ -215,6 +306,16 @@ data KeyCursor = KeyCursor
 
 keyCursor :: KeyValCursor -> Text -> KeyCursor
 keyCursor kvc t = KeyCursor {keyCursorParent = kvc, keyCursorSelected = t}
+
+keyCursorModifyKey :: (Text -> Text) -> KeyCursor -> KeyCursor
+keyCursorModifyKey func kc = kc'
+  where
+    kc' =
+        KeyCursor
+        { keyCursorParent =
+              keyValCursorModifyKey (const kc') (keyCursorParent kc)
+        , keyCursorSelected = func $ keyCursorSelected kc
+        }
 
 instance Rebuild KeyCursor where
     rebuild = rebuild . keyCursorParent
@@ -247,10 +348,7 @@ cursorUp :: ACursor -> Maybe ACursor
 cursorUp cur =
     case cur of
         APropC _ -> Nothing -- Cannot go up in a property
-        ALElC lec ->
-            case listElCursorPrevElems lec of
-                [] -> Nothing -- Cannot go down past the end of a list
-                (nlec:_) -> pure $ ALElC nlec
+        ALElC lec -> ALElC <$> listElCursorSelectPrev lec
         AKC _ -> Nothing -- Cannot go up in a key
         AMKVC kvc ->
             case keyValCursorPrevElems kvc of
@@ -261,10 +359,7 @@ cursorDown :: ACursor -> Maybe ACursor
 cursorDown cur =
     case cur of
         APropC _ -> Nothing -- Cannot go down in a property
-        ALElC lec ->
-            case listElCursorNextElems lec of
-                [] -> Nothing -- Cannot go down past the end of a list
-                (nlec:_) -> pure $ ALElC nlec
+        ALElC lec -> ALElC <$> listElCursorSelectNext lec
         AKC _ -> Nothing -- Cannot go down in a key
         AMKVC kvc ->
             case keyValCursorNextElems kvc of
@@ -275,8 +370,8 @@ cursorLeft :: ACursor -> Maybe ACursor
 cursorLeft cur =
     case cur of
         APropC pc -> do
-            let parentCursor pc =
-                    case pc of
+            let parentCursor parc =
+                    case parc of
                         Nothing -> Nothing
                         Just (ListElPC lec) -> Just $ ALElC lec
                         Just (KeyValPC kvc) -> Just $ AMKVC kvc
@@ -293,7 +388,7 @@ cursorRight cur =
     case cur of
         APropC pc ->
             case pc of
-                ValC vc -> Nothing
+                ValC _ -> Nothing
                 ListC lc ->
                     case listCursorElems lc of
                         [] -> Nothing
