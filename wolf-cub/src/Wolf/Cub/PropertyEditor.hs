@@ -32,7 +32,7 @@ import Wolf.Cub.PropertyEditor.Cursor
 
 data PropertyEditor n = PropertyEditor
     { propertyEditorName :: n
-    , propertyEditorCursor :: Maybe PropertyCursor
+    , propertyEditorCursor :: Maybe ACursor
     , propertyEditorSelection :: Maybe [Int]
     , propertyEditorCurrentEditor :: Maybe (Editor Text n)
     } deriving (Generic)
@@ -138,22 +138,8 @@ handlePropertyEditorEvent e pe@PropertyEditor {..} =
                         (EvKey KUp []) -> moveUp pe prop
                         (EvKey KLeft []) -> moveLeft pe prop
                         (EvKey KRight []) -> moveRight pe prop
-                        (EvKey (KChar 'e') []) ->
-                            case select propertyEditorSelection prop of
-                                Nothing -> pure pe -- Do nothing if the selection is invalid.
-                                Just (SelectVal (PVal ppv)) ->
-                                    pure $
-                                    pe
-                                    { propertyEditorCurrentEditor =
-                                          Just $
-                                          editorText
-                                              (propertyEditorName <>
-                                               propertyEditorName -- Weird hack to get the name to be unique.
-                                               )
-                                              (Just 1)
-                                              (personPropertyValueContents ppv)
-                                    }
-                                Just _ -> pure pe -- Do nothing if the selection is not specific.
+                        (EvKey KEnter []) -> tryToStartSubEditor pe
+                        (EvKey (KChar 'e') []) -> tryToStartSubEditor pe
                         _ -> pure pe
                 Just ed ->
                     case e of
@@ -162,6 +148,39 @@ handlePropertyEditorEvent e pe@PropertyEditor {..} =
                         _ -> do
                             ne <- handleEditorEvent e ed
                             pure $ pe {propertyEditorCurrentEditor = Just ne}
+
+tryToStartSubEditor ::
+       Monoid n => PropertyEditor n -> EventM n (PropertyEditor n)
+tryToStartSubEditor pe@PropertyEditor {..} =
+    case propertyEditorCursor of
+        Nothing -> pure pe
+        Just cur ->
+            let mContents =
+                    case cur of
+                        APropC (ValC vc) ->
+                            Just $
+                            personPropertyValueContents $ valCursorSelected vc
+                        _ -> Nothing
+            in case mContents of
+                   Nothing -> pure pe
+                   Just cts ->
+                       pure $
+                       pe
+                       { propertyEditorCurrentEditor =
+                             Just $
+                             editorText
+                                 (propertyEditorName <>
+                                  propertyEditorName -- Weird hack to get the name to be unique.
+                                  )
+                                 (Just 1)
+                                 cts
+                       }
+
+tryToQuitAndSaveEditor :: PropertyEditor n -> EventM n (PropertyEditor n)
+tryToQuitAndSaveEditor pe@PropertyEditor {..} =
+    case propertyEditorCurrentEditor of
+        Nothing -> pure pe
+        Just _ -> pure pe
 
 data Selection
     = SelectVal PersonProperty
