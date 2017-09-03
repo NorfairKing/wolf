@@ -198,10 +198,11 @@ select (Just [i, j]) (PMap ls) =
                 0 -> Just $ SelectKey k
                 1 -> Just $ SelectVal p
                 _ -> Nothing
-select (Just (i:_:is)) (PMap ls) =
+select (Just (i:1:is)) (PMap ls) =
     case ls `atMay` i of
         Nothing -> Nothing
         Just (_, p) -> select (Just is) p
+select _ _ = Nothing
 
 unsnocMay :: [a] -> Maybe ([a], a)
 unsnocMay as = (,) <$> initMay as <*> lastMay as
@@ -256,7 +257,7 @@ moveLeft :: PropertyEditor n -> PersonProperty -> EventM n (PropertyEditor n)
 moveLeft = modSel selectionLeft
 
 selectionLeft :: Maybe [Int] -> PersonProperty -> Maybe [Int]
-selectionLeft = makeNewHorSel Nothing tailMay
+selectionLeft = makeNewHorSel Nothing initMay
 
 moveRight :: PropertyEditor n -> PersonProperty -> EventM n (PropertyEditor n)
 moveRight = modSel selectionRight
