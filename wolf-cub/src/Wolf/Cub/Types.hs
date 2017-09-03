@@ -49,3 +49,7 @@ newtype ResourceName =
 
 instance IsString ResourceName where
     fromString = ResourceName
+
+instance Monoid ResourceName where
+    mempty = ""
+    mappend (ResourceName s1) (ResourceName s2) = ResourceName $ s1 ++ s2
