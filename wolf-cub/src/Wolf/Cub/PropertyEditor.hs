@@ -15,6 +15,7 @@ module Wolf.Cub.PropertyEditor
 import Import
 
 import qualified Data.Text as T
+import Data.Time
 
 import Safe
 
@@ -33,7 +34,6 @@ import Wolf.Cub.PropertyEditor.Cursor
 data PropertyEditor n = PropertyEditor
     { propertyEditorName :: n
     , propertyEditorCursor :: Maybe ACursor
-    , propertyEditorSelection :: Maybe [Int]
     , propertyEditorCurrentEditor :: Maybe (Editor Text n)
     } deriving (Generic)
 
@@ -42,26 +42,40 @@ propertyEditor name mprop =
     PropertyEditor
     { propertyEditorName = name
     , propertyEditorCursor = cursor <$> mprop
-    , propertyEditorSelection = Nothing
     , propertyEditorCurrentEditor = Nothing
     }
 
 renderPropertyEditor :: (Show n, Ord n) => PropertyEditor n -> Widget n
-renderPropertyEditor PropertyEditor {..} =
-    ((withAttr propertyEditorAttrSelected (str (show propertyEditorSelection)) <=>
-      str " ") <=>) $ -- TODO remove this.
-    (<=> withAttr
-             propertyEditorAttrSelected
-             (strWrap
-                  (show $
-                   select propertyEditorSelection <$>
-                   (rebuild <$> propertyEditorCursor)))) $ -- TODO remove this.
+renderPropertyEditor PropertyEditor {..}
+    -- (withAttr
+    --      propertyEditorAttrSelected
+    --      (case propertyEditorCursor of
+    --           Nothing -> emptyWidget
+    --           Just cur ->
+    --               str $
+    --               case cur of
+    --                   APropC pc -> show $ build pc
+    --                   ALElC lec -> show $ build lec
+    --                   AKC kc -> show $ build kc
+    --                   AMKVC kvc -> show $ build kvc) <=>) $ -- TODO remove this.
+    -- ((withAttr
+    --       propertyEditorAttrSelected
+    --       (str (show $ propertyEditorSelection <$> cur)) <=>
+    --   str " ") <=>) $ -- TODO remove this.
+    -- (<=> withAttr
+    --          propertyEditorAttrSelected
+    --          (strWrap
+    --               (show $
+    --                select propertyEditorSelection <$>
+    --                (rebuild <$> propertyEditorCursor)))) $ -- TODO remove this.
+ =
     withAttr propertyEditorAttr $
     vBox
         [ case rebuild <$> propertyEditorCursor of
               Nothing -> txt "No properties, press 's' to start a new property."
               Just pp ->
-                  padRight Max $ padBottom Max $ go propertyEditorSelection pp
+                  padRight Max $
+                  padBottom Max $ go (makeSelection <$> propertyEditorCursor) pp
         , case propertyEditorCurrentEditor of
               Nothing -> emptyWidget
               Just e -> renderEditor (txt . T.concat) True e
@@ -160,6 +174,7 @@ tryToStartSubEditor pe@PropertyEditor {..} =
                         APropC (ValC vc) ->
                             Just $
                             personPropertyValueContents $ valCursorSelected vc
+                        AKC kc -> Just $ keyCursorSelected kc
                         _ -> Nothing
             in case mContents of
                    Nothing -> pure pe
@@ -180,7 +195,29 @@ tryToQuitAndSaveEditor :: PropertyEditor n -> EventM n (PropertyEditor n)
 tryToQuitAndSaveEditor pe@PropertyEditor {..} =
     case propertyEditorCurrentEditor of
         Nothing -> pure pe
-        Just _ -> pure pe
+        Just ed ->
+            case propertyEditorCursor of
+                Nothing -> pure pe
+                Just cur ->
+                    case cur of
+                        APropC (ValC vc) -> do
+                            now <- liftIO getCurrentTime
+                            let contents = T.concat $ getEditContents ed
+                            let newValue =
+                                    PersonPropertyValue
+                                    { personPropertyValueLastUpdatedTimestamp =
+                                          now
+                                    , personPropertyValueContents = contents
+                                    }
+                            pure $
+                                pe
+                                { propertyEditorCursor =
+                                      Just $
+                                      APropC $
+                                      ValC $
+                                      valCursorModifyValue (const newValue) vc
+                                }
+                        _ -> pure pe
 
 data Selection
     = SelectVal PersonProperty
@@ -252,34 +289,52 @@ makeNewHorSel start func msel prop =
                    Nothing -> msel
                    Just _ -> newSel
 
-modSel ::
-       (Maybe [Int] -> PersonProperty -> Maybe [Int])
-    -> PropertyEditor n
-    -> PersonProperty
-    -> EventM n (PropertyEditor n)
-modSel func pe prop =
-    pure pe {propertyEditorSelection = func (propertyEditorSelection pe) prop}
-
+-- modSel ::
+--        (Maybe [Int] -> PersonProperty -> Maybe [Int])
+--     -> PropertyEditor n
+--     -> PersonProperty
+--     -> EventM n (PropertyEditor n)
+-- modSel func pe prop =
+--     pure pe {propertyEditorSelection = func (propertyEditorSelection pe) prop}
 moveUp :: PropertyEditor n -> PersonProperty -> EventM n (PropertyEditor n)
-moveUp = modSel selectionUp
+moveUp = undefined -- modSel selectionUp
 
-selectionUp :: Maybe [Int] -> PersonProperty -> Maybe [Int]
-selectionUp = makeNewVerSel $ \(is, i) -> is ++ [i - 1]
-
+-- selectionUp :: Maybe [Int] -> PersonProperty -> Maybe [Int]
+-- selectionUp = makeNewVerSel $ \(is, i) -> is ++ [i - 1]
 moveDown :: PropertyEditor n -> PersonProperty -> EventM n (PropertyEditor n)
-moveDown = modSel selectionDown
+moveDown = undefined -- modSel selectionDown
 
-selectionDown :: Maybe [Int] -> PersonProperty -> Maybe [Int]
-selectionDown = makeNewVerSel $ \(is, i) -> is ++ [i + 1]
-
+-- selectionDown :: Maybe [Int] -> PersonProperty -> Maybe [Int]
+-- selectionDown = makeNewVerSel $ \(is, i) -> is ++ [i + 1]
 moveLeft :: PropertyEditor n -> PersonProperty -> EventM n (PropertyEditor n)
-moveLeft = modSel selectionLeft
+moveLeft = undefined -- modSel selectionLeft
 
-selectionLeft :: Maybe [Int] -> PersonProperty -> Maybe [Int]
-selectionLeft = makeNewHorSel Nothing initMay
-
+-- selectionLeft :: Maybe [Int] -> PersonProperty -> Maybe [Int]
+-- selectionLeft = makeNewHorSel Nothing initMay
 moveRight :: PropertyEditor n -> PersonProperty -> EventM n (PropertyEditor n)
-moveRight = modSel selectionRight
+moveRight pe prop = cursorRight pe
+    -- modSel selectionRight pe prop
 
-selectionRight :: Maybe [Int] -> PersonProperty -> Maybe [Int]
-selectionRight = makeNewHorSel (Just [0]) $ \is -> Just $ is ++ [0]
+-- selectionRight :: Maybe [Int] -> PersonProperty -> Maybe [Int]
+-- selectionRight = makeNewHorSel (Just [0]) $ \is -> Just $ is ++ [0]
+cursorRight pe@PropertyEditor {..} = do
+    let setCursor c = pure pe {propertyEditorCursor = Just c}
+    case propertyEditorCursor of
+        Nothing -> pure pe
+        Just cur ->
+            case cur of
+                APropC pc ->
+                    case pc of
+                        ValC vc -> pure pe -- Can't go right if we're looking at a value.
+                        ListC lc ->
+                            case listCursorElems lc of
+                                [] -> pure pe -- Can't go into a list without elements.
+                                (lec:_) -> setCursor $ ALElC lec -- The first list element.
+                        MapC mc ->
+                            case mapCursorElems mc of
+                                [] -> pure pe -- Can't go into a map without elements.
+                                (kvc:_) -> setCursor $ AMKVC kvc -- The first map element.
+                ALElC lec -> setCursor $ APropC $ listElCursorValue lec
+                AKC kc -> pure pe
+                AMKVC kvc -> setCursor $ AKC $ keyValCursorKey kvc
+

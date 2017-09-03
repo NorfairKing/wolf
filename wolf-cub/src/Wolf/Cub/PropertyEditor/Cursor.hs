@@ -5,8 +5,17 @@ module Wolf.Cub.PropertyEditor.Cursor
     , PropertyCursor(..)
     , ValCursor
     , valCursorSelected
+    , valCursorModifyValue
     , cursor
+    , build
     , rebuild
+    , listCursorElems
+    , mapCursorElems
+    , listElCursorValue
+    , keyValCursorKey
+    , keyValCursorValue
+    , keyCursorSelected
+    , makeSelection
     ) where
 
 import Import
@@ -23,6 +32,7 @@ class Build a where
 data ACursor
     = APropC PropertyCursor
     | ALElC ListElCursor
+    | AKC KeyCursor
     | AMKVC KeyValCursor
 
 cursor :: PersonProperty -> ACursor
@@ -31,6 +41,7 @@ cursor = APropC . propertyCursor Nothing
 instance Rebuild ACursor where
     rebuild (APropC pc) = rebuild pc
     rebuild (ALElC alec) = rebuild alec
+    rebuild (AKC kc) = rebuild kc
     rebuild (AMKVC akvc) = rebuild akvc
 
 data PropertyCursor
@@ -71,6 +82,10 @@ data ValCursor = ValCursor
 
 valCursor :: Maybe ParentCursor -> PersonPropertyValue -> ValCursor
 valCursor par val = ValCursor {valCursorParent = par, valCursorSelected = val}
+
+valCursorModifyValue ::
+       (PersonPropertyValue -> PersonPropertyValue) -> ValCursor -> ValCursor
+valCursorModifyValue = undefined
 
 instance Rebuild ValCursor where
     rebuild vc =
@@ -133,9 +148,11 @@ mapCursor par ls = mc
             { keyValCursorParent = mc
             , keyValCursorPrevElems = reverse $ take (i - 1) els
             , keyValCursorNextElems = drop i els
-            , keyValCursorKey = k
+            , keyValCursorIx = i
+            , keyValCursorKey = kc
             , keyValCursorValue = pc
             }
+        kc = keyCursor kvc k
         pc = propertyCursor (Just $ KeyValPC kvc) v
 
 instance Rebuild MapCursor where
@@ -179,7 +196,8 @@ data KeyValCursor = KeyValCursor
     { keyValCursorParent :: MapCursor
     , keyValCursorPrevElems :: [KeyValCursor]
     , keyValCursorNextElems :: [KeyValCursor]
-    , keyValCursorKey :: Text
+    , keyValCursorIx :: Int
+    , keyValCursorKey :: KeyCursor
     , keyValCursorValue :: PropertyCursor
     }
 
@@ -188,15 +206,39 @@ instance Rebuild KeyValCursor where
 
 instance Build KeyValCursor where
     type Building KeyValCursor = (Text, PersonProperty)
-    build kvc = (keyValCursorKey kvc, build $ keyValCursorValue kvc)
--- class HasParentCursor a where
---     parent :: a -> Maybe ParentCursor
---
--- instance HasParentCursor ValCursor where
---     parent = valCursorParent
---
--- instance HasParentCursor ListCursor where
---     parent = listCursorParent
---
--- instance HasParentCursor MapCursor where
---     parent = mapCursorParent
+    build kvc = (build $ keyValCursorKey kvc, build $ keyValCursorValue kvc)
+
+data KeyCursor = KeyCursor
+    { keyCursorParent :: KeyValCursor
+    , keyCursorSelected :: Text
+    }
+
+keyCursor :: KeyValCursor -> Text -> KeyCursor
+keyCursor kvc t = KeyCursor {keyCursorParent = kvc, keyCursorSelected = t}
+
+instance Rebuild KeyCursor where
+    rebuild = rebuild . keyCursorParent
+
+instance Build KeyCursor where
+    type Building KeyCursor = Text
+    build = keyCursorSelected
+
+makeSelection :: ACursor -> [Int]
+makeSelection ac =
+    reverse $
+    case ac of
+        APropC pc -> mspc pc
+        ALElC lec -> mslec lec
+        AKC kc -> mskc kc
+        AMKVC kvc -> mskvc kvc
+  where
+    mspc (ValC vc) = fromMaybe [] $ msparc <$> valCursorParent vc
+    mspc (ListC lc) = mslc lc
+    mspc (MapC mc) = msmc mc
+    msparc (ListElPC lec) = mslec lec
+    msparc (KeyValPC kvc) = mskvc kvc
+    mslc lc = fromMaybe [] $ msparc <$> listCursorParent lc
+    msmc mc = fromMaybe [] $ msparc <$> mapCursorParent mc
+    mslec lec = listElCursorIx lec : mslc (listElCursorParent lec)
+    mskc kc = 0: mskvc (keyCursorParent kc)
+    mskvc kvc = keyValCursorIx kvc : msmc (keyValCursorParent kvc)
