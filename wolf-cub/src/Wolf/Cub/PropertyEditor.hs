@@ -48,7 +48,14 @@ propertyEditor name mprop =
 
 renderPropertyEditor :: (Show n, Ord n) => PropertyEditor n -> Widget n
 renderPropertyEditor PropertyEditor {..} =
-    (withAttr propertyEditorAttrSelected (str (show propertyEditorSelection)) <=>) $ -- TODO remove this.
+    ((withAttr propertyEditorAttrSelected (str (show propertyEditorSelection)) <=>
+      str " ") <=>) $ -- TODO remove this.
+    (<=> withAttr
+             propertyEditorAttrSelected
+             (strWrap
+                  (show $
+                   select propertyEditorSelection <$>
+                   (rebuild <$> propertyEditorCursor)))) $ -- TODO remove this.
     withAttr propertyEditorAttr $
     vBox
         [ case rebuild <$> propertyEditorCursor of
@@ -74,11 +81,20 @@ renderPropertyEditor PropertyEditor {..} =
         withSelectedAttr msel $
         vBox $
         flip map (zip [0 ..] tups) $ \(ix, (k, v)) ->
-            let msel' = drillSel msel ix
-                leftSide = withSelectedAttr msel' $ txt k <+> txt ": "
-            in case v of
-                   (PVal _) -> leftSide <+> go msel' v
-                   _ -> leftSide <=> padLeft (Pad 2) (go msel' v)
+            let thisSel = drillSel msel ix
+                withKeyValueAttr = withSelectedAttr thisSel
+                keySel = drillSel thisSel 0
+                withKeyAttr = withSelectedAttr keySel
+                valueSel = drillSel thisSel 1
+                withValueAttr = withSelectedAttr valueSel
+                keySide = withKeyAttr $ txt k
+                mid = txt ": "
+                leftSide = keySide <+> mid
+                valueSide = withValueAttr $ go valueSel v
+            in withKeyValueAttr $
+               case v of
+                   (PVal _) -> leftSide <+> valueSide
+                   _ -> leftSide <=> padLeft (Pad 2) valueSide
     drillSel msel ix =
         case msel of
             Nothing -> Nothing
@@ -125,7 +141,7 @@ handlePropertyEditorEvent e pe@PropertyEditor {..} =
                         (EvKey (KChar 'e') []) ->
                             case select propertyEditorSelection prop of
                                 Nothing -> pure pe -- Do nothing if the selection is invalid.
-                                Just (PVal ppv) ->
+                                Just (SelectVal (PVal ppv)) ->
                                     pure $
                                     pe
                                     { propertyEditorCurrentEditor =
@@ -147,19 +163,42 @@ handlePropertyEditorEvent e pe@PropertyEditor {..} =
                             ne <- handleEditorEvent e ed
                             pure $ pe {propertyEditorCurrentEditor = Just ne}
 
+data Selection
+    = SelectVal PersonProperty
+    | SelectListEl Int
+                   PersonProperty
+    | SelectList [PersonProperty]
+    | SelectKey Text
+    | SelectKeyVal Text
+                   PersonProperty
+    | SelectMap [(Text, PersonProperty)]
+    deriving (Show, Eq, Generic)
+
 -- Try to select a subtree of a 'PersonProperty'
 --
 -- Returns 'Nothing' if the selection is invalid and 'Just' with the selection
 -- if the selection is valid.
-select :: Maybe [Int] -> PersonProperty -> Maybe PersonProperty
+select :: Maybe [Int] -> PersonProperty -> Maybe Selection
 select Nothing _ = Nothing
-select (Just []) p = Just p
+select (Just []) p = Just $ SelectVal p
 select (Just _) (PVal _) = Nothing
 select (Just (i:is)) (PList ls) =
     case ls `atMay` i of
         Nothing -> Nothing
         Just p -> select (Just is) p
-select (Just (i:is)) (PMap ls) =
+select (Just [i]) (PMap ls) =
+    case ls `atMay` i of
+        Nothing -> Nothing
+        Just (k, v) -> Just $ SelectKeyVal k v
+select (Just [i, j]) (PMap ls) =
+    case ls `atMay` i of
+        Nothing -> Nothing
+        Just (k, p) ->
+            case j of
+                0 -> Just $ SelectKey k
+                1 -> Just $ SelectVal p
+                _ -> Nothing
+select (Just (i:_:is)) (PMap ls) =
     case ls `atMay` i of
         Nothing -> Nothing
         Just (_, p) -> select (Just is) p
@@ -167,13 +206,28 @@ select (Just (i:is)) (PMap ls) =
 unsnocMay :: [a] -> Maybe ([a], a)
 unsnocMay as = (,) <$> initMay as <*> lastMay as
 
-makeNewSel ::
+makeNewVerSel ::
        (([Int], Int) -> [Int]) -> Maybe [Int] -> PersonProperty -> Maybe [Int]
-makeNewSel func msel prop =
+makeNewVerSel func msel prop =
     case msel of
-        Nothing -> Just [0]
+        Nothing -> Just []
         Just sel ->
             let newSel = func <$> unsnocMay sel
+            in case select newSel prop of
+                   Nothing -> msel
+                   Just _ -> newSel
+
+makeNewHorSel ::
+       Maybe [Int]
+    -> ([Int] -> Maybe [Int])
+    -> Maybe [Int]
+    -> PersonProperty
+    -> Maybe [Int]
+makeNewHorSel start func msel prop =
+    case msel of
+        Nothing -> start
+        Just sel ->
+            let newSel = func sel
             in case select newSel prop of
                    Nothing -> msel
                    Just _ -> newSel
@@ -190,22 +244,22 @@ moveUp :: PropertyEditor n -> PersonProperty -> EventM n (PropertyEditor n)
 moveUp = modSel selectionUp
 
 selectionUp :: Maybe [Int] -> PersonProperty -> Maybe [Int]
-selectionUp = makeNewSel $ \(is, i) -> is ++ [i - 1]
+selectionUp = makeNewVerSel $ \(is, i) -> is ++ [i - 1]
 
 moveDown :: PropertyEditor n -> PersonProperty -> EventM n (PropertyEditor n)
 moveDown = modSel selectionDown
 
 selectionDown :: Maybe [Int] -> PersonProperty -> Maybe [Int]
-selectionDown = makeNewSel $ \(is, i) -> is ++ [i + 1]
+selectionDown = makeNewVerSel $ \(is, i) -> is ++ [i + 1]
 
 moveLeft :: PropertyEditor n -> PersonProperty -> EventM n (PropertyEditor n)
 moveLeft = modSel selectionLeft
 
 selectionLeft :: Maybe [Int] -> PersonProperty -> Maybe [Int]
-selectionLeft = makeNewSel fst
+selectionLeft = makeNewHorSel Nothing tailMay
 
 moveRight :: PropertyEditor n -> PersonProperty -> EventM n (PropertyEditor n)
 moveRight = modSel selectionRight
 
 selectionRight :: Maybe [Int] -> PersonProperty -> Maybe [Int]
-selectionRight = makeNewSel $ \(is, i) -> is ++ [i, 0]
+selectionRight = makeNewHorSel (Just [0]) $ \is -> Just $ is ++ [0]
