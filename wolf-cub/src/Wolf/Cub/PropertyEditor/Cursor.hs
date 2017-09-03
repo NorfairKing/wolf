@@ -14,8 +14,13 @@ module Wolf.Cub.PropertyEditor.Cursor
     , listElCursorValue
     , keyValCursorKey
     , keyValCursorValue
+    , keyCursorParent
     , keyCursorSelected
     , makeSelection
+    , cursorUp
+    , cursorDown
+    , cursorLeft
+    , cursorRight
     ) where
 
 import Import
@@ -113,8 +118,9 @@ listCursor par ls = lc
         vec =
             ListElCursor
             { listElCursorParent = lc
-            , listElCursorPrevElems = reverse $ take (i - 1) els
-            , listElCursorNextElems = drop i els
+            , listElCursorPrevElems =
+                  reverse $ filter ((< i) . listElCursorIx) els
+            , listElCursorNextElems = filter ((> i) . listElCursorIx) els
             , listElCursorIx = i
             , listElCursorValue = pc
             }
@@ -146,8 +152,9 @@ mapCursor par ls = mc
         kvc =
             KeyValCursor
             { keyValCursorParent = mc
-            , keyValCursorPrevElems = reverse $ take (i - 1) els
-            , keyValCursorNextElems = drop i els
+            , keyValCursorPrevElems =
+                  reverse $ filter ((< i) . keyValCursorIx) els
+            , keyValCursorNextElems = filter ((> i) . keyValCursorIx) els
             , keyValCursorIx = i
             , keyValCursorKey = kc
             , keyValCursorValue = pc
@@ -235,10 +242,73 @@ makeSelection ac =
     mspc (ValC vc) = fromMaybe [] $ msparc <$> valCursorParent vc
     mspc (ListC lc) = mslc lc
     mspc (MapC mc) = msmc mc
-    msparc (ListElPC lec) = mslec lec
-    msparc (KeyValPC kvc) = mskvc kvc
+    msparc (ListElPC lec) = 0 : mslec lec
+    msparc (KeyValPC kvc) = 1 : mskvc kvc
     mslc lc = fromMaybe [] $ msparc <$> listCursorParent lc
     msmc mc = fromMaybe [] $ msparc <$> mapCursorParent mc
     mslec lec = listElCursorIx lec : mslc (listElCursorParent lec)
-    mskc kc = 0: mskvc (keyCursorParent kc)
+    mskc kc = 0 : mskvc (keyCursorParent kc)
     mskvc kvc = keyValCursorIx kvc : msmc (keyValCursorParent kvc)
+
+cursorUp :: ACursor -> Maybe ACursor
+cursorUp cur =
+    case cur of
+        APropC _ -> Nothing -- Cannot go up in a property
+        ALElC lec ->
+            case listElCursorPrevElems lec of
+                [] -> Nothing -- Cannot go down past the end of a list
+                (nlec:_) -> pure $ ALElC nlec
+        AKC _ -> Nothing -- Cannot go up in a key
+        AMKVC kvc ->
+            case keyValCursorPrevElems kvc of
+                [] -> Nothing -- Cannot go up past the end of a map
+                (nkvc:_) -> pure $ AMKVC nkvc
+
+cursorDown :: ACursor -> Maybe ACursor
+cursorDown cur =
+    case cur of
+        APropC _ -> Nothing -- Cannot go down in a property
+        ALElC lec ->
+            case listElCursorNextElems lec of
+                [] -> Nothing -- Cannot go down past the end of a list
+                (nlec:_) -> pure $ ALElC nlec
+        AKC _ -> Nothing -- Cannot go down in a key
+        AMKVC kvc ->
+            case keyValCursorNextElems kvc of
+                [] -> Nothing -- Cannot go down past the end of a map
+                (nkvc:_) -> pure $ AMKVC nkvc
+
+cursorLeft :: ACursor -> Maybe ACursor
+cursorLeft cur =
+    case cur of
+        APropC pc -> do
+            let parentCursor pc =
+                    case pc of
+                        Nothing -> Nothing
+                        Just (ListElPC lec) -> Just $ ALElC lec
+                        Just (KeyValPC kvc) -> Just $ AMKVC kvc
+            case pc of
+                ValC vc -> parentCursor $ valCursorParent vc
+                ListC lc -> parentCursor $ listCursorParent lc
+                MapC mc -> parentCursor $ mapCursorParent mc
+        ALElC lec -> Just $ APropC $ ListC $ listElCursorParent lec
+        AKC kc -> Just $ AMKVC $ keyCursorParent kc
+        AMKVC kvc -> Just $ APropC $ MapC $ keyValCursorParent kvc
+
+cursorRight :: ACursor -> Maybe ACursor
+cursorRight cur =
+    case cur of
+        APropC pc ->
+            case pc of
+                ValC vc -> Nothing
+                ListC lc ->
+                    case listCursorElems lc of
+                        [] -> Nothing
+                        (lec:_) -> Just $ ALElC lec -- The first list element.
+                MapC mc ->
+                    case mapCursorElems mc of
+                        [] -> Nothing
+                        (kvc:_) -> Just $ AMKVC kvc -- The first map element.
+        ALElC lec -> Just $ APropC $ listElCursorValue lec
+        AKC kc -> Just $ APropC $ keyValCursorValue $ keyCursorParent kc
+        AMKVC kvc -> Just $ AKC $ keyValCursorKey kvc

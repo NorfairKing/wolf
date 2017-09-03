@@ -46,29 +46,8 @@ propertyEditor name mprop =
     }
 
 renderPropertyEditor :: (Show n, Ord n) => PropertyEditor n -> Widget n
-renderPropertyEditor PropertyEditor {..}
-    -- (withAttr
-    --      propertyEditorAttrSelected
-    --      (case propertyEditorCursor of
-    --           Nothing -> emptyWidget
-    --           Just cur ->
-    --               str $
-    --               case cur of
-    --                   APropC pc -> show $ build pc
-    --                   ALElC lec -> show $ build lec
-    --                   AKC kc -> show $ build kc
-    --                   AMKVC kvc -> show $ build kvc) <=>) $ -- TODO remove this.
-    -- ((withAttr
-    --       propertyEditorAttrSelected
-    --       (str (show $ propertyEditorSelection <$> cur)) <=>
-    --   str " ") <=>) $ -- TODO remove this.
-    -- (<=> withAttr
-    --          propertyEditorAttrSelected
-    --          (strWrap
-    --               (show $
-    --                select propertyEditorSelection <$>
-    --                (rebuild <$> propertyEditorCursor)))) $ -- TODO remove this.
- =
+renderPropertyEditor PropertyEditor {..} =
+    addDebugInfo $
     withAttr propertyEditorAttr $
     vBox
         [ case rebuild <$> propertyEditorCursor of
@@ -87,10 +66,16 @@ renderPropertyEditor PropertyEditor {..}
     go msel (PList vs) =
         withSelectedAttr msel $
         vBox $
-        map (txt "- " <+>) $
         flip map (zip [0 ..] vs) $ \(ix, v) ->
-            let msel' = drillSel msel ix
-            in go msel' v
+            let thisSel = drillSel msel ix
+                withListElemAttr = withSelectedAttr thisSel
+                dashSel = thisSel
+                withDashAttr = withSelectedAttr dashSel
+                valueSel = drillSel thisSel 0
+                withValueAttr = withSelectedAttr valueSel
+                dash = withDashAttr $ txt "- "
+                valueSide = withValueAttr $ go valueSel v
+            in withListElemAttr $ dash <+> valueSide
     go msel (PMap tups) =
         withSelectedAttr msel $
         vBox $
@@ -122,6 +107,29 @@ renderPropertyEditor PropertyEditor {..}
             Nothing -> id
             Just [] -> withAttr propertyEditorAttrSelected
             Just _ -> id
+    addDebugInfo =
+        (<=> withAttr
+                 propertyEditorAttrSelected
+                 (case propertyEditorCursor of
+                      Nothing -> emptyWidget
+                      Just cur ->
+                          strWrap $
+                          case cur of
+                              APropC pc -> show $ build pc
+                              ALElC lec -> show $ build lec
+                              AKC kc -> show $ build kc
+                              AMKVC kvc -> show $ build kvc -- TODO remove this.
+                  ))
+    -- ((withAttr
+    --       propertyEditorAttrSelected
+    --       (str (show $ propertyEditorSelection <$> cur)) <=>
+    --   str " ") <=>) $ -- TODO remove this.
+    -- (<=> withAttr
+    --          propertyEditorAttrSelected
+    --          (strWrap
+    --               (show $
+    --                select propertyEditorSelection <$>
+    --                (rebuild <$> propertyEditorCursor)))) $ -- TODO remove this.
 
 propertyEditorAttr :: AttrName
 propertyEditorAttr = "property-editor"
@@ -148,17 +156,16 @@ handlePropertyEditorEvent e pe@PropertyEditor {..} =
             case propertyEditorCurrentEditor of
                 Nothing ->
                     case e of
-                        (EvKey KDown []) -> moveDown pe prop
-                        (EvKey KUp []) -> moveUp pe prop
-                        (EvKey KLeft []) -> moveLeft pe prop
-                        (EvKey KRight []) -> moveRight pe prop
+                        (EvKey KDown []) -> moveDown pe
+                        (EvKey KUp []) -> moveUp pe
+                        (EvKey KLeft []) -> moveLeft pe
+                        (EvKey KRight []) -> moveRight pe
                         (EvKey KEnter []) -> tryToStartSubEditor pe
                         (EvKey (KChar 'e') []) -> tryToStartSubEditor pe
                         _ -> pure pe
                 Just ed ->
                     case e of
-                        (EvKey KEnter []) ->
-                            pure $ pe {propertyEditorCurrentEditor = Nothing}
+                        (EvKey KEnter []) -> tryToQuitAndSaveEditor pe ed
                         _ -> do
                             ne <- handleEditorEvent e ed
                             pure $ pe {propertyEditorCurrentEditor = Just ne}
@@ -191,33 +198,29 @@ tryToStartSubEditor pe@PropertyEditor {..} =
                                  cts
                        }
 
-tryToQuitAndSaveEditor :: PropertyEditor n -> EventM n (PropertyEditor n)
-tryToQuitAndSaveEditor pe@PropertyEditor {..} =
-    case propertyEditorCurrentEditor of
+tryToQuitAndSaveEditor ::
+       PropertyEditor n -> Editor Text t -> EventM n (PropertyEditor n)
+tryToQuitAndSaveEditor pe@PropertyEditor {..} ed =
+    case propertyEditorCursor of
         Nothing -> pure pe
-        Just ed ->
-            case propertyEditorCursor of
-                Nothing -> pure pe
-                Just cur ->
-                    case cur of
-                        APropC (ValC vc) -> do
-                            now <- liftIO getCurrentTime
-                            let contents = T.concat $ getEditContents ed
-                            let newValue =
-                                    PersonPropertyValue
-                                    { personPropertyValueLastUpdatedTimestamp =
-                                          now
-                                    , personPropertyValueContents = contents
-                                    }
-                            pure $
-                                pe
-                                { propertyEditorCursor =
-                                      Just $
-                                      APropC $
-                                      ValC $
-                                      valCursorModifyValue (const newValue) vc
-                                }
-                        _ -> pure pe
+        Just cur ->
+            case cur of
+                APropC (ValC vc) -> do
+                    now <- liftIO getCurrentTime
+                    let contents = T.concat $ getEditContents ed
+                    let newValue =
+                            PersonPropertyValue
+                            { personPropertyValueLastUpdatedTimestamp = now
+                            , personPropertyValueContents = contents
+                            }
+                    pure $
+                        pe
+                        { propertyEditorCursor =
+                              Just $
+                              APropC $
+                              ValC $ valCursorModifyValue (const newValue) vc
+                        }
+                _ -> pure pe
 
 data Selection
     = SelectVal PersonProperty
@@ -289,52 +292,27 @@ makeNewHorSel start func msel prop =
                    Nothing -> msel
                    Just _ -> newSel
 
--- modSel ::
---        (Maybe [Int] -> PersonProperty -> Maybe [Int])
---     -> PropertyEditor n
---     -> PersonProperty
---     -> EventM n (PropertyEditor n)
--- modSel func pe prop =
---     pure pe {propertyEditorSelection = func (propertyEditorSelection pe) prop}
-moveUp :: PropertyEditor n -> PersonProperty -> EventM n (PropertyEditor n)
-moveUp = undefined -- modSel selectionUp
+moveUp :: PropertyEditor n -> EventM n (PropertyEditor n)
+moveUp = moveCursor cursorUp
 
--- selectionUp :: Maybe [Int] -> PersonProperty -> Maybe [Int]
--- selectionUp = makeNewVerSel $ \(is, i) -> is ++ [i - 1]
-moveDown :: PropertyEditor n -> PersonProperty -> EventM n (PropertyEditor n)
-moveDown = undefined -- modSel selectionDown
+moveDown :: PropertyEditor n -> EventM n (PropertyEditor n)
+moveDown = moveCursor cursorDown
 
--- selectionDown :: Maybe [Int] -> PersonProperty -> Maybe [Int]
--- selectionDown = makeNewVerSel $ \(is, i) -> is ++ [i + 1]
-moveLeft :: PropertyEditor n -> PersonProperty -> EventM n (PropertyEditor n)
-moveLeft = undefined -- modSel selectionLeft
+moveLeft :: PropertyEditor n -> EventM n (PropertyEditor n)
+moveLeft = moveCursor cursorLeft
 
--- selectionLeft :: Maybe [Int] -> PersonProperty -> Maybe [Int]
--- selectionLeft = makeNewHorSel Nothing initMay
-moveRight :: PropertyEditor n -> PersonProperty -> EventM n (PropertyEditor n)
-moveRight pe prop = cursorRight pe
-    -- modSel selectionRight pe prop
+moveRight :: PropertyEditor n -> EventM n (PropertyEditor n)
+moveRight = moveCursor cursorRight
 
--- selectionRight :: Maybe [Int] -> PersonProperty -> Maybe [Int]
--- selectionRight = makeNewHorSel (Just [0]) $ \is -> Just $ is ++ [0]
-cursorRight pe@PropertyEditor {..} = do
-    let setCursor c = pure pe {propertyEditorCursor = Just c}
-    case propertyEditorCursor of
-        Nothing -> pure pe
-        Just cur ->
-            case cur of
-                APropC pc ->
-                    case pc of
-                        ValC vc -> pure pe -- Can't go right if we're looking at a value.
-                        ListC lc ->
-                            case listCursorElems lc of
-                                [] -> pure pe -- Can't go into a list without elements.
-                                (lec:_) -> setCursor $ ALElC lec -- The first list element.
-                        MapC mc ->
-                            case mapCursorElems mc of
-                                [] -> pure pe -- Can't go into a map without elements.
-                                (kvc:_) -> setCursor $ AMKVC kvc -- The first map element.
-                ALElC lec -> setCursor $ APropC $ listElCursorValue lec
-                AKC kc -> pure pe
-                AMKVC kvc -> setCursor $ AKC $ keyValCursorKey kvc
-
+moveCursor ::
+       (ACursor -> Maybe ACursor)
+    -> PropertyEditor n
+    -> EventM n (PropertyEditor n)
+moveCursor move pe =
+    pure
+        pe
+        { propertyEditorCursor =
+              case propertyEditorCursor pe of
+                  Nothing -> Nothing
+                  Just cur -> Just $ fromMaybe cur $ move cur
+        }
