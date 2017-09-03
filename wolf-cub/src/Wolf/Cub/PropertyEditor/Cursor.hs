@@ -3,20 +3,13 @@
 module Wolf.Cub.PropertyEditor.Cursor
     ( ACursor(..)
     , PropertyCursor(..)
-    , ValCursor
-    , valCursorSelected
-    , valCursorModifyValue
     , cursor
     , build
     , rebuild
-    , listCursorElems
-    , mapCursorElems
-    , listElCursorValue
-    , keyValCursorKey
-    , keyValCursorValue
-    , keyCursorParent
-    , keyCursorSelected
     , makeSelection
+    , valCursorSelected
+    , valCursorModifyValue
+    , keyCursorSelected
     , cursorUp
     , cursorDown
     , cursorLeft
