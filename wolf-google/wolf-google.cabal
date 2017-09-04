@@ -32,9 +32,9 @@ library
         optparse-applicative >=0.13,
         process >=1.4 && <1.5,
         text >=1.2 && <1.3,
-        time >= 1.6 && < 1.7,
+        time >=1.6 && <1.7,
         vector >=0.11 && <0.12,
-        wolf-data
+        wolf-data -any
     default-language: Haskell2010
     default-extensions: NoImplicitPrelude
     hs-source-dirs: src/

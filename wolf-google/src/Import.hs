@@ -4,6 +4,8 @@ module Import
 
 import Prelude as X
 
+import Debug.Trace as X
+
 import GHC.Generics as X (Generic)
 
 import Data.Map as X (Map)
