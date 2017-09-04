@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE ScopedTypeVariables #-}
@@ -8,12 +9,14 @@ module Wolf.Google.Suggest where
 import Import
 
 import Control.Monad.Catch
+import Data.List
 import Data.Aeson as JSON
 import Data.Aeson.Encode.Pretty as JSON
 import qualified Data.ByteString.Lazy.Char8 as LB8
 import Data.Proxy (Proxy(..))
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
+import Data.Time
 import qualified Data.Vector as V
 import GHC.TypeLits (Symbol)
 import Lens.Micro
@@ -27,10 +30,13 @@ import Network.Google
 import Network.Google.Auth
 import Network.Google.People
 
+import Wolf.Data
+
 import Wolf.Google.Types
 
 suggest :: IO ()
 suggest = do
+    now <- getCurrentTime
     lgr <- newLogger Debug stdout
     man <- newManager tlsManagerSettings
     store <- getUserAuth wolfOauthClient wolfScopes lgr man
@@ -43,40 +49,67 @@ suggest = do
         Just "person.names,person.emailAddresses"
     forM_ (resp ^. lcrConnections) $ \p -> do
         LB8.putStrLn $ JSON.encodePretty p
-        LB8.putStrLn $ JSON.encodePretty $ makeSuggestion p
+        LB8.putStrLn $ JSON.encodePretty $ gatherData now p
 
-makeSuggestion :: Person -> Maybe PersonSuggestion
-makeSuggestion p =
-    case p ^. perNames of
-        [] -> Nothing
-        (n:_) -> do
-            firstName <- n ^. nGivenName
-            lastName <- n ^. nFamilyName
-            let ps =
-                    catMaybes
-                        [ case p ^. perEmailAddresses of
-                              [] -> Nothing
-                              [ea] -> do
-                                  v <- ea ^. eaValue
-                                  pure ("email", JSON.String v)
-                              eas ->
-                                  Just
-                                      ( "email"
-                                      , JSON.Array $ V.fromList $
-                                        flip mapMaybe eas $ \ea -> do
-                                            v <- ea ^. eaValue
-                                            pure $ JSON.String v)
-                        ]
-            pure
-                PersonSuggestion
-                { personSuggestionAlias = T.unwords [firstName, lastName]
-                , personSuggestionEntry =
-                      JSON.object $
-                      [ ("first name", JSON.String firstName)
-                      , ("last name", JSON.String lastName)
-                      ] ++
-                      ps
-                }
+gatherData :: UTCTime -> Person -> Maybe GatheredPerson
+gatherData now p = do
+    let aliases = gatherAliases p
+    let val t =
+            PVal $
+            PersonPropertyValue
+            { personPropertyValueContents = t
+            , personPropertyValueLastUpdatedTimestamp = now
+            }
+    let ns = gatherNames now p
+    let ps =
+            catMaybes
+                [ case p ^. perEmailAddresses of
+                      [] -> Nothing
+                      [ea] -> do
+                          v <- ea ^. eaValue
+                          pure ("email", val v)
+                      eas ->
+                          Just
+                              ( "email"
+                              , PList $ flip mapMaybe eas $ \ea -> do
+                                    v <- ea ^. eaValue
+                                    pure $ val v)
+                ]
+    pure
+        GatheredPerson
+        {gatheredPersonAliases = aliases, gatheredPersonEntry = PMap $ ns ++ ps}
+
+gatherNames :: UTCTime -> Person -> [(Text, PersonProperty)]
+gatherNames now p =
+    case ns of
+        [] -> []
+        [n] -> n
+        ns -> [("name", PList $ map PMap ns)]
+  where
+    val t =
+        PVal $
+        PersonPropertyValue
+        { personPropertyValueContents = t
+        , personPropertyValueLastUpdatedTimestamp = now
+        }
+    ns =
+        nub $ flip mapMaybe (p ^. perNames) $ \n -> do
+            let el :: Text
+                   -> Lens' Name (Maybe Text)
+                   -> Maybe (Text, PersonProperty)
+                el t mv = do
+                    v <- n ^. mv
+                    pure (t, val v)
+            pure $
+                catMaybes
+                    [el "first name" nGivenName, el "last name" nFamilyName]
+
+gatherAliases :: Person -> [Text]
+gatherAliases p =
+    flip mapMaybe (p ^. perNames) $ \n -> do
+        firstName <- n ^. nGivenName
+        lastName <- n ^. nFamilyName
+        pure $ T.unwords [firstName, lastName]
 
 type WolfScopes = '[ "https://www.googleapis.com/auth/contacts.readonly"]
 

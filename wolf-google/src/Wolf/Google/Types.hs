@@ -6,11 +6,13 @@ import Import
 
 import Data.Aeson as JSON
 
-data PersonSuggestion = PersonSuggestion
-    { personSuggestionAlias :: Text
-    , personSuggestionEntry :: JSON.Value
+import Wolf.Data
+
+data GatheredPerson = GatheredPerson
+    { gatheredPersonAliases :: [Text]
+    , gatheredPersonEntry :: PersonProperty
     } deriving (Show, Eq, Generic)
 
-instance FromJSON PersonSuggestion
+instance FromJSON GatheredPerson
 
-instance ToJSON PersonSuggestion
+instance ToJSON GatheredPerson
