@@ -17,13 +17,13 @@ data CubState = CubState
     { cubStateShown :: CubShown
     , cubStateNow :: UTCTime
     , cubStateDataSettings :: DataSettings
-    } deriving (Show, Generic)
+    } deriving (Generic)
 
 data CubShown
     = CubShowPersonList PersonListState
     | CubShowPerson PersonState
     | CubEditPerson EditPersonState
-    deriving (Show, Generic)
+    deriving (Generic)
 
 data PersonListState = PersonListState
     { personListStatePeople :: List ResourceName (Text, PersonUuid)
@@ -41,7 +41,7 @@ data EditPersonState = EditPersonState
     { editPersonStateUuid :: PersonUuid
     , editPersonStateStartingEntry :: Maybe PersonEntry
     , editPersonStatePropertyEditor :: PropertyEditor ResourceName
-    } deriving (Show, Generic)
+    } deriving (Generic)
 
 newtype ResourceName =
     ResourceName String
