@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE RecordWildCards #-}
@@ -43,7 +44,10 @@ propertyEditor name mprop =
     , propertyEditorCurrentEditor = Nothing
     }
 
-renderPropertyEditor :: (Show n, Ord n) => PropertyEditor n -> Widget n
+renderPropertyEditor ::
+       forall n. (Show n, Ord n)
+    => PropertyEditor n
+    -> Widget n
 renderPropertyEditor PropertyEditor {..} =
     addDebugInfo $
     withAttr propertyEditorAttr $
@@ -53,9 +57,9 @@ renderPropertyEditor PropertyEditor {..} =
               Just pp ->
                   padRight Max $
                   padBottom Max $ go (makeSelection <$> propertyEditorCursor) pp
-        , case propertyEditorCurrentEditor of
-              Nothing -> emptyWidget
-              Just e -> renderEditor (txt . T.concat) True e
+        -- , case propertyEditorCurrentEditor of
+        --       Nothing -> emptyWidget
+        --       Just e -> renderEditor (txt . T.concat) True e
         ]
   where
     go :: Maybe [Int] -> PersonProperty -> Widget n
@@ -100,11 +104,18 @@ renderPropertyEditor PropertyEditor {..} =
                 if x == ix
                     then Just xs
                     else Nothing
+    withSelectedAttr :: Maybe [Int] -> Widget n -> Widget n
     withSelectedAttr msel =
         case msel of
             Nothing -> id
-            Just [] -> withAttr propertyEditorAttrSelected
+            Just [] ->
+                case propertyEditorCurrentEditor of
+                    Nothing -> withAttr propertyEditorAttrSelected
+                    Just ed -> const $ renderEd ed
             Just _ -> id
+    renderEd ed =
+        hLimit (T.length . T.concat $ getEditContents ed) $
+        renderEditor (txt . T.concat) True ed
     addDebugInfo =
         (<=> withAttr
                  propertyEditorAttrSelected
