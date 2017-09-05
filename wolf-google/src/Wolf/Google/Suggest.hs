@@ -15,7 +15,6 @@ import Data.List
 import Data.Proxy (Proxy(..))
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
-import Data.Time
 import GHC.TypeLits (Symbol)
 import Lens.Micro
 import Network.HTTP.Client (Manager)
@@ -28,13 +27,10 @@ import Network.Google
 import Network.Google.Auth
 import Network.Google.People
 
-import Wolf.Data
-
 import Wolf.Google.Types
 
 suggest :: IO ()
 suggest = do
-    now <- getCurrentTime
     lgr <- newLogger Debug stdout
     man <- newManager tlsManagerSettings
     store <- getUserAuth wolfOauthClient wolfScopes lgr man
@@ -47,19 +43,16 @@ suggest = do
         Just "person.names,person.emailAddresses,person.phoneNumbers"
     forM_ (resp ^. lcrConnections) $ \p -> do
         LB8.putStrLn $ JSON.encodePretty p
-        LB8.putStrLn $ JSON.encodePretty $ gatherData now p
+        LB8.putStrLn $ JSON.encodePretty $ gatherData p
 
-gatherData :: UTCTime -> Person -> Maybe GatheredPerson
-gatherData now p = do
-    let aliases = gatherAliases p
-    let ns = gatherNames now p
-    let ps = gatherEmails now p
-    let pns = gatherPhoneNumbers now p
-    pure
-        GatheredPerson
-        { gatheredPersonAliases = aliases
-        , gatheredPersonEntry = PMap $ ns ++ ps ++ pns
-        }
+gatherData :: Person -> GatheredPerson
+gatherData p =
+    GatheredPerson
+    { gatheredPersonAliases = gatherAliases p
+    , gatheredPersonNames = gatherNames p
+    , gatheredPersonEmails = gatherEmails p
+    , gatheredPersonPhoneNumbers = gatherPhoneNumbers p
+    }
 
 gatherAliases :: Person -> [Text]
 gatherAliases p =
@@ -68,61 +61,24 @@ gatherAliases p =
         lastName <- n ^. nFamilyName
         pure $ T.unwords [firstName, lastName]
 
-val :: UTCTime -> Text -> PersonProperty
-val now t =
-    PVal
-        PersonPropertyValue
-        { personPropertyValueContents = t
-        , personPropertyValueLastUpdatedTimestamp = now
+gatherNames :: Person -> [GatheredName]
+gatherNames p =
+    nub $ flip map (p ^. perNames) $ \n ->
+        GatheredName
+        { gatheredNamePrefix = n ^. nHonorificPrefix
+        , gatheredNameFirstName = n ^. nGivenName
+        , gatheredNameMiddleName = n ^. nMiddleName
+        , gatheredNameLastName = n ^. nFamilyName
+        , gatheredNameSuffix = n ^. nHonorificSuffix
         }
 
-gatherNames :: UTCTime -> Person -> [(Text, PersonProperty)]
-gatherNames now p =
-    case ns of
-        [] -> []
-        [n] -> n
-        ns_ -> [("name", PList $ map PMap ns_)]
-  where
-    ns =
-        nub $ flip mapMaybe (p ^. perNames) $ \n -> do
-            let el :: Text
-                   -> Lens' Name (Maybe Text)
-                   -> Maybe (Text, PersonProperty)
-                el t mv = do
-                    v <- n ^. mv
-                    pure (t, val now v)
-            pure $
-                catMaybes
-                    [ el "prefix" nHonorificPrefix
-                    , el "first name" nGivenName
-                    , el "middle name" nMiddleName
-                    , el "last name" nFamilyName
-                    , el "suffix" nHonorificSuffix
-                    ]
+gatherEmails :: Person -> [Text]
+gatherEmails p =
+    nub $ flip mapMaybe (p ^. perEmailAddresses) $ \ea -> ea ^. eaValue
 
-gatherEmails :: UTCTime -> Person -> [(Text, PersonProperty)]
-gatherEmails now p =
-    case es of
-        [] -> []
-        [e] -> [("email", e)]
-        _ -> [("email", PList es)]
-  where
-    es =
-        nub $ flip mapMaybe (p ^. perEmailAddresses) $ \ea -> do
-            ee <- ea ^. eaValue
-            pure $ val now ee
-
-gatherPhoneNumbers :: UTCTime -> Person -> [(Text, PersonProperty)]
-gatherPhoneNumbers now p =
-    case pns of
-        [] -> []
-        [pn] -> [("phone", pn)]
-        _ -> [("phone", PList pns)]
-  where
-    pns =
-        nub $ flip mapMaybe (p ^. perPhoneNumbers) $ \pn -> do
-            v <- pn ^. pnCanonicalForm
-            pure $ val now v
+gatherPhoneNumbers :: Person -> [Text]
+gatherPhoneNumbers p =
+    nub $ flip mapMaybe (p ^. perPhoneNumbers) $ \pn -> pn ^. pnCanonicalForm
 
 type WolfScopes = '[ "https://www.googleapis.com/auth/contacts.readonly"]
 
