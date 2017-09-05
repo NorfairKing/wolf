@@ -119,22 +119,31 @@ handleEditPerson ::
 handleEditPerson state e eps@EditPersonState {..} =
     case e of
         (VtyEvent ve) ->
-            let unpop = showPerson state editPersonStateUuid
-            in case ve of
-                   (EvKey V.KEsc []) -> unpop
-                   (EvKey (V.KChar 'q') []) -> unpop
-                   _ -> do
-                       ne <-
-                           handlePropertyEditorEvent
-                               ve
-                               editPersonStatePropertyEditor
-                       continue $
-                           state
-                           { cubStateShown =
-                                 CubEditPerson $
-                                 eps {editPersonStatePropertyEditor = ne}
-                           }
+            case ve of
+                (EvKey V.KEsc []) -> unpop
+                (EvKey (V.KChar 'q') []) -> unpop
+                _ -> do
+                    ne <-
+                        handlePropertyEditorEvent
+                            ve
+                            editPersonStatePropertyEditor
+                    continue $
+                        state
+                        { cubStateShown =
+                              CubEditPerson $
+                              eps {editPersonStatePropertyEditor = ne}
+                        }
         _ -> continue state
+  where
+    unpop = do
+        save
+        showPerson state editPersonStateUuid
+    save =
+        liftIO $
+        flip runReaderT (cubStateDataSettings state) $ do
+            case propertyEditorCurrentValue editPersonStatePropertyEditor of
+                Nothing -> pure () -- TODO delete the entry if it was deleted?
+                Just pe -> putPersonEntry editPersonStateUuid pe
 
 showPerson :: CubState -> PersonUuid -> EventM ResourceName (Next CubState)
 showPerson state personUuid = do

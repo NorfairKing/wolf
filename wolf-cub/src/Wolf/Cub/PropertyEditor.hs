@@ -9,6 +9,7 @@ module Wolf.Cub.PropertyEditor
     , propertyEditor
     , renderPropertyEditor
     , handlePropertyEditorEvent
+    , propertyEditorCurrentValue
     , propertyEditorAttr
     , propertyEditorAttrSelected
     ) where
@@ -139,6 +140,10 @@ renderPropertyEditor PropertyEditor {..} =
     --               (show $
     --                select propertyEditorSelection <$>
     --                (rebuild <$> propertyEditorCursor)))) $ -- TODO remove this.
+
+propertyEditorCurrentValue :: PropertyEditor n -> Maybe PersonEntry
+propertyEditorCurrentValue ed =
+    (rebuild <$> propertyEditorCursor ed) >>= personEntry
 
 propertyEditorAttr :: AttrName
 propertyEditorAttr = "property-editor"
