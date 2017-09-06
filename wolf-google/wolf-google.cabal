@@ -19,7 +19,8 @@ library
         Wolf.Google.Suggest
         Wolf.Google.Suggest.Call
         Wolf.Google.Suggest.Gather
-        Wolf.Google.Types
+        Wolf.Google.Suggest.MakeSuggestion
+        Wolf.Google.Suggest.Types
     build-depends:
         base >=4.9 && <=5,
         aeson >=1.0 && <1.1,
@@ -31,11 +32,13 @@ library
         gogol-people >=0.3 && <0.4,
         http-client >=0.5 && <0.6,
         microlens >=0.4 && <0.5,
+        mtl >= 2.2 && < 2.3,
         optparse-applicative >=0.13,
         process >=1.4 && <1.5,
         text >=1.2 && <1.3,
         time >=1.6 && <1.7,
         vector >=0.11 && <0.12,
+        wolf-cli,
         wolf-data -any
     default-language: Haskell2010
     default-extensions: NoImplicitPrelude

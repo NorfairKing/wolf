@@ -2,12 +2,15 @@ module Wolf.Google.OptParse.Types where
 
 import Import
 
+import qualified Wolf.Cli.OptParse.Types as Cli
+import Wolf.Data.Types
+
 type Arguments = (Command, Flags)
 
 type Instructions = (Dispatch, Settings)
 
 data Command =
-    CommandSuggest
+    CommandSuggest Cli.DataFlags
     deriving (Show, Eq)
 
 data Flags =
@@ -19,7 +22,7 @@ data Configuration =
     deriving (Show, Eq)
 
 data Dispatch =
-    DispatchSuggest
+    DispatchSuggest DataSettings
     deriving (Show, Eq)
 
 data Settings =

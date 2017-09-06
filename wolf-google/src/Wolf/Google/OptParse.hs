@@ -11,6 +11,8 @@ import System.Environment (getArgs)
 
 import Options.Applicative
 
+import qualified Wolf.Cli.OptParse as Cli
+
 import Wolf.Google.OptParse.Types
 
 getInstructions :: IO Instructions
@@ -20,8 +22,9 @@ getInstructions = do
     combineToInstructions cmd flags config
 
 combineToInstructions :: Command -> Flags -> Configuration -> IO Instructions
-combineToInstructions CommandSuggest Flags Configuration =
-    pure (DispatchSuggest, Settings)
+combineToInstructions (CommandSuggest df) Flags Configuration = do
+    ds <- Cli.deriveDataSettings df
+    pure (DispatchSuggest ds, Settings)
 
 getConfiguration :: Command -> Flags -> IO Configuration
 getConfiguration _ _ = pure Configuration
@@ -60,7 +63,7 @@ parseCommand = hsubparser $ mconcat [command "suggest" parseCommandSuggest]
 parseCommandSuggest :: ParserInfo Command
 parseCommandSuggest = info parser modifier
   where
-    parser = pure CommandSuggest
+    parser = CommandSuggest <$> Cli.parseDataFlags'
     modifier = fullDesc <> progDesc "Suggest from google contacts."
 
 parseFlags :: Parser Flags

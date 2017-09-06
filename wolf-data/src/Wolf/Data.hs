@@ -11,6 +11,7 @@ module Wolf.Data
     , personUuidText
     , personUuidString
     , nextRandomPersonUuid
+    , getPersonUuids
     , Index
     , indexMap
     , indexKeys
@@ -55,6 +56,12 @@ module Wolf.Data
     , createNewNoteUuid
     , readNote
     , writeNote
+    -- * Suggestions
+    , Suggestion(..)
+    , readPersonEntrySuggestions
+    , addPersonEntrySuggestions
+    , readUsedPersonEntrySuggestions
+    , recordUsedPersonEntrySuggestions
     ) where
 
 import Wolf.Data.Entry
@@ -62,4 +69,6 @@ import Wolf.Data.Index
 import Wolf.Data.Init
 import Wolf.Data.Note
 import Wolf.Data.NoteIndex
+import Wolf.Data.Suggestion
 import Wolf.Data.Types
+import Wolf.Data.People

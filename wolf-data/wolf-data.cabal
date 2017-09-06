@@ -24,6 +24,7 @@ library
         Wolf.Data.NoteIndex
         Wolf.Data.NoteIndex.Types
         Wolf.Data.Path
+        Wolf.Data.People
         Wolf.Data.Suggestion
         Wolf.Data.Suggestion.Types
         Wolf.Data.Time

@@ -8,7 +8,7 @@ import Lens.Micro
 
 import Network.Google.People
 
-import Wolf.Google.Types
+import Wolf.Google.Suggest.Types
 
 gatherData :: Person -> GatheredPerson
 gatherData p =

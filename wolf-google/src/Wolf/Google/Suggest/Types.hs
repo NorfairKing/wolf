@@ -1,10 +1,12 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module Wolf.Google.Types where
+module Wolf.Google.Suggest.Types where
 
 import Import
 
 import Data.Aeson as JSON
+
+import Wolf.Data
 
 data GatheredPerson = GatheredPerson
     { gatheredPersonAliases :: [Text]
@@ -28,3 +30,9 @@ data GatheredName = GatheredName
 instance FromJSON GatheredName
 
 instance ToJSON GatheredName
+
+data PersonContext = PersonContext
+    { personContextUuid :: PersonUuid
+    , personContextAliases :: [Text]
+    , personContextEntry :: Maybe PersonEntry
+    }

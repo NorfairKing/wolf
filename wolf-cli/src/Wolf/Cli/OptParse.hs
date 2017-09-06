@@ -235,14 +235,22 @@ parseFlags = Flags <$> parseDataFlags
 parseDataFlags :: ReaderT ParserEnv Parser DataFlags
 parseDataFlags =
     ReaderT $ \env ->
-        DataFlags <$>
-        option
-            (Just <$> str)
-            (mconcat
-                 [ long "wolf-dir"
-                 , metavar "DIR"
-                 , help "the data directory for all wolf data"
-                 , value Nothing
-                 , showDefaultWith
-                       (const $ toFilePath $ parserEnvDefaultWolfDir env)
-                 ])
+        parseDataFlagsWithDefault $ Just $ parserEnvDefaultWolfDir env
+
+parseDataFlags' :: Parser DataFlags
+parseDataFlags' = parseDataFlagsWithDefault Nothing
+
+parseDataFlagsWithDefault :: Maybe (Path Abs Dir) -> Parser DataFlags
+parseDataFlagsWithDefault mDefDir =
+    DataFlags <$>
+    option
+        (Just <$> str)
+        (mconcat
+             [ long "wolf-dir"
+             , metavar "DIR"
+             , help "the data directory for all wolf data"
+             , value $ toFilePath <$> mDefDir
+             , case mDefDir of
+                   Nothing -> mempty
+                   Just defDir -> showDefaultWith (const $ toFilePath defDir)
+             ])
