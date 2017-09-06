@@ -90,5 +90,6 @@ test-suite wolf-data-test
         Wolf.Data.NoteIndexSpec
         Wolf.Data.NoteSpec
         Wolf.Data.Suggestion.TypesSpec
+        Wolf.Data.SuggestionSpec
         Wolf.Data.TypesSpec
     ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
