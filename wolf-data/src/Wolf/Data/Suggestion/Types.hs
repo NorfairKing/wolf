@@ -1,4 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Wolf.Data.Suggestion.Types where
 
@@ -14,6 +16,15 @@ data Suggestion a = Suggestion
 
 instance Validity a => Validity (Suggestion a)
 
-instance FromJSON a => FromJSON (Suggestion a)
+instance FromJSON a => FromJSON (Suggestion a) where
+    parseJSON =
+        withObject "Suggestion" $ \o ->
+            Suggestion <$> o .: "suggestor" <*> o .: "reason" <*> o .: "data"
 
-instance ToJSON a => ToJSON (Suggestion a)
+instance ToJSON a => ToJSON (Suggestion a) where
+    toJSON Suggestion {..} =
+        object
+            [ "suggestor" .= suggestionSuggestor
+            , "reason" .= suggestionReason
+            , "data" .= suggestionData
+            ]

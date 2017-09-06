@@ -4,8 +4,8 @@ import Import
 
 import Control.Monad.Reader
 
-import Wolf.Google.Suggest
 import Wolf.Google.OptParse
+import Wolf.Google.Suggest
 
 wolfGoogle :: IO ()
 wolfGoogle = do

@@ -69,6 +69,6 @@ import Wolf.Data.Index
 import Wolf.Data.Init
 import Wolf.Data.Note
 import Wolf.Data.NoteIndex
+import Wolf.Data.People
 import Wolf.Data.Suggestion
 import Wolf.Data.Types
-import Wolf.Data.People
