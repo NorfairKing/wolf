@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Wolf.Data.Path
@@ -27,30 +28,20 @@ import Wolf.Data.Types
 wolfDir :: MonadReader DataSettings m => m (Path Abs Dir)
 wolfDir = asks dataSetWolfDir
 
-initFile :: (MonadReader DataSettings m, MonadIO m) => m (Path Abs File)
-initFile = do
-    wd <- wolfDir
-    liftIO $ resolveFile wd "init.json"
+initFile :: MonadReader DataSettings m => m (Path Abs File)
+initFile = (</> $(mkRelFile "init.json")) <$> wolfDir
 
-indexFile :: (MonadReader DataSettings m, MonadIO m) => m (Path Abs File)
-indexFile = do
-    wd <- wolfDir
-    liftIO $ resolveFile wd "index.json"
+indexFile :: MonadReader DataSettings m => m (Path Abs File)
+indexFile = (</> $(mkRelFile "index.json")) <$> wolfDir
 
-noteIndexFile :: (MonadReader DataSettings m, MonadIO m) => m (Path Abs File)
-noteIndexFile = do
-    wd <- wolfDir
-    liftIO $ resolveFile wd "notes.json"
+noteIndexFile :: MonadReader DataSettings m => m (Path Abs File)
+noteIndexFile = (</> $(mkRelFile "notes.json")) <$> wolfDir
 
-peopleDir :: (MonadReader DataSettings m, MonadIO m) => m (Path Abs Dir)
-peopleDir = do
-    wd <- wolfDir
-    liftIO $ resolveDir wd "people"
+peopleDir :: MonadReader DataSettings m => m (Path Abs Dir)
+peopleDir = (</> $(mkRelDir "people")) <$> wolfDir
 
-notesDir :: (MonadReader DataSettings m, MonadIO m) => m (Path Abs Dir)
-notesDir = do
-    wd <- wolfDir
-    liftIO $ resolveDir wd "notes"
+notesDir :: MonadReader DataSettings m => m (Path Abs Dir)
+notesDir = (</> $(mkRelDir "notes")) <$> wolfDir
 
 personDir ::
        (MonadReader DataSettings m, MonadIO m) => PersonUuid -> m (Path Abs Dir)

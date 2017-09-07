@@ -35,4 +35,8 @@ data PersonContext = PersonContext
     { personContextUuid :: PersonUuid
     , personContextAliases :: [Text]
     , personContextEntry :: Maybe PersonEntry
-    }
+    } deriving (Show, Eq, Generic)
+
+instance FromJSON PersonContext
+
+instance ToJSON PersonContext

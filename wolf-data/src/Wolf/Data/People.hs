@@ -6,6 +6,8 @@ module Wolf.Data.People
 
 import Import
 
+import qualified System.FilePath as FP
+
 import Wolf.Data.Path
 import Wolf.Data.Types
 
@@ -14,4 +16,7 @@ getPersonUuids = do
     pd <- peopleDir
     dirs <- liftIO $ fst <$> listDir pd
     let relDirs = mapMaybe (stripDir pd) dirs
-    pure $ mapMaybe (parsePersonUuidString . toFilePath) relDirs
+    pure $
+        mapMaybe
+            (parsePersonUuidString . FP.dropTrailingPathSeparator . toFilePath)
+            relDirs

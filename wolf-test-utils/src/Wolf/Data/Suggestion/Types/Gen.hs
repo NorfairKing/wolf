@@ -10,3 +10,7 @@ instance GenUnchecked a => GenUnchecked (Suggestion a)
 
 instance GenValid a => GenValid (Suggestion a) where
     genValid = Suggestion <$> genValid <*> genValid <*> genValid
+instance GenUnchecked EntrySuggestion
+
+instance GenValid EntrySuggestion where
+    genValid = Suggestion <$> genValid <*> genValid <*> genValid

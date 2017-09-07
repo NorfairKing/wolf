@@ -8,6 +8,9 @@ import Import
 
 import Data.Aeson
 
+import Wolf.Data.Entry.Types
+import Wolf.Data.Types
+
 data Suggestion a = Suggestion
     { suggestionSuggestor :: Text
     , suggestionReason :: Text
@@ -28,3 +31,16 @@ instance ToJSON a => ToJSON (Suggestion a) where
             , "reason" .= suggestionReason
             , "data" .= suggestionData
             ]
+
+data EntrySuggestion = EntrySuggestion
+    { entrySuggestionEntry :: PersonEntry
+    , entrySuggestionLikelyRelevantPerson :: Maybe (PersonUuid, Double)
+    } deriving (Show, Eq, Generic)
+
+instance Validity EntrySuggestion
+
+instance FromJSON EntrySuggestion where
+    parseJSON = withObject "EntrySuggestion" $ \o -> EntrySuggestion <$> o .: "entry" <*> o .: "relevant-person"
+
+instance ToJSON EntrySuggestion where
+    toJSON EntrySuggestion{..} = object ["entry" .= entrySuggestionEntry, "relevant-person" .= entrySuggestionLikelyRelevantPerson]

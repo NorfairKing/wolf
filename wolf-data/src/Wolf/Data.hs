@@ -58,6 +58,7 @@ module Wolf.Data
     , writeNote
     -- * Suggestions
     , Suggestion(..)
+    , EntrySuggestion(..)
     , readPersonEntrySuggestions
     , addPersonEntrySuggestions
     , readUsedPersonEntrySuggestions

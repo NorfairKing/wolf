@@ -3,6 +3,7 @@
 
 module Wolf.Data.Suggestion
     ( Suggestion(..)
+    , EntrySuggestion(..)
     , readPersonEntrySuggestions
     , writePersonEntrySuggestions
     , addPersonEntrySuggestions
@@ -30,12 +31,12 @@ usedEntrySuggestionFile :: MonadReader DataSettings m => m (Path Abs File)
 usedEntrySuggestionFile = (</> $(mkRelFile "entry-used")) <$> suggestionsDir
 
 readPersonEntrySuggestions ::
-       (MonadIO m, MonadReader DataSettings m) => m [Suggestion PersonEntry]
+       (MonadIO m, MonadReader DataSettings m) => m [Suggestion EntrySuggestion]
 readPersonEntrySuggestions = entrySuggestionsFile >>= readJSONWithDefault []
 
 writePersonEntrySuggestions ::
        (MonadIO m, MonadReader DataSettings m)
-    => [Suggestion PersonEntry]
+    => [Suggestion EntrySuggestion]
     -> m ()
 writePersonEntrySuggestions ess = do
     f <- entrySuggestionsFile
@@ -43,7 +44,7 @@ writePersonEntrySuggestions ess = do
 
 addPersonEntrySuggestions ::
        (MonadIO m, MonadReader DataSettings m)
-    => [Suggestion PersonEntry]
+    => [Suggestion EntrySuggestion]
     -> m ()
 addPersonEntrySuggestions newSugs = do
     sugs <- readPersonEntrySuggestions
@@ -51,13 +52,13 @@ addPersonEntrySuggestions newSugs = do
     writePersonEntrySuggestions sugs'
 
 readUsedPersonEntrySuggestions ::
-       (MonadIO m, MonadReader DataSettings m) => m [Suggestion PersonEntry]
+       (MonadIO m, MonadReader DataSettings m) => m [Suggestion EntrySuggestion]
 readUsedPersonEntrySuggestions =
     usedEntrySuggestionFile >>= readJSONWithDefault []
 
 writeUsedPersonEntrySuggestions ::
        (MonadIO m, MonadReader DataSettings m)
-    => [Suggestion PersonEntry]
+    => [Suggestion EntrySuggestion]
     -> m ()
 writeUsedPersonEntrySuggestions ess = do
     f <- usedEntrySuggestionFile
@@ -65,7 +66,7 @@ writeUsedPersonEntrySuggestions ess = do
 
 recordUsedPersonEntrySuggestions ::
        (MonadIO m, MonadReader DataSettings m)
-    => [Suggestion PersonEntry]
+    => [Suggestion EntrySuggestion]
     -> m ()
 recordUsedPersonEntrySuggestions usedSugs = do
     sugs <- readUsedPersonEntrySuggestions

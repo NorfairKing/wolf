@@ -8,6 +8,7 @@ import Debug.Trace as X
 
 import GHC.Generics as X (Generic)
 
+import Data.Ord as X
 import Data.List as X
 import Data.Map as X (Map)
 import Data.Maybe as X
