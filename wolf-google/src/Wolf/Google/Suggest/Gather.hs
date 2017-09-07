@@ -2,7 +2,6 @@ module Wolf.Google.Suggest.Gather where
 
 import Import
 
-import Data.List
 import qualified Data.Text as T
 import Lens.Micro
 
@@ -21,7 +20,6 @@ gatherData p =
 
 gatherAliases :: Person -> [Text]
 gatherAliases p =
-    nub $
     flip mapMaybe (p ^. perNames) $ \n -> do
         firstName <- n ^. nGivenName
         lastName <- n ^. nFamilyName
@@ -29,7 +27,6 @@ gatherAliases p =
 
 gatherNames :: Person -> [GatheredName]
 gatherNames p =
-    nub $
     flip map (p ^. perNames) $ \n ->
         GatheredName
         { gatheredNamePrefix = n ^. nHonorificPrefix
@@ -40,9 +37,8 @@ gatherNames p =
         }
 
 gatherEmails :: Person -> [Text]
-gatherEmails p =
-    nub $ flip mapMaybe (p ^. perEmailAddresses) $ \ea -> ea ^. eaValue
+gatherEmails p = flip mapMaybe (p ^. perEmailAddresses) $ \ea -> ea ^. eaValue
 
 gatherPhoneNumbers :: Person -> [Text]
 gatherPhoneNumbers p =
-    nub $ flip mapMaybe (p ^. perPhoneNumbers) $ \pn -> pn ^. pnCanonicalForm
+    flip mapMaybe (p ^. perPhoneNumbers) $ \pn -> pn ^. pnCanonicalForm

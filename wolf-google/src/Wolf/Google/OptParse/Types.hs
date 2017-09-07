@@ -9,7 +9,7 @@ type Arguments = (Command, Flags)
 
 type Instructions = (Dispatch, Settings)
 
-data Command =
+newtype Command =
     CommandSuggest Cli.DataFlags
     deriving (Show, Eq)
 
@@ -21,7 +21,7 @@ data Configuration =
     Configuration
     deriving (Show, Eq)
 
-data Dispatch =
+newtype Dispatch =
     DispatchSuggest DataSettings
     deriving (Show, Eq)
 

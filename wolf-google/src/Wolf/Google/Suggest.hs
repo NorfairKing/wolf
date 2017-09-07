@@ -26,7 +26,7 @@ suggest = do
     let gatheredPeople = map gatherData $ resp ^. lcrConnections
     contexts <- getPeopleContexts
     let newSugs = mapMaybe (makeSuggestions now contexts) gatheredPeople
-    liftIO $ forM_ newSugs $ \sug -> LB8.putStrLn $ JSON.encodePretty sug
+    liftIO $ forM_ newSugs $ LB8.putStrLn . JSON.encodePretty
     -- addPersonEntrySuggestions newSugs
 
 getPeopleContexts ::
