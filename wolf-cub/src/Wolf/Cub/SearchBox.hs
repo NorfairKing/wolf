@@ -18,13 +18,13 @@ import Graphics.Vty as V
 
 import qualified Data.Text as T
 
-data SearchBox n = SearchBox
+data SearchBox n a = SearchBox
     { searchBoxName :: n
     , searchBoxCurrentContent :: Text
-    , searchBoxSelectable :: [Text]
+    , searchBoxSelectable :: [(Text, a)]
     } deriving (Show, Eq, Generic)
 
-searchBox :: n -> [Text] -> SearchBox n
+searchBox :: n -> [(Text, a)] -> SearchBox n a
 searchBox name ts =
     SearchBox
     { searchBoxName = name
@@ -32,17 +32,20 @@ searchBox name ts =
     , searchBoxSelectable = ts
     }
 
-searchBoxCurrentlySelected :: SearchBox n -> [Text]
+searchBoxCurrentlySelected :: SearchBox n a -> [(Text, a)]
 searchBoxCurrentlySelected SearchBox {..} =
-    filter (T.isInfixOf searchBoxCurrentContent) searchBoxSelectable
+    filter (T.isInfixOf searchBoxCurrentContent . fst) searchBoxSelectable
 
-renderSearchBox :: SearchBox n -> Widget n
-renderSearchBox SearchBox {..} = txt searchBoxCurrentContent
+renderSearchBox :: SearchBox n a -> Widget n
+renderSearchBox SearchBox {..} = txt "Search: " <+> txt searchBoxCurrentContent
 
-handleSearchBox :: SearchBox n -> Event -> SearchBox n
-handleSearchBox sb@SearchBox {..} e =
+handleSearchBox :: SearchBox n a -> Event -> SearchBox n a
+handleSearchBox sb e =
     case e of
         (EvKey (KChar c) []) ->
             sb
-            {searchBoxCurrentContent = searchBoxCurrentContent <> T.singleton c}
+            {searchBoxCurrentContent = searchBoxCurrentContent sb <> T.pack [c]}
+        (EvKey KBS []) ->
+            sb
+            {searchBoxCurrentContent = T.dropEnd 1 $ searchBoxCurrentContent sb}
         _ -> sb

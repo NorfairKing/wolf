@@ -30,7 +30,7 @@ data CubShown
 data PersonListState = PersonListState
     { personListStatePeople :: List ResourceName (Text, PersonUuid)
     , personListStateShowHelp :: Bool
-    , personListStateSearchBox :: Maybe (SearchBox ResourceName)
+    , personListStateSearchBox :: Maybe (SearchBox ResourceName PersonUuid)
     } deriving (Show, Generic)
 
 data PersonState = PersonState

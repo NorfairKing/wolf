@@ -76,15 +76,32 @@ handleEventShowPersonList state e pls@PersonListState {..} =
                                          {cubStateShown = CubShowPersonList ns}
                          Just sb ->
                              let unsearch =
+                                     continue $
                                      setPersonListShowSearchBox
                                          state
                                          pls
                                          Nothing
                              in case ve of
                                     (EvKey V.KEsc []) -> unsearch
-                                    _ ->
-                                        setPersonListShowSearchBox state pls $
-                                        Just $ handleSearchBox sb ve
+                                    _ -> do
+                                        let sb' = handleSearchBox sb ve
+                                        let pls' =
+                                                pls
+                                                { personListStateSearchBox =
+                                                      Just sb'
+                                                }
+                                        let state' =
+                                                state
+                                                { cubStateShown =
+                                                      CubShowPersonList pls'
+                                                }
+                                        continue $
+                                            if sb == sb'
+                                                then state'
+                                                else refreshListFromSearch
+                                                         state'
+                                                         pls'
+                                                         sb'
         _ -> continue state
 
 setPersonListShowHelp ::
@@ -96,18 +113,36 @@ setPersonListShowHelp state pls b =
 
 showNewSearchBox :: CubState -> PersonListState -> EventM n (Next CubState)
 showNewSearchBox state pls@PersonListState {..} =
+    continue $
     setPersonListShowSearchBox state pls $
-    Just $ searchBox "search-box" $ map fst $ toList personListStatePeople
+    Just $ searchBox "search-box" $ toList personListStatePeople
 
 setPersonListShowSearchBox ::
        CubState
     -> PersonListState
-    -> Maybe (SearchBox ResourceName)
-    -> EventM n (Next CubState)
+    -> Maybe (SearchBox ResourceName PersonUuid)
+    -> CubState
 setPersonListShowSearchBox state pls msb =
-    continue
-        state
-        {cubStateShown = CubShowPersonList pls {personListStateSearchBox = msb}}
+    state
+    {cubStateShown = CubShowPersonList pls {personListStateSearchBox = msb}}
+
+refreshListFromSearch ::
+       CubState
+    -> PersonListState
+    -> SearchBox ResourceName PersonUuid
+    -> CubState
+refreshListFromSearch state pls sb =
+    state
+    { cubStateShown =
+          CubShowPersonList
+              pls
+              { personListStatePeople =
+                    list
+                        "person-list"
+                        (V.fromList $ searchBoxCurrentlySelected sb)
+                        1
+              }
+    }
 
 handleEventShowPerson ::
        CubState
