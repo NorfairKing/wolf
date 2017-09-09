@@ -17,9 +17,11 @@ library
         Wolf.Google.OptParse
         Wolf.Google.OptParse.Types
         Wolf.Google.Suggest
+        Wolf.Google.Suggest.Adapt
         Wolf.Google.Suggest.Call
+        Wolf.Google.Suggest.Finalise
         Wolf.Google.Suggest.Gather
-        Wolf.Google.Suggest.MakeSuggestion
+        Wolf.Google.Suggest.MakeEntry
         Wolf.Google.Suggest.Types
     build-depends:
         base >=4.9 && <=5,

@@ -5,8 +5,6 @@ module Wolf.Google.Suggest where
 import Import
 
 import Control.Monad.Reader
-import Data.Aeson.Encode.Pretty as JSON
-import qualified Data.ByteString.Lazy.Char8 as LB8
 import Data.Time
 import Lens.Micro
 
@@ -14,20 +12,43 @@ import Network.Google.People
 
 import Wolf.Data
 
+import Wolf.Google.Suggest.Adapt
 import Wolf.Google.Suggest.Call
+import Wolf.Google.Suggest.Finalise
 import Wolf.Google.Suggest.Gather
-import Wolf.Google.Suggest.MakeSuggestion
+import Wolf.Google.Suggest.MakeEntry
 import Wolf.Google.Suggest.Types
 
 suggest :: (MonadIO m, MonadReader DataSettings m) => m ()
 suggest = do
-    resp <- liftIO getPeople
+    resps <- liftIO getPeople
     now <- liftIO getCurrentTime
-    let gatheredPeople = map gatherData $ resp ^. lcrConnections
+    let gatheredPeople =
+            flip concatMap resps $ \resp ->
+                map gatherData $ resp ^. lcrConnections
     contexts <- getPeopleContexts
-    let newSugs = mapMaybe (makeSuggestions now contexts) gatheredPeople
-    liftIO $ forM_ newSugs $ LB8.putStrLn . JSON.encodePretty
-    -- addPersonEntrySuggestions newSugs
+    let sugEntries = map (makeSuggestionProperty now) gatheredPeople
+    let sugs =
+            flip mapMaybe sugEntries $ \pp -> do
+                pe <- personEntry pp
+                case findSimilar pe contexts of
+                    Nothing ->
+                        pure
+                            EntrySuggestion
+                            { entrySuggestionEntry = pe
+                            , entrySuggestionLikelyRelevantPerson = Nothing
+                            }
+                    Just (pc, score) -> do
+                        pp' <- adaptToPerson pe pc
+                        pe' <- personEntry pp'
+                        pure
+                            EntrySuggestion
+                            { entrySuggestionEntry = pe'
+                            , entrySuggestionLikelyRelevantPerson =
+                                  Just (personContextUuid pc, score)
+                            }
+    let finalisedSugs = map finaliseSuggestion sugs
+    addPersonEntrySuggestions finalisedSugs
 
 getPeopleContexts ::
        (MonadIO m, MonadReader DataSettings m) => m [PersonContext]

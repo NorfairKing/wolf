@@ -40,7 +40,13 @@ data EntrySuggestion = EntrySuggestion
 instance Validity EntrySuggestion
 
 instance FromJSON EntrySuggestion where
-    parseJSON = withObject "EntrySuggestion" $ \o -> EntrySuggestion <$> o .: "entry" <*> o .: "relevant-person"
+    parseJSON =
+        withObject "EntrySuggestion" $ \o ->
+            EntrySuggestion <$> o .: "entry" <*> o .: "relevant-person"
 
 instance ToJSON EntrySuggestion where
-    toJSON EntrySuggestion{..} = object ["entry" .= entrySuggestionEntry, "relevant-person" .= entrySuggestionLikelyRelevantPerson]
+    toJSON EntrySuggestion {..} =
+        object
+            [ "entry" .= entrySuggestionEntry
+            , "relevant-person" .= entrySuggestionLikelyRelevantPerson
+            ]

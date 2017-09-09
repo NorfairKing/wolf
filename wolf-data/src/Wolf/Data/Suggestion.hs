@@ -14,7 +14,6 @@ module Wolf.Data.Suggestion
 
 import Import
 
-import Wolf.Data.Entry.Types
 import Wolf.Data.JSONUtils
 import Wolf.Data.Path
 import Wolf.Data.Types
@@ -25,7 +24,7 @@ suggestionsDir :: MonadReader DataSettings m => m (Path Abs Dir)
 suggestionsDir = (</> $(mkRelDir "suggestions")) <$> wolfDir
 
 entrySuggestionsFile :: MonadReader DataSettings m => m (Path Abs File)
-entrySuggestionsFile = (</> $(mkRelFile "entry")) <$> suggestionsDir
+entrySuggestionsFile = (</> $(mkRelFile "entry.json")) <$> suggestionsDir
 
 usedEntrySuggestionFile :: MonadReader DataSettings m => m (Path Abs File)
 usedEntrySuggestionFile = (</> $(mkRelFile "entry-used")) <$> suggestionsDir

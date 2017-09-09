@@ -1,10 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Wolf.Google.Suggest.Call where
+module Wolf.Google.Suggest.Call
+    ( getPeople
+    ) where
 
 import Import
 
@@ -24,7 +27,7 @@ import Network.Google
 import Network.Google.Auth
 import Network.Google.People
 
-getPeople :: IO ListConnectionsResponse
+getPeople :: IO [ListConnectionsResponse]
 getPeople = do
     lgr <- newLogger Debug stdout
     man <- newManager tlsManagerSettings
@@ -32,9 +35,24 @@ getPeople = do
     env <-
         newEnv <&> (envLogger .~ lgr) . (envScopes .~ wolfScopes) .
         (envStore .~ store)
-    runResourceT . runGoogle env $ send $ peopleConnectionsList "people/me" &
-        pclRequestMaskIncludeField .~
-        Just "person.names,person.emailAddresses,person.phoneNumbers"
+    runResourceT . runGoogle env $ makeCalls
+
+makeCalls :: Google WolfScopes [ListConnectionsResponse]
+makeCalls = do
+    let origReq :: PeopleConnectionsList
+        origReq =
+            peopleConnectionsList "people/me" & pclRequestMaskIncludeField .~
+            Just "person.names,person.emailAddresses,person.phoneNumbers"
+    resp <- send origReq
+    let go r =
+            case r ^. lcrNextSyncToken of
+                Nothing -> pure []
+                Just npt -> do
+                    r' <- send $ origReq & pclPageToken .~ Just npt
+                    rest <- go r'
+                    pure $ r' : rest
+    rest <- go resp
+    pure (resp : rest)
 
 type WolfScopes = '[ "https://www.googleapis.com/auth/contacts.readonly"]
 

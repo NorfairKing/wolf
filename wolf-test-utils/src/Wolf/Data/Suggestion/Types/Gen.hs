@@ -6,11 +6,15 @@ import Import
 
 import Wolf.Data.Suggestion.Types
 
+import Wolf.Data.Entry.Types.Gen ()
+import Wolf.Data.Types.Gen ()
+
 instance GenUnchecked a => GenUnchecked (Suggestion a)
 
 instance GenValid a => GenValid (Suggestion a) where
     genValid = Suggestion <$> genValid <*> genValid <*> genValid
+
 instance GenUnchecked EntrySuggestion
 
 instance GenValid EntrySuggestion where
-    genValid = Suggestion <$> genValid <*> genValid <*> genValid
+    genValid = EntrySuggestion <$> genValid <*> genValid
