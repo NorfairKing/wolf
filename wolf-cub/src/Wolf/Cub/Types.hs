@@ -28,7 +28,8 @@ data CubShown
     deriving (Generic)
 
 data PersonListState = PersonListState
-    { personListStatePeople :: List ResourceName (Text, PersonUuid)
+    { personListStateInitialPeople :: [(Text, PersonUuid)]
+    , personListStatePeopleList :: List ResourceName (Text, PersonUuid)
     , personListStateShowHelp :: Bool
     , personListStateSearchBox :: Maybe (SearchBox ResourceName PersonUuid)
     } deriving (Show, Generic)

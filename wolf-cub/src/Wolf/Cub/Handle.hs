@@ -60,7 +60,7 @@ handleEventShowPersonList state e pls@PersonListState {..} =
                                  (EvKey V.KEnter []) -> do
                                      let msel =
                                              listSelectedElement
-                                                 personListStatePeople
+                                                 personListStatePeopleList
                                      case msel of
                                          Nothing -> continue state
                                          Just (_, (_, personUuid)) ->
@@ -69,8 +69,10 @@ handleEventShowPersonList state e pls@PersonListState {..} =
                                      nl <-
                                          handleListEvent
                                              ve
-                                             personListStatePeople
-                                     let ns = pls {personListStatePeople = nl}
+                                             personListStatePeopleList
+                                     let ns =
+                                             pls
+                                             {personListStatePeopleList = nl}
                                      continue $
                                          state
                                          {cubStateShown = CubShowPersonList ns}
@@ -83,6 +85,7 @@ handleEventShowPersonList state e pls@PersonListState {..} =
                                          Nothing
                              in case ve of
                                     (EvKey V.KEsc []) -> unsearch
+                                    (EvKey V.KEnter []) -> unsearch
                                     _ -> do
                                         let sb' = handleSearchBox sb ve
                                         let pls' =
@@ -115,7 +118,7 @@ showNewSearchBox :: CubState -> PersonListState -> EventM n (Next CubState)
 showNewSearchBox state pls@PersonListState {..} =
     continue $
     setPersonListShowSearchBox state pls $
-    Just $ searchBox "search-box" $ toList personListStatePeople
+    Just $ searchBox "search-box" personListStateInitialPeople
 
 setPersonListShowSearchBox ::
        CubState
@@ -136,7 +139,7 @@ refreshListFromSearch state pls sb =
     { cubStateShown =
           CubShowPersonList
               pls
-              { personListStatePeople =
+              { personListStatePeopleList =
                     list
                         "person-list"
                         (V.fromList $ searchBoxCurrentlySelected sb)
@@ -250,7 +253,8 @@ showPersonList state = do
         { cubStateShown =
               CubShowPersonList
                   PersonListState
-                  { personListStatePeople = makePersonList index
+                  { personListStateInitialPeople = indexTuples index
+                  , personListStatePeopleList = makePersonList index
                   , personListStateShowHelp = False
                   , personListStateSearchBox = Nothing
                   }

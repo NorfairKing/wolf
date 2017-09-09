@@ -36,7 +36,7 @@ drawPersonList PersonListState {..} =
   where
     listUi =
         borderWithLabel (txt "[Wolf Cub]") $
-        renderList renderElement True personListStatePeople <=>
+        renderList renderElement True personListStatePeopleList <=>
         case personListStateSearchBox of
             Nothing -> emptyWidget
             Just sb -> renderSearchBox sb

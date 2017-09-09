@@ -33,7 +33,8 @@ initialState now i ds =
     { cubStateShown =
           CubShowPersonList
               PersonListState
-              { personListStatePeople = makePersonList i
+              { personListStateInitialPeople = indexTuples i
+              , personListStatePeopleList = makePersonList i
               , personListStateShowHelp = False
               , personListStateSearchBox = Nothing
               }
