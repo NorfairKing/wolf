@@ -19,6 +19,7 @@ library
         Wolf.Cub.OptParse.Types
         Wolf.Cub.PropertyEditor
         Wolf.Cub.PropertyEditor.Cursor
+        Wolf.Cub.SearchBox
         Wolf.Cub.Types
     build-depends:
         base >=4.9 && <=5,
