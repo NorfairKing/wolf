@@ -29,21 +29,23 @@ suggest = do
     contexts <- getPeopleContexts
     let sugEntries = map (makeSuggestionProperty now) gatheredPeople
     let sugs =
-            flip mapMaybe sugEntries $ \pp -> do
+            flip mapMaybe sugEntries $ \(aliases, pp) -> do
                 pe <- personEntry pp
                 case findSimilar pe contexts of
                     Nothing ->
                         pure
                             EntrySuggestion
                             { entrySuggestionEntry = pe
+                            , entrySuggestionNewAliases = aliases
                             , entrySuggestionLikelyRelevantPerson = Nothing
                             }
                     Just (pc, score) -> do
-                        pp' <- adaptToPerson pe pc
+                        (aliases', pp') <- adaptToPerson aliases pe pc
                         pe' <- personEntry pp'
                         pure
                             EntrySuggestion
                             { entrySuggestionEntry = pe'
+                            , entrySuggestionNewAliases = aliases'
                             , entrySuggestionLikelyRelevantPerson =
                                   Just (personContextUuid pc, score)
                             }

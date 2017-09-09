@@ -96,11 +96,14 @@ possiblyMultipleAt key pe =
     onValue (PVal v) = Just v
     onValue _ = Nothing
 
-adaptToPerson :: PersonEntry -> PersonContext -> Maybe PersonProperty
-adaptToPerson pe pc =
+adaptToPerson ::
+       [Text] -> PersonEntry -> PersonContext -> Maybe ([Text], PersonProperty)
+adaptToPerson aliases pe pc =
     case personContextEntry pc of
-        Nothing -> Just pp1
-        Just pp2 -> go pp1 $ personEntryProperties pp2
+        Nothing -> Just (aliases, pp1)
+        Just pp2 ->
+            (,) (aliases \\ personContextAliases pc) <$>
+            go pp1 (personEntryProperties pp2)
   where
     pp1 = personEntryProperties pe
     go :: PersonProperty -> PersonProperty -> Maybe PersonProperty
