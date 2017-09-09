@@ -22,8 +22,9 @@ data Command
     | CommandSuggestion SuggestionFlags
     deriving (Show, Eq)
 
-data SuggestionFlags =
-    CommandListSuggestions
+data SuggestionFlags
+    = CommandListSuggestions
+    | CommandReviewSuggestion
     deriving (Show, Eq)
 
 newtype Flags = Flags
@@ -51,8 +52,9 @@ data Dispatch
     | DispatchSuggestion SuggestionSettings
     deriving (Show, Eq)
 
-data SuggestionSettings =
-    DispatchListSuggestions
+data SuggestionSettings
+    = DispatchListSuggestions
+    | DispatchReviewSuggestion
     deriving (Show, Eq)
 
 newtype Settings = Settings
