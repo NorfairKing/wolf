@@ -140,10 +140,10 @@ handleEditPerson state e eps@EditPersonState {..} =
         showPerson state editPersonStateUuid
     save =
         liftIO $
-        flip runReaderT (cubStateDataSettings state) $ do
-            case propertyEditorCurrentValue editPersonStatePropertyEditor of
-                Nothing -> pure () -- TODO delete the entry if it was deleted?
-                Just pe -> putPersonEntry editPersonStateUuid pe
+        flip runReaderT (cubStateDataSettings state) $
+        case propertyEditorCurrentValue editPersonStatePropertyEditor of
+            Nothing -> pure () -- TODO delete the entry if it was deleted?
+            Just pe -> putPersonEntry editPersonStateUuid pe
 
 showPerson :: CubState -> PersonUuid -> EventM ResourceName (Next CubState)
 showPerson state personUuid = do

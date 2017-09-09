@@ -50,7 +50,6 @@ renderPropertyEditor ::
     => PropertyEditor n
     -> Widget n
 renderPropertyEditor PropertyEditor {..} =
-    addDebugInfo $
     withAttr propertyEditorAttr $
     vBox
         [ case rebuild <$> propertyEditorCursor of
@@ -58,9 +57,6 @@ renderPropertyEditor PropertyEditor {..} =
               Just pp ->
                   padRight Max $
                   padBottom Max $ go (makeSelection <$> propertyEditorCursor) pp
-        -- , case propertyEditorCurrentEditor of
-        --       Nothing -> emptyWidget
-        --       Just e -> renderEditor (txt . T.concat) True e
         ]
   where
     go :: Maybe [Int] -> PersonProperty -> Widget n
@@ -117,29 +113,6 @@ renderPropertyEditor PropertyEditor {..} =
     renderEd ed =
         hLimit (T.length . T.concat $ getEditContents ed) $
         renderEditor (txt . T.concat) True ed
-    addDebugInfo =
-        (<=> withAttr
-                 propertyEditorAttrSelected
-                 (case propertyEditorCursor of
-                      Nothing -> emptyWidget
-                      Just cur ->
-                          strWrap $
-                          case cur of
-                              APropC pc -> show $ build pc
-                              ALElC lec -> show $ build lec
-                              AKC kc -> show $ build kc
-                              AMKVC kvc -> show $ build kvc -- TODO remove this.
-                  ))
-    -- ((withAttr
-    --       propertyEditorAttrSelected
-    --       (str (show $ propertyEditorSelection <$> cur)) <=>
-    --   str " ") <=>) $ -- TODO remove this.
-    -- (<=> withAttr
-    --          propertyEditorAttrSelected
-    --          (strWrap
-    --               (show $
-    --                select propertyEditorSelection <$>
-    --                (rebuild <$> propertyEditorCursor)))) $ -- TODO remove this.
 
 propertyEditorCurrentValue :: PropertyEditor n -> Maybe PersonEntry
 propertyEditorCurrentValue ed =
