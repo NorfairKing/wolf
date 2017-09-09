@@ -35,6 +35,7 @@ initialState now i ds =
               PersonListState
               { personListStatePeople = makePersonList i
               , personListStateShowHelp = False
+              , personListStateSearchBox = Nothing
               }
     , cubStateNow = now
     , cubStateDataSettings = ds

@@ -20,6 +20,7 @@ import Wolf.Data
 import Wolf.Data.Time
 
 import Wolf.Cub.PropertyEditor
+import Wolf.Cub.SearchBox
 import Wolf.Cub.Types
 
 drawUI :: CubState -> [Widget ResourceName]
@@ -35,7 +36,10 @@ drawPersonList PersonListState {..} =
   where
     listUi =
         borderWithLabel (txt "[Wolf Cub]") $
-        renderList renderElement True personListStatePeople
+        renderList renderElement True personListStatePeople <=>
+        case personListStateSearchBox of
+            Nothing -> emptyWidget
+            Just sb -> renderSearchBox sb
     renderElement :: Bool -> (Text, PersonUuid) -> Widget ResourceName
     renderElement _ (name, _) = padLeftRight 1 $ txt name
     helpUI =

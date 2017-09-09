@@ -17,6 +17,7 @@ import Graphics.Vty as V
 import Wolf.Data
 
 import Wolf.Cub.PropertyEditor
+import Wolf.Cub.SearchBox
 import Wolf.Cub.Types
 
 makePersonList :: Index -> List ResourceName (Text, PersonUuid)
@@ -47,23 +48,43 @@ handleEventShowPersonList state e pls@PersonListState {..} =
                             (EvKey (V.KChar 'q') []) -> unhelp
                             (EvKey (V.KChar 'h') []) -> unhelp
                             _ -> continue state
-                else case ve of
-                         (EvKey V.KEsc []) -> halt state
-                         (EvKey (V.KChar 'q') []) -> halt state
-                         (EvKey (V.KChar 'h') []) ->
-                             setPersonListShowHelp state pls True
-                         (EvKey V.KEnter []) -> do
-                             let msel =
-                                     listSelectedElement personListStatePeople
-                             case msel of
-                                 Nothing -> continue state
-                                 Just (_, (_, personUuid)) ->
-                                     showPerson state personUuid
-                         _ -> do
-                             nl <- handleListEvent ve personListStatePeople
-                             let ns = pls {personListStatePeople = nl}
-                             continue $
-                                 state {cubStateShown = CubShowPersonList ns}
+                else case personListStateSearchBox of
+                         Nothing ->
+                             case ve of
+                                 (EvKey V.KEsc []) -> halt state
+                                 (EvKey (V.KChar 'q') []) -> halt state
+                                 (EvKey (V.KChar 'h') []) ->
+                                     setPersonListShowHelp state pls True
+                                 (EvKey (V.KChar 's') []) ->
+                                     showNewSearchBox state pls
+                                 (EvKey V.KEnter []) -> do
+                                     let msel =
+                                             listSelectedElement
+                                                 personListStatePeople
+                                     case msel of
+                                         Nothing -> continue state
+                                         Just (_, (_, personUuid)) ->
+                                             showPerson state personUuid
+                                 _ -> do
+                                     nl <-
+                                         handleListEvent
+                                             ve
+                                             personListStatePeople
+                                     let ns = pls {personListStatePeople = nl}
+                                     continue $
+                                         state
+                                         {cubStateShown = CubShowPersonList ns}
+                         Just sb ->
+                             let unsearch =
+                                     setPersonListShowSearchBox
+                                         state
+                                         pls
+                                         Nothing
+                             in case ve of
+                                    (EvKey V.KEsc []) -> unsearch
+                                    _ ->
+                                        setPersonListShowSearchBox state pls $
+                                        Just $ handleSearchBox sb ve
         _ -> continue state
 
 setPersonListShowHelp ::
@@ -72,6 +93,21 @@ setPersonListShowHelp state pls b =
     continue
         state
         {cubStateShown = CubShowPersonList pls {personListStateShowHelp = b}}
+
+showNewSearchBox :: CubState -> PersonListState -> EventM n (Next CubState)
+showNewSearchBox state pls@PersonListState {..} =
+    setPersonListShowSearchBox state pls $
+    Just $ searchBox "search-box" $ map fst $ toList personListStatePeople
+
+setPersonListShowSearchBox ::
+       CubState
+    -> PersonListState
+    -> Maybe (SearchBox ResourceName)
+    -> EventM n (Next CubState)
+setPersonListShowSearchBox state pls msb =
+    continue
+        state
+        {cubStateShown = CubShowPersonList pls {personListStateSearchBox = msb}}
 
 handleEventShowPerson ::
        CubState
@@ -181,6 +217,7 @@ showPersonList state = do
                   PersonListState
                   { personListStatePeople = makePersonList index
                   , personListStateShowHelp = False
+                  , personListStateSearchBox = Nothing
                   }
         }
 

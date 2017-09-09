@@ -10,8 +10,10 @@ import Data.Time
 
 import Brick.Widgets.List (List)
 
-import Wolf.Cub.PropertyEditor
 import Wolf.Data
+
+import Wolf.Cub.PropertyEditor
+import Wolf.Cub.SearchBox
 
 data CubState = CubState
     { cubStateShown :: CubShown
@@ -28,6 +30,7 @@ data CubShown
 data PersonListState = PersonListState
     { personListStatePeople :: List ResourceName (Text, PersonUuid)
     , personListStateShowHelp :: Bool
+    , personListStateSearchBox :: Maybe (SearchBox ResourceName)
     } deriving (Show, Generic)
 
 data PersonState = PersonState
