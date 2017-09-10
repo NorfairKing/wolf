@@ -85,6 +85,9 @@ personUuidText (PersonUuid uuid) = UUID.toText uuid
 parsePersonUuid :: Text -> Maybe PersonUuid
 parsePersonUuid = fmap PersonUuid . UUID.fromText
 
+parsePersonUuidString :: String -> Maybe PersonUuid
+parsePersonUuidString = fmap PersonUuid . UUID.fromString
+
 newtype DataSettings = DataSettings
     { dataSetWolfDir :: Path Abs Dir
     } deriving (Show, Eq)

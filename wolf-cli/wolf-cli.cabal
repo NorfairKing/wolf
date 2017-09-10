@@ -21,10 +21,15 @@ library
         Wolf.Cli.Command.Note
         Wolf.Cli.Command.RandomPerson
         Wolf.Cli.Command.Review
+        Wolf.Cli.Command.Suggestion
+        Wolf.Cli.Command.Suggestion.Internal
+        Wolf.Cli.Command.Suggestion.List
+        Wolf.Cli.Command.Suggestion.Review
         Wolf.Cli.Command.Summary
         Wolf.Cli.Editor
         Wolf.Cli.OptParse
         Wolf.Cli.OptParse.Types
+        Wolf.Cli.Prompt
         Wolf.Cli.Report
         Wolf.Cli.Utils
     build-depends:
