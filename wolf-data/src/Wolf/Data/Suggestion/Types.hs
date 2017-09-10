@@ -14,6 +14,7 @@ import Import
 import Data.Aeson
 
 import Wolf.Data.Entry.Types
+import Wolf.Data.Index.Types
 import Wolf.Data.People.Types
 
 data Suggestion a = Suggestion
@@ -39,7 +40,7 @@ instance ToJSON a => ToJSON (Suggestion a) where
 
 data EntrySuggestion = EntrySuggestion
     { entrySuggestionEntry :: PersonEntry
-    , entrySuggestionNewAliases :: [Text]
+    , entrySuggestionNewAliases :: [Alias]
     , entrySuggestionLikelyRelevantPerson :: Maybe (PersonUuid, Double)
     } deriving (Show, Eq, Generic)
 

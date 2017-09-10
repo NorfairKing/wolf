@@ -14,7 +14,7 @@ import Wolf.Cli.Utils
 import Wolf.Data
 import Wolf.Data.Git
 
-note :: (MonadIO m, MonadReader Settings m) => [Text] -> m ()
+note :: (MonadIO m, MonadReader Settings m) => [Alias] -> m ()
 note people =
     runData $
     withInitCheck $ do
@@ -54,7 +54,7 @@ note people =
 
 getRelevantPeopleUuidsAndNewIndex ::
        (MonadIO m, MonadReader DataSettings m)
-    => [Text]
+    => [Alias]
     -> Index
     -> m ([PersonUuid], Index)
 getRelevantPeopleUuidsAndNewIndex [] origIndex = pure ([], origIndex)

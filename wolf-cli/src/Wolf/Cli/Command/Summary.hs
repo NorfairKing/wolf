@@ -26,14 +26,14 @@ import Wolf.Cli.Utils
 import Wolf.Data
 import Wolf.Data.Time
 
-summary :: (MonadIO m, MonadReader Settings m) => Text -> m ()
+summary :: (MonadIO m, MonadReader Settings m) => Alias -> m ()
 summary person =
     runData $
     withInitCheck $ do
         index <- getIndexWithDefault
         case lookupInIndex person index of
             Nothing ->
-                liftIO $ die $ unwords ["No person found for", show person]
+                liftIO $ die $ unwords ["No person found for", aliasString person]
             Just personUuid -> printSummaryReportFor personUuid
 
 printSummaryReportFor ::

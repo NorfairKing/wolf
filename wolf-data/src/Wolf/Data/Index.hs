@@ -1,7 +1,10 @@
 {-# LANGUAGE FlexibleContexts #-}
 
 module Wolf.Data.Index
-    ( Index
+    ( Alias
+    , aliasText
+    , aliasString
+    , Index
     , indexMap
     , newIndex
     , indexKeys
@@ -34,35 +37,35 @@ import Wolf.Data.Path
 import Wolf.Data.People.Types
 import Wolf.Data.Types
 
-indexKeys :: Index -> [Text]
+indexKeys :: Index -> [Alias]
 indexKeys = M.keys . indexMap
 
-indexTuples :: Index -> [(Text, PersonUuid)]
+indexTuples :: Index -> [(Alias, PersonUuid)]
 indexTuples = M.toList . indexMap
 
 -- | Look up a `PersonUuid` in the 'Index' by its alias
-lookupInIndex :: Text -> Index -> Maybe PersonUuid
+lookupInIndex :: Alias -> Index -> Maybe PersonUuid
 lookupInIndex person index = M.lookup person (indexMap index)
 
-reverseIndexLookup :: PersonUuid -> Index -> [Text]
+reverseIndexLookup :: PersonUuid -> Index -> [Alias]
 reverseIndexLookup uuid index =
     map fst $ filter ((== uuid) . snd) (M.toList $ indexMap index)
 
-reverseIndexLookupSingleAlias :: PersonUuid -> Index -> Maybe Text
+reverseIndexLookupSingleAlias :: PersonUuid -> Index -> Maybe Alias
 reverseIndexLookupSingleAlias uuid i =
     case reverseIndexLookup uuid i of
         [] -> Nothing
         (a:_) -> Just a
 
 -- | Add a 'PersonUuid' to the 'Index' at an alias
-addIndexEntry :: Text -> PersonUuid -> Index -> Index
+addIndexEntry :: Alias -> PersonUuid -> Index -> Index
 addIndexEntry person uuid origIndex =
     origIndex {indexMap = M.insert person uuid $ indexMap origIndex}
 
 -- | Create a new person, if the given aliases was unasigned
 createNewPerson ::
        (MonadIO m, MonadReader DataSettings m)
-    => [Text]
+    => [Alias]
     -> Index
     -> m (Maybe (PersonUuid, Index))
 createNewPerson aliases origIndex = do
@@ -71,7 +74,7 @@ createNewPerson aliases origIndex = do
     pure $ (,) uuid <$> index
 
 -- | Add aliases for a 'PersonUuid', if the aliases were all unasigned
-addAliases :: [Text] -> PersonUuid -> Index -> Maybe Index
+addAliases :: [Alias] -> PersonUuid -> Index -> Maybe Index
 addAliases aliases uuid origIndex =
     if any (isJust . (`lookupInIndex` origIndex)) aliases
         then Nothing
@@ -88,14 +91,14 @@ addAliases aliases uuid origIndex =
 -- 'Index' at the given alias if it does not exist yet.
 lookupOrCreateNewPerson ::
        (MonadIO m, MonadReader DataSettings m)
-    => Text
+    => Alias
     -> Index
     -> m (PersonUuid, Index)
 lookupOrCreateNewPerson person origIndex =
     case lookupInIndex person origIndex of
         Just i -> pure (i, origIndex)
         Nothing ->
-            case find ((== person) . personUuidText) $
+            case find ((== aliasText person) . personUuidText) $
                  M.elems (indexMap origIndex) of
                 Just puuid -> pure (puuid, origIndex)
                 Nothing -> do

@@ -1,8 +1,12 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Wolf.Data.Index.Types
-    ( Index(..)
+    ( Alias(..)
+    , aliasText
+    , aliasString
+    , Index(..)
     , newIndex
     ) where
 
@@ -11,11 +15,25 @@ import Import
 import Data.Aeson as JSON
 import Data.Map (Map)
 import qualified Data.Map as M
+import qualified Data.Text as T
 
 import Wolf.Data.People.Types
 
+newtype Alias = Alias
+    { aliasText :: Text
+    } deriving (Show, Eq, Ord, Generic, FromJSONKey, ToJSONKey)
+
+aliasString :: Alias -> String
+aliasString = T.unpack . aliasText
+
+instance Validity Alias
+
+instance FromJSON Alias
+
+instance ToJSON Alias
+
 newtype Index = Index
-    { indexMap :: Map Text PersonUuid
+    { indexMap :: Map Alias PersonUuid
     } deriving (Show, Eq, Ord, Generic)
 
 instance Validity Index

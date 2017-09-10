@@ -12,6 +12,9 @@ module Wolf.Data
     , personUuidString
     , nextRandomPersonUuid
     , getPersonUuids
+    , Alias
+    , aliasText
+    , aliasString
     , Index
     , indexMap
     , indexKeys

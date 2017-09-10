@@ -62,7 +62,7 @@ reviewSingle s = do
                             , case oldAliases ++
                                    entrySuggestionNewAliases (suggestionData s) of
                                   [] -> "for a person without aliases."
-                                  (a:_) -> "for " ++ T.unpack a ++ "."
+                                  (a:_) -> "for " ++ aliasString a ++ "."
                             ]
                 makeGitCommit message
         Yes -> do
@@ -172,7 +172,7 @@ showData s@Suggestion {..} = do
                 ]
     liftIO $ putStr $ renderReport infoReport
 
-promptAboutAliases :: (MonadIO m, MonadReader Settings m) => [Text] -> m [Text]
+promptAboutAliases :: (MonadIO m, MonadReader Settings m) => [Alias] -> m [Alias]
 promptAboutAliases aliases = do
     yn <-
         liftIO $

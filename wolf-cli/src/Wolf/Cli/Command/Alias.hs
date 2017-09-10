@@ -8,7 +8,7 @@ import Wolf.Cli.OptParse.Types
 import Wolf.Cli.Utils
 import Wolf.Data.Index
 
-alias :: (MonadIO m, MonadReader Settings m) => Text -> Text -> m ()
+alias :: (MonadIO m, MonadReader Settings m) => Alias -> Alias -> m ()
 alias new old = do
     origIndex <- runData getIndexWithDefault
     personUuid <-

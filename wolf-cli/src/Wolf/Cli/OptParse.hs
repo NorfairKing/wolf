@@ -253,9 +253,9 @@ parseCommandSuggestionReview =
     in info parser modifier
 
 peopleMap :: ParserEnv -> [String]
-peopleMap = map (escapeSpaces . fst) . M.toList . indexMap . parserEnvIndex
+peopleMap = map (escapeSpaces . aliasString . fst) . M.toList . indexMap . parserEnvIndex
   where
-    escapeSpaces = concatMap go . T.unpack
+    escapeSpaces = concatMap go
       where
         go ' ' = "\\ "
         go c = [c]

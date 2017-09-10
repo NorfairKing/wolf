@@ -20,7 +20,7 @@ import Wolf.Cli.Utils
 import Wolf.Data
 import Wolf.Data.Git
 
-entry :: (MonadIO m, MonadReader Settings m) => Text -> m ()
+entry :: (MonadIO m, MonadReader Settings m) => Alias -> m ()
 entry person =
     runData $
     withInitCheck $ do
@@ -82,5 +82,5 @@ entry person =
                                     makeGitCommit $
                                         unwords
                                             [ "Added/changed entry for"
-                                            , T.unpack person
+                                            , aliasString person
                                             ]
