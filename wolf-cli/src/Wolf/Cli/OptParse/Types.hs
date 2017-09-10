@@ -41,12 +41,12 @@ data Configuration =
 
 data Dispatch
     = DispatchInit
-    | DispatchNote [Text]
-    | DispatchSummary Text
-    | DispatchEntry Text
+    | DispatchNote [Alias]
+    | DispatchSummary Alias
+    | DispatchEntry Alias
     | DispatchGit [String]
-    | DispatchAlias Text
-                    Text
+    | DispatchAlias Alias
+                    Alias
     | DispatchReview
     | DispatchRandomPerson
     | DispatchSuggestion SuggestionSettings

@@ -97,7 +97,7 @@ reviewSingle s = do
                                     pure $
                                         unwords
                                             [ "Added entry for"
-                                            , T.unpack displayName
+                                            , aliasString displayName
                                             , "via a suggestion from"
                                             , T.unpack $ suggestionSuggestor s
                                             ]
@@ -122,7 +122,7 @@ reviewSingle s = do
                                     pure $
                                         unwords
                                             [ "Changed entry for"
-                                            , T.unpack displayName
+                                            , aliasString displayName
                                             , "via a suggestion from"
                                             , T.unpack $ suggestionSuggestor s
                                             ]
@@ -148,7 +148,7 @@ showData s@Suggestion {..} = do
                     , stringReport $
                       case relevantAliases of
                           [] -> "No alias found for this person."
-                          (a:_) -> T.unpack a
+                          (a:_) -> aliasString a
                     , "Score: " <> stringReport (show score)
                     ] ++
                     let yellow = colored [SetColor Foreground Dull Yellow]
@@ -172,7 +172,8 @@ showData s@Suggestion {..} = do
                 ]
     liftIO $ putStr $ renderReport infoReport
 
-promptAboutAliases :: (MonadIO m, MonadReader Settings m) => [Alias] -> m [Alias]
+promptAboutAliases ::
+       (MonadIO m, MonadReader Settings m) => [Alias] -> m [Alias]
 promptAboutAliases aliases = do
     yn <-
         liftIO $
@@ -186,7 +187,7 @@ promptAboutAliases aliases = do
             liftIO $
                 T.writeFile (toFilePath taf) $
                 T.unlines $
-                aliases ++
+                map aliasText aliases ++
                 [ ""
                 , "# Leave one alias per line."
                 , "# Lines beginning with a '#' will be ignored."
@@ -197,7 +198,8 @@ promptAboutAliases aliases = do
                     EditingFailure err ->
                         die $ "Failed to edit; " <> T.unpack err
                     EditingSuccess ->
-                        (filter (not . T.null) .
+                        (map alias .
+                         filter (not . T.null) .
                          filter (not . T.isPrefixOf "#") . T.lines) <$>
                         T.readFile (toFilePath taf)
 

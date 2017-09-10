@@ -33,13 +33,14 @@ combineToInstructions cmd Flags {..} Configuration = do
             CommandNote mp people ->
                 pure $
                 DispatchNote $
+                map alias $
                 case mp of
                     Just p -> p : people
                     Nothing -> people
-            CommandSummary person -> pure $ DispatchSummary person
-            CommandEntry person -> pure $ DispatchEntry person
+            CommandSummary person -> pure $ DispatchSummary $ alias person
+            CommandEntry person -> pure $ DispatchEntry $ alias person
             CommandGit args -> pure $ DispatchGit args
-            CommandAlias old new -> pure $ DispatchAlias old new
+            CommandAlias old new -> pure $ DispatchAlias (alias old) (alias new)
             CommandReview -> pure DispatchReview
             CommandRandomPerson -> pure DispatchRandomPerson
             CommandSuggestion sfs ->
@@ -253,7 +254,9 @@ parseCommandSuggestionReview =
     in info parser modifier
 
 peopleMap :: ParserEnv -> [String]
-peopleMap = map (escapeSpaces . aliasString . fst) . M.toList . indexMap . parserEnvIndex
+peopleMap =
+    map (escapeSpaces . aliasString . fst) .
+    M.toList . indexMap . parserEnvIndex
   where
     escapeSpaces = concatMap go
       where

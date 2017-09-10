@@ -49,7 +49,7 @@ servePostNewPerson acc pe = do
     runDataForAccount acc $ putPersonEntry personUuid pe
     pure personUuid
 
-serveGetPersonByAlias :: Account -> Text -> WolfHandler PersonUuid
+serveGetPersonByAlias :: Account -> Alias -> WolfHandler PersonUuid
 serveGetPersonByAlias acc key = do
     mPersonUuid <- runDataForAccount acc $ (>>= lookupInIndex key) <$> getIndex
     case mPersonUuid of

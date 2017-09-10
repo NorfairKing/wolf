@@ -2,6 +2,7 @@
 
 module Wolf.Data.Index
     ( Alias
+    , alias
     , aliasText
     , aliasString
     , Index

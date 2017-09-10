@@ -35,8 +35,8 @@ renderEntrySuggestion EntrySuggestion {..} =
     (case entrySuggestionNewAliases of
          [] -> [green "No suggested aliases."]
          _ ->
-             [ green $ "Suggested alias: " ++ aliasString alias
-             | alias <- entrySuggestionNewAliases
+             [ green $ "Suggested alias: " ++ aliasString a
+             | a <- entrySuggestionNewAliases
              ]) ++
     [ case TE.decodeUtf8' $ tmpEntryFileContents entrySuggestionEntry of
           Left _ ->

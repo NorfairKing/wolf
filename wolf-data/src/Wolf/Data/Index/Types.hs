@@ -4,6 +4,7 @@
 
 module Wolf.Data.Index.Types
     ( Alias(..)
+    , alias
     , aliasText
     , aliasString
     , Index(..)
@@ -23,8 +24,14 @@ newtype Alias = Alias
     { aliasText :: Text
     } deriving (Show, Eq, Ord, Generic, FromJSONKey, ToJSONKey)
 
+alias :: Text -> Alias
+alias = Alias
+
 aliasString :: Alias -> String
 aliasString = T.unpack . aliasText
+
+instance IsString Alias where
+    fromString = Alias . T.pack
 
 instance Validity Alias
 

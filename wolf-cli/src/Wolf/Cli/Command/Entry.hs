@@ -10,7 +10,6 @@ module Wolf.Cli.Command.Entry
 import Import
 
 import qualified Data.ByteString as SB
-import qualified Data.Text as T
 import Data.Time
 
 import Wolf.Cli.Command.Entry.Internal

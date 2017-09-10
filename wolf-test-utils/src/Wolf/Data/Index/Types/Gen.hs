@@ -12,6 +12,7 @@ instance GenUnchecked Alias
 
 instance GenValid Alias where
     genValid = Alias <$> genValid
+
 instance GenUnchecked Index
 
 instance GenValid Index where

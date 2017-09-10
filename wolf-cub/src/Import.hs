@@ -12,5 +12,6 @@ import Data.Monoid as X
 import Data.Proxy as X
 import Data.Text as X (Text)
 
+import Control.Arrow as X (first, second)
 import Control.Monad as X
 import Control.Monad.IO.Class as X

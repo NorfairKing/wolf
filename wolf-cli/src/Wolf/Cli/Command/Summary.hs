@@ -33,7 +33,8 @@ summary person =
         index <- getIndexWithDefault
         case lookupInIndex person index of
             Nothing ->
-                liftIO $ die $ unwords ["No person found for", aliasString person]
+                liftIO $
+                die $ unwords ["No person found for", aliasString person]
             Just personUuid -> printSummaryReportFor personUuid
 
 printSummaryReportFor ::

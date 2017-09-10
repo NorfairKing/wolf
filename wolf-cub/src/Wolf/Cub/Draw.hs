@@ -40,8 +40,8 @@ drawPersonList PersonListState {..} =
         case personListStateSearchBox of
             Nothing -> emptyWidget
             Just sb -> renderSearchBox sb
-    renderElement :: Bool -> (Text, PersonUuid) -> Widget ResourceName
-    renderElement _ (name, _) = padLeftRight 1 $ txt name
+    renderElement :: Bool -> (Alias, PersonUuid) -> Widget ResourceName
+    renderElement _ (name, _) = padLeftRight 1 $ txt $ aliasText name
     helpUI =
         centerLayer $
         borderWithLabel (txt "[Help]") $ vBox $ map txt ["q: Exit", "h: Help"]

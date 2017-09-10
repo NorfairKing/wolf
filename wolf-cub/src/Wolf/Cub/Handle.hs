@@ -20,7 +20,7 @@ import Wolf.Cub.PropertyEditor
 import Wolf.Cub.SearchBox
 import Wolf.Cub.Types
 
-makePersonList :: Index -> List ResourceName (Text, PersonUuid)
+makePersonList :: Index -> List ResourceName (Alias, PersonUuid)
 makePersonList i = list "person-list" (V.fromList $ indexTuples i) 1
 
 handleEvent ::
@@ -118,7 +118,8 @@ showNewSearchBox :: CubState -> PersonListState -> EventM n (Next CubState)
 showNewSearchBox state pls@PersonListState {..} =
     continue $
     setPersonListShowSearchBox state pls $
-    Just $ searchBox "search-box" personListStateInitialPeople
+    Just $
+    searchBox "search-box" $ map (first aliasText) personListStateInitialPeople
 
 setPersonListShowSearchBox ::
        CubState
@@ -140,6 +141,7 @@ refreshListFromSearch state pls sb =
           CubShowPersonList
               pls
               { personListStatePeopleList =
+                    first alias <$>
                     list
                         "person-list"
                         (V.fromList $ searchBoxCurrentlySelected sb)
