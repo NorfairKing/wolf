@@ -1,7 +1,10 @@
 {-# LANGUAGE FlexibleContexts #-}
 
 module Wolf.Data.Index
-    ( indexKeys
+    ( Index
+    , indexMap
+    , newIndex
+    , indexKeys
     , indexTuples
     , lookupInIndex
     , reverseIndexLookup
@@ -25,8 +28,10 @@ import Import
 import qualified Data.Map as M
 
 import Wolf.Data.Entry.Types
+import Wolf.Data.Index.Types
 import Wolf.Data.JSONUtils
 import Wolf.Data.Path
+import Wolf.Data.People.Types
 import Wolf.Data.Types
 
 indexKeys :: Index -> [Text]

@@ -7,7 +7,7 @@ import Import
 import Wolf.Data.Suggestion.Types
 
 import Wolf.Data.Entry.Types.Gen ()
-import Wolf.Data.Types.Gen ()
+import Wolf.Data.People.Types.Gen ()
 
 instance GenUnchecked a => GenUnchecked (Suggestion a)
 

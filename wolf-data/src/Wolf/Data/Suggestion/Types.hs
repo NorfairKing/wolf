@@ -14,7 +14,7 @@ import Import
 import Data.Aeson
 
 import Wolf.Data.Entry.Types
-import Wolf.Data.Types
+import Wolf.Data.People.Types
 
 data Suggestion a = Suggestion
     { suggestionSuggestor :: Text

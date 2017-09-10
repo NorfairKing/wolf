@@ -8,6 +8,7 @@ import qualified Data.Text as T
 
 import Wolf.API
 
+import Wolf.Data.People.Types.Gen ()
 import Wolf.Data.Types.Gen ()
 
 instance GenUnchecked AccountUUID

@@ -5,7 +5,7 @@ module Wolf.Data.NoteIndex.Types.Gen where
 import Import
 
 import Wolf.Data.NoteIndex.Types
-import Wolf.Data.Types.Gen ()
+import Wolf.Data.People.Types.Gen ()
 
 instance GenUnchecked NoteIndex
 

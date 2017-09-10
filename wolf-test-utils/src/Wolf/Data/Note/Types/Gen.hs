@@ -6,7 +6,7 @@ import Import
 
 import Wolf.Data.Note.Types
 
-import Wolf.Data.Types.Gen ()
+import Wolf.Data.People.Types.Gen ()
 
 instance GenUnchecked Note
 

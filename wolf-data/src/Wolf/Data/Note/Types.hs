@@ -9,7 +9,7 @@ import Import
 import Data.Aeson as JSON
 import Data.Time
 
-import Wolf.Data.Types -- TODO refactor PersonUuid so that this is no longer necessary
+import Wolf.Data.People.Types
 
 data Note = Note
     { noteContents :: Text

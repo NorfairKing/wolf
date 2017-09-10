@@ -12,6 +12,6 @@ import Wolf.Data.Types.Gen ()
 
 spec :: Spec
 spec = do
+    eqSpec @InitData
+    genValidSpec @InitData
     jsonSpecOnValid @InitData
-    jsonSpecOnValid @Index
-    jsonSpec @PersonUuid
