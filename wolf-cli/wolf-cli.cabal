@@ -29,6 +29,7 @@ library
         Wolf.Cli.Editor
         Wolf.Cli.OptParse
         Wolf.Cli.OptParse.Types
+        Wolf.Cli.Prompt
         Wolf.Cli.Report
         Wolf.Cli.Utils
     build-depends:

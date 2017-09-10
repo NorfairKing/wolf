@@ -32,9 +32,12 @@ renderSuggestion func Suggestion {..} =
 renderEntrySuggestion :: EntrySuggestion -> Report
 renderEntrySuggestion EntrySuggestion {..} =
     unlinesReport $
-    [ colored [SetColor Foreground Dull Green] $ "Suggested alias: " ++ (T.unpack alias)
-    | alias <- entrySuggestionNewAliases
-    ] ++
+    (case entrySuggestionNewAliases of
+         [] -> [green "No suggested aliases."]
+         _ ->
+             [ green $ "Suggested alias: " ++ T.unpack alias
+             | alias <- entrySuggestionNewAliases
+             ]) ++
     [ case TE.decodeUtf8' $ tmpEntryFileContents entrySuggestionEntry of
           Left _ ->
               colored
@@ -42,3 +45,5 @@ renderEntrySuggestion EntrySuggestion {..} =
                   "Failed to decode UTF8 Text for entry suggestion YAML"
           Right t -> stringReport $ T.unpack t
     ]
+  where
+    green = colored [SetColor Foreground Dull Green]

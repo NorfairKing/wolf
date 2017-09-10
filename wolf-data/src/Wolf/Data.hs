@@ -17,7 +17,11 @@ module Wolf.Data
     , indexKeys
     , indexTuples
     , lookupInIndex
+    , reverseIndexLookup
+    , reverseIndexLookupSingleAlias
     , addIndexEntry
+    , createNewPerson
+    , addAliases
     , lookupOrCreateNewPerson
     , getIndex
     , getIndexWithDefault

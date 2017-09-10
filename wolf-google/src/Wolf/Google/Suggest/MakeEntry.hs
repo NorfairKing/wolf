@@ -29,7 +29,8 @@ deduplicateGathering GatheredPerson {..} =
 suggestionProperty :: UTCTime -> GatheredPerson -> ([Text], PersonProperty)
 suggestionProperty now GatheredPerson {..} = (aliases, PMap $ ns ++ es ++ ps)
   where
-    aliases = nub $
+    aliases =
+        nub $
         flip mapMaybe gatheredPersonNames $ \GatheredName {..} ->
             fmap (\(fn, ln) -> T.unwords [fn, ln]) $
             (,) <$> gatheredNameFirstName <*> gatheredNameLastName
