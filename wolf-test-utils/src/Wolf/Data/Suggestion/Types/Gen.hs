@@ -17,4 +17,4 @@ instance GenValid a => GenValid (Suggestion a) where
 instance GenUnchecked EntrySuggestion
 
 instance GenValid EntrySuggestion where
-    genValid = EntrySuggestion <$> genValid <*> genValid
+    genValid = EntrySuggestion <$> genValid <*> genValid <*> genValid

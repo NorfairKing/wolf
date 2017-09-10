@@ -27,7 +27,8 @@ entrySuggestionsFile :: MonadReader DataSettings m => m (Path Abs File)
 entrySuggestionsFile = (</> $(mkRelFile "entry.json")) <$> suggestionsDir
 
 usedEntrySuggestionFile :: MonadReader DataSettings m => m (Path Abs File)
-usedEntrySuggestionFile = (</> $(mkRelFile "entry-used")) <$> suggestionsDir
+usedEntrySuggestionFile =
+    (</> $(mkRelFile "entry-used.json")) <$> suggestionsDir
 
 readPersonEntrySuggestions ::
        (MonadIO m, MonadReader DataSettings m) => m [Suggestion EntrySuggestion]
@@ -68,6 +69,8 @@ recordUsedPersonEntrySuggestions ::
     => [Suggestion EntrySuggestion]
     -> m ()
 recordUsedPersonEntrySuggestions usedSugs = do
+    psugs <- readPersonEntrySuggestions
+    writePersonEntrySuggestions $ psugs \\ usedSugs
     sugs <- readUsedPersonEntrySuggestions
     let sugs' = nub $ sugs ++ usedSugs
     writeUsedPersonEntrySuggestions sugs'

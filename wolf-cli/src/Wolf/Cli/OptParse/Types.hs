@@ -19,6 +19,12 @@ data Command
                    Text
     | CommandReview
     | CommandRandomPerson
+    | CommandSuggestion SuggestionFlags
+    deriving (Show, Eq)
+
+data SuggestionFlags
+    = CommandListSuggestions
+    | CommandReviewSuggestion
     deriving (Show, Eq)
 
 newtype Flags = Flags
@@ -43,6 +49,12 @@ data Dispatch
                     Text
     | DispatchReview
     | DispatchRandomPerson
+    | DispatchSuggestion SuggestionSettings
+    deriving (Show, Eq)
+
+data SuggestionSettings
+    = DispatchListSuggestions
+    | DispatchReviewSuggestion
     deriving (Show, Eq)
 
 newtype Settings = Settings

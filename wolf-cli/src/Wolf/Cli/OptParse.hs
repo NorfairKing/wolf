@@ -42,6 +42,12 @@ combineToInstructions cmd Flags {..} Configuration = do
             CommandAlias old new -> pure $ DispatchAlias old new
             CommandReview -> pure DispatchReview
             CommandRandomPerson -> pure DispatchRandomPerson
+            CommandSuggestion sfs ->
+                case sfs of
+                    CommandListSuggestions ->
+                        pure $ DispatchSuggestion DispatchListSuggestions
+                    CommandReviewSuggestion ->
+                        pure $ DispatchSuggestion DispatchReviewSuggestion
     pure (disp, Settings {setDataSets = ds})
 
 defaultWolfDir :: MonadIO m => m (Path Abs Dir)
@@ -109,6 +115,7 @@ parseCommand =
             , command "alias" $ runReaderT parseCommandAlias env
             , command "review" parseCommandReview
             , command "random" parseCommandRandomPerson
+            , command "suggestion" parseCommandSuggestion
             ]
 
 parseCommandInit :: ParserInfo Command
@@ -219,6 +226,30 @@ parseCommandRandomPerson :: ParserInfo Command
 parseCommandRandomPerson =
     let parser = pure CommandRandomPerson
         modifier = fullDesc <> progDesc "Summarise a random person."
+    in info parser modifier
+
+parseCommandSuggestion :: ParserInfo Command
+parseCommandSuggestion =
+    let parser =
+            fmap CommandSuggestion $
+            hsubparser $
+            mconcat
+                [ command "list" parseCommandSuggestionList
+                , command "review" parseCommandSuggestionReview
+                ]
+        modifier = fullDesc <> progDesc "Manipulate Suggestions."
+    in info parser modifier
+
+parseCommandSuggestionList :: ParserInfo SuggestionFlags
+parseCommandSuggestionList =
+    let parser = pure CommandListSuggestions
+        modifier = fullDesc <> progDesc "List all suggestions."
+    in info parser modifier
+
+parseCommandSuggestionReview :: ParserInfo SuggestionFlags
+parseCommandSuggestionReview =
+    let parser = pure CommandReviewSuggestion
+        modifier = fullDesc <> progDesc "Review the next suggestion."
     in info parser modifier
 
 peopleMap :: ParserEnv -> [String]

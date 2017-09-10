@@ -34,6 +34,7 @@ instance ToJSON a => ToJSON (Suggestion a) where
 
 data EntrySuggestion = EntrySuggestion
     { entrySuggestionEntry :: PersonEntry
+    , entrySuggestionNewAliases :: [Text]
     , entrySuggestionLikelyRelevantPerson :: Maybe (PersonUuid, Double)
     } deriving (Show, Eq, Generic)
 
@@ -42,11 +43,13 @@ instance Validity EntrySuggestion
 instance FromJSON EntrySuggestion where
     parseJSON =
         withObject "EntrySuggestion" $ \o ->
-            EntrySuggestion <$> o .: "entry" <*> o .: "relevant-person"
+            EntrySuggestion <$> o .: "entry" <*> o .: "new-aliases" <*>
+            o .: "relevant-person"
 
 instance ToJSON EntrySuggestion where
     toJSON EntrySuggestion {..} =
         object
             [ "entry" .= entrySuggestionEntry
+            , "new-aliases" .= entrySuggestionNewAliases
             , "relevant-person" .= entrySuggestionLikelyRelevantPerson
             ]
