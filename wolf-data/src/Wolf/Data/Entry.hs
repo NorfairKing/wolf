@@ -4,7 +4,9 @@ module Wolf.Data.Entry
     , personEntryProperties
     , newPersonEntry
     , PersonProperty(..)
+    , sameValues
     , PersonPropertyValue(..)
+    , sameContents
     ) where
 
 import Wolf.Data.Entry.Types

@@ -32,7 +32,9 @@ module Wolf.Data
     , personEntryProperties
     , newPersonEntry
     , PersonProperty(..)
+    , sameValues
     , PersonPropertyValue(..)
+    , sameContents
     , getPersonEntry
     , putPersonEntry
     -- * Notes
@@ -63,6 +65,8 @@ module Wolf.Data
     -- * Suggestions
     , Suggestion(..)
     , EntrySuggestion(..)
+    , sameEntrySuggestionData
+    , sameEntrySuggestion
     , readPersonEntrySuggestions
     , addPersonEntrySuggestions
     , readUsedPersonEntrySuggestions

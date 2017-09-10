@@ -4,6 +4,8 @@
 module Wolf.Data.Suggestion
     ( Suggestion(..)
     , EntrySuggestion(..)
+    , sameEntrySuggestionData
+    , sameEntrySuggestion
     , readPersonEntrySuggestions
     , writePersonEntrySuggestions
     , addPersonEntrySuggestions
@@ -47,8 +49,11 @@ addPersonEntrySuggestions ::
     => [Suggestion EntrySuggestion]
     -> m ()
 addPersonEntrySuggestions newSugs = do
+    usedSugs <- readUsedPersonEntrySuggestions
     sugs <- readPersonEntrySuggestions
-    let sugs' = nub $ sugs ++ newSugs
+    let sugs' =
+            nubBy sameEntrySuggestionData $
+            sugs ++ deleteFirstsBy sameEntrySuggestionData newSugs usedSugs
     writePersonEntrySuggestions sugs'
 
 readUsedPersonEntrySuggestions ::
@@ -72,5 +77,5 @@ recordUsedPersonEntrySuggestions usedSugs = do
     psugs <- readPersonEntrySuggestions
     writePersonEntrySuggestions $ psugs \\ usedSugs
     sugs <- readUsedPersonEntrySuggestions
-    let sugs' = nub $ sugs ++ usedSugs
+    let sugs' = nubBy sameEntrySuggestionData $ sugs ++ usedSugs
     writeUsedPersonEntrySuggestions sugs'

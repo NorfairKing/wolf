@@ -2,7 +2,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 
-module Wolf.Data.Suggestion.Types where
+module Wolf.Data.Suggestion.Types
+    ( Suggestion(..)
+    , EntrySuggestion(..)
+    , sameEntrySuggestionData
+    , sameEntrySuggestion
+    ) where
 
 import Import
 
@@ -53,3 +58,23 @@ instance ToJSON EntrySuggestion where
             , "new-aliases" .= entrySuggestionNewAliases
             , "relevant-person" .= entrySuggestionLikelyRelevantPerson
             ]
+
+sameEntrySuggestionData ::
+       Suggestion EntrySuggestion -> Suggestion EntrySuggestion -> Bool
+sameEntrySuggestionData =
+    aaand
+        [ (==) `on` suggestionSuggestor
+        , (==) `on` suggestionReason
+        , sameEntrySuggestion `on` suggestionData
+        ]
+
+sameEntrySuggestion :: EntrySuggestion -> EntrySuggestion -> Bool
+sameEntrySuggestion =
+    aaand
+        [ sameValues `on` (personEntryProperties . entrySuggestionEntry)
+        , (==) `on` entrySuggestionNewAliases
+        , (==) `on` entrySuggestionLikelyRelevantPerson
+        ]
+
+aaand :: [a -> a -> Bool] -> a -> a -> Bool
+aaand fs a b = all (\f -> f a b) fs

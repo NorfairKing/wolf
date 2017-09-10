@@ -118,12 +118,4 @@ adaptToPerson aliases pe pc =
                              [] -> Nothing
                              kvs -> Just $ PMap kvs
                      _ -> Just p1
-    sameValues :: PersonProperty -> PersonProperty -> Bool
-    sameValues (PVal v1) (PVal v2) =
-        ((==) `on` personPropertyValueContents) v1 v2
-    sameValues (PList l1) (PList l2) =
-        length l1 == length l2 && and (zipWith sameValues l1 l2)
-    sameValues (PMap m1) (PMap m2) =
-        length m1 == length m2 && and (zipWith tuplesMatch m1 m2)
-    sameValues _ _ = False
     tuplesMatch (k1, v1) (k2, v2) = k1 == k2 && sameValues v1 v2
