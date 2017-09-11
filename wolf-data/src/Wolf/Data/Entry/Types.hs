@@ -8,7 +8,9 @@ module Wolf.Data.Entry.Types
     , personEntryProperties
     , newPersonEntry
     , PersonProperty(..)
+    , sameValues
     , PersonPropertyValue(..)
+    , sameContents
     ) where
 
 import Import
@@ -83,6 +85,18 @@ instance FromJSON PersonProperty where
         (PVal <$> parseJSON o) <|> (PList <$> parseJSON o) <|>
         (PMap <$> parseJSON o)
 
+sameValues :: PersonProperty -> PersonProperty -> Bool
+sameValues p1 p2 =
+    case (p1, p2) of
+        (PVal v1, PVal v2) -> sameContents v1 v2
+        (PList vs1, PList vs2) ->
+            length vs1 == length vs2 && and (zipWith sameValues vs1 vs2)
+        (PMap kvs1, PMap kvs2) ->
+            length kvs1 == length kvs2 && and (zipWith sameTuple kvs1 kvs2)
+        (_, _) -> False
+  where
+    sameTuple (k1, v1) (k2, v2) = k1 == k2 && sameValues v1 v2
+
 data PersonPropertyValue = PersonPropertyValue
     { personPropertyValueContents :: Text
     , personPropertyValueLastUpdatedTimestamp :: UTCTime
@@ -101,3 +115,6 @@ instance ToJSON PersonPropertyValue where
             [ "value" .= personPropertyValueContents
             , "last-updated" .= personPropertyValueLastUpdatedTimestamp
             ]
+
+sameContents :: PersonPropertyValue -> PersonPropertyValue -> Bool
+sameContents = (==) `on` personPropertyValueContents

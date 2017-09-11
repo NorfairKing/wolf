@@ -33,15 +33,22 @@ combineToInstructions cmd Flags {..} Configuration = do
             CommandNote mp people ->
                 pure $
                 DispatchNote $
+                map alias $
                 case mp of
                     Just p -> p : people
                     Nothing -> people
-            CommandSummary person -> pure $ DispatchSummary person
-            CommandEntry person -> pure $ DispatchEntry person
+            CommandSummary person -> pure $ DispatchSummary $ alias person
+            CommandEntry person -> pure $ DispatchEntry $ alias person
             CommandGit args -> pure $ DispatchGit args
-            CommandAlias old new -> pure $ DispatchAlias old new
+            CommandAlias old new -> pure $ DispatchAlias (alias old) (alias new)
             CommandReview -> pure DispatchReview
             CommandRandomPerson -> pure DispatchRandomPerson
+            CommandSuggestion sfs ->
+                case sfs of
+                    CommandListSuggestions ->
+                        pure $ DispatchSuggestion DispatchListSuggestions
+                    CommandReviewSuggestion ->
+                        pure $ DispatchSuggestion DispatchReviewSuggestion
     pure (disp, Settings {setDataSets = ds})
 
 defaultWolfDir :: MonadIO m => m (Path Abs Dir)
@@ -109,6 +116,7 @@ parseCommand =
             , command "alias" $ runReaderT parseCommandAlias env
             , command "review" parseCommandReview
             , command "random" parseCommandRandomPerson
+            , command "suggestion" parseCommandSuggestion
             ]
 
 parseCommandInit :: ParserInfo Command
@@ -221,10 +229,36 @@ parseCommandRandomPerson =
         modifier = fullDesc <> progDesc "Summarise a random person."
     in info parser modifier
 
+parseCommandSuggestion :: ParserInfo Command
+parseCommandSuggestion =
+    let parser =
+            fmap CommandSuggestion $
+            hsubparser $
+            mconcat
+                [ command "list" parseCommandSuggestionList
+                , command "review" parseCommandSuggestionReview
+                ]
+        modifier = fullDesc <> progDesc "Manipulate Suggestions."
+    in info parser modifier
+
+parseCommandSuggestionList :: ParserInfo SuggestionFlags
+parseCommandSuggestionList =
+    let parser = pure CommandListSuggestions
+        modifier = fullDesc <> progDesc "List all suggestions."
+    in info parser modifier
+
+parseCommandSuggestionReview :: ParserInfo SuggestionFlags
+parseCommandSuggestionReview =
+    let parser = pure CommandReviewSuggestion
+        modifier = fullDesc <> progDesc "Review the next suggestion."
+    in info parser modifier
+
 peopleMap :: ParserEnv -> [String]
-peopleMap = map (escapeSpaces . fst) . M.toList . indexMap . parserEnvIndex
+peopleMap =
+    map (escapeSpaces . aliasString . fst) .
+    M.toList . indexMap . parserEnvIndex
   where
-    escapeSpaces = concatMap go . T.unpack
+    escapeSpaces = concatMap go
       where
         go ' ' = "\\ "
         go c = [c]
@@ -235,14 +269,22 @@ parseFlags = Flags <$> parseDataFlags
 parseDataFlags :: ReaderT ParserEnv Parser DataFlags
 parseDataFlags =
     ReaderT $ \env ->
-        DataFlags <$>
-        option
-            (Just <$> str)
-            (mconcat
-                 [ long "wolf-dir"
-                 , metavar "DIR"
-                 , help "the data directory for all wolf data"
-                 , value Nothing
-                 , showDefaultWith
-                       (const $ toFilePath $ parserEnvDefaultWolfDir env)
-                 ])
+        parseDataFlagsWithDefault $ Just $ parserEnvDefaultWolfDir env
+
+parseDataFlags' :: Parser DataFlags
+parseDataFlags' = parseDataFlagsWithDefault Nothing
+
+parseDataFlagsWithDefault :: Maybe (Path Abs Dir) -> Parser DataFlags
+parseDataFlagsWithDefault mDefDir =
+    DataFlags <$>
+    option
+        (Just <$> str)
+        (mconcat
+             [ long "wolf-dir"
+             , metavar "DIR"
+             , help "the data directory for all wolf data"
+             , value $ toFilePath <$> mDefDir
+             , case mDefDir of
+                   Nothing -> mempty
+                   Just defDir -> showDefaultWith (const $ toFilePath defDir)
+             ])

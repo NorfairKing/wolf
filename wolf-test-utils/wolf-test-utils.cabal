@@ -13,8 +13,11 @@ author: Tom Sydney Kerckhove
 library
     exposed-modules:
         Wolf.Data.Entry.Types.Gen
+        Wolf.Data.Index.Types.Gen
         Wolf.Data.Note.Types.Gen
         Wolf.Data.NoteIndex.Types.Gen
+        Wolf.Data.People.Types.Gen
+        Wolf.Data.Suggestion.Types.Gen
         Wolf.Data.TestUtils
         Wolf.Data.Types.Gen
     build-depends:
@@ -84,9 +87,13 @@ test-suite wolf-data-test
         Wolf.Data.Entry.TypesSpec
         Wolf.Data.EntrySpec
         Wolf.Data.IndexSpec
+        Wolf.Data.Index.TypesSpec
         Wolf.Data.Note.TypesSpec
         Wolf.Data.NoteIndex.TypesSpec
         Wolf.Data.NoteIndexSpec
         Wolf.Data.NoteSpec
+        Wolf.Data.People.TypesSpec
+        Wolf.Data.Suggestion.TypesSpec
+        Wolf.Data.SuggestionSpec
         Wolf.Data.TypesSpec
     ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall

@@ -36,7 +36,7 @@ review =
                     unlinesReport
                         [ colored [SetColor Foreground Dull Blue] $
                           unwords
-                              [ T.unpack nickName ++ ","
+                              [ aliasString nickName ++ ","
                               , T.unpack $
                                 formatMomentNicely
                                     now

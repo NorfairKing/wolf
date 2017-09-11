@@ -12,20 +12,26 @@ import Brick.Widgets.List (List)
 
 import Wolf.Data
 
+import Wolf.Cub.PropertyEditor
+import Wolf.Cub.SearchBox
+
 data CubState = CubState
     { cubStateShown :: CubShown
     , cubStateNow :: UTCTime
     , cubStateDataSettings :: DataSettings
-    } deriving (Show, Generic)
+    } deriving (Generic)
 
 data CubShown
     = CubShowPersonList PersonListState
     | CubShowPerson PersonState
-    deriving (Show, Generic)
+    | CubEditPerson EditPersonState
+    deriving (Generic)
 
 data PersonListState = PersonListState
-    { personListStatePeople :: List ResourceName (Text, PersonUuid)
+    { personListStateInitialPeople :: [(Alias, PersonUuid)]
+    , personListStatePeopleList :: List ResourceName (Alias, PersonUuid)
     , personListStateShowHelp :: Bool
+    , personListStateSearchBox :: Maybe (SearchBox ResourceName PersonUuid)
     } deriving (Show, Generic)
 
 data PersonState = PersonState
@@ -35,9 +41,19 @@ data PersonState = PersonState
     , personStateShowHelp :: Bool
     } deriving (Show, Generic)
 
+data EditPersonState = EditPersonState
+    { editPersonStateUuid :: PersonUuid
+    , editPersonStateStartingEntry :: Maybe PersonEntry
+    , editPersonStatePropertyEditor :: PropertyEditor ResourceName
+    } deriving (Generic)
+
 newtype ResourceName =
     ResourceName String
     deriving (Show, Read, Eq, Ord, Generic)
 
 instance IsString ResourceName where
     fromString = ResourceName
+
+instance Monoid ResourceName where
+    mempty = ""
+    mappend (ResourceName s1) (ResourceName s2) = ResourceName $ s1 ++ s2

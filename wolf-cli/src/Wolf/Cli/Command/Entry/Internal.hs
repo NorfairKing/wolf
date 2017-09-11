@@ -65,9 +65,9 @@ reconstructPersonEntry now old new =
                  -> go oldValue value
     go _ r = fillWithNow r
 
-parseFirstnameLastname :: Text -> Maybe (Text, Text)
+parseFirstnameLastname :: Alias -> Maybe (Text, Text)
 parseFirstnameLastname s =
-    case T.words s of
+    case T.words $ aliasText s of
         [fn, ln] -> Just (fn, ln)
         _ -> Nothing
 

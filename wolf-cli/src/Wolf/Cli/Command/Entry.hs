@@ -10,7 +10,6 @@ module Wolf.Cli.Command.Entry
 import Import
 
 import qualified Data.ByteString as SB
-import qualified Data.Text as T
 import Data.Time
 
 import Wolf.Cli.Command.Entry.Internal
@@ -20,7 +19,7 @@ import Wolf.Cli.Utils
 import Wolf.Data
 import Wolf.Data.Git
 
-entry :: (MonadIO m, MonadReader Settings m) => Text -> m ()
+entry :: (MonadIO m, MonadReader Settings m) => Alias -> m ()
 entry person =
     runData $
     withInitCheck $ do
@@ -82,5 +81,5 @@ entry person =
                                     makeGitCommit $
                                         unwords
                                             [ "Added/changed entry for"
-                                            , T.unpack person
+                                            , aliasString person
                                             ]

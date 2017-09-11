@@ -19,6 +19,8 @@ import Graphics.Vty as V
 import Wolf.Data
 import Wolf.Data.Time
 
+import Wolf.Cub.PropertyEditor
+import Wolf.Cub.SearchBox
 import Wolf.Cub.Types
 
 drawUI :: CubState -> [Widget ResourceName]
@@ -26,6 +28,7 @@ drawUI CubState {..} =
     case cubStateShown of
         CubShowPersonList l -> drawPersonList l
         CubShowPerson ps -> drawPerson cubStateNow ps
+        CubEditPerson eps -> drawEditPerson eps
 
 drawPersonList :: PersonListState -> [Widget ResourceName]
 drawPersonList PersonListState {..} =
@@ -33,9 +36,12 @@ drawPersonList PersonListState {..} =
   where
     listUi =
         borderWithLabel (txt "[Wolf Cub]") $
-        renderList renderElement True personListStatePeople
-    renderElement :: Bool -> (Text, PersonUuid) -> Widget ResourceName
-    renderElement _ (name, _) = padLeftRight 1 $ txt name
+        renderList renderElement True personListStatePeopleList <=>
+        case personListStateSearchBox of
+            Nothing -> emptyWidget
+            Just sb -> renderSearchBox sb
+    renderElement :: Bool -> (Alias, PersonUuid) -> Widget ResourceName
+    renderElement _ (name, _) = padLeftRight 1 $ txt $ aliasText name
     helpUI =
         centerLayer $
         borderWithLabel (txt "[Help]") $ vBox $ map txt ["q: Exit", "h: Help"]
@@ -88,6 +94,13 @@ personEntryWidget now pe = go $ personEntryProperties pe
                    (PVal _) -> leftSide <+> go v
                    _ -> leftSide <=> padLeft (Pad 2) (go v)
 
+drawEditPerson :: EditPersonState -> [Widget ResourceName]
+drawEditPerson eps = [editUi]
+  where
+    editUi =
+        borderWithLabel (txt "[Edit]") $
+        renderPropertyEditor $ editPersonStatePropertyEditor eps
+
 headerAttr :: AttrName
 headerAttr = "header"
 
@@ -109,4 +122,6 @@ theMap =
         , (entryKeyAttr, fg V.yellow)
         , (entryValueAttr, fg V.white)
         , (entryLastUpdatedAttr, currentAttr)
+        , (propertyEditorAttr, fg V.white)
+        , (propertyEditorAttrSelected, fg V.yellow)
         ]

@@ -6,6 +6,8 @@ import TestImport
 
 import Wolf.API
 
+import Wolf.Data.Index.Types.Gen ()
+import Wolf.Data.People.Types.Gen ()
 import Wolf.Data.Types.Gen ()
 
 instance GenUnchecked SetPersonAlias

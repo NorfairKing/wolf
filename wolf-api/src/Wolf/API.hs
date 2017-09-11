@@ -182,14 +182,14 @@ type PostNewPerson
      = Protected :> "person" :> "new" :> ReqBody '[ JSON] PersonEntry :> Post '[ JSON] PersonUuid
 
 type GetPersonByAlias
-     = Protected :> "person" :> "by-alias" :> ReqBody '[ JSON] Text :> Get '[ JSON] PersonUuid
+     = Protected :> "person" :> "by-alias" :> ReqBody '[ JSON] Alias :> Get '[ JSON] PersonUuid
 
 type PostPersonSetAlias
      = Protected :> "person" :> "alias" :> ReqBody '[ JSON] SetPersonAlias :> Post '[ JSON] ()
 
 data SetPersonAlias = SetPersonAlias
     { setPersonAliasPersonUuid :: PersonUuid
-    , setPersonAliasAlias :: Text
+    , setPersonAliasAlias :: Alias
     } deriving (Show, Eq, Generic)
 
 instance Validity SetPersonAlias

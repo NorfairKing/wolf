@@ -33,6 +33,7 @@ import Wolf.Data.JSONUtils
 import Wolf.Data.Note
 import Wolf.Data.NoteIndex.Types
 import Wolf.Data.Path
+import Wolf.Data.People.Types
 import Wolf.Data.Types
 
 -- | Add a note uuid to a note index

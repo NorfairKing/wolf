@@ -17,6 +17,7 @@ library
         Wolf.Data.Entry.Types
         Wolf.Data.Git
         Wolf.Data.Index
+        Wolf.Data.Index.Types
         Wolf.Data.Init
         Wolf.Data.JSONUtils
         Wolf.Data.Note
@@ -24,6 +25,10 @@ library
         Wolf.Data.NoteIndex
         Wolf.Data.NoteIndex.Types
         Wolf.Data.Path
+        Wolf.Data.People
+        Wolf.Data.People.Types
+        Wolf.Data.Suggestion
+        Wolf.Data.Suggestion.Types
         Wolf.Data.Time
         Wolf.Data.Types
     build-depends:
@@ -32,6 +37,7 @@ library
         aeson-pretty >=0.8 && <0.9,
         bytestring >=0.10 && <0.11,
         containers >=0.5 && <0.6,
+        filepath >=1.4 && <1.5,
         mtl >=2.2 && <2.3,
         path >=0.5 && <0.6,
         path-io >=1.2 && <1.3,
@@ -39,12 +45,12 @@ library
         servant-server >=0.9 && <0.10,
         text >=1.2 && <1.3,
         time >=1.6 && <1.7,
+        unordered-containers >=0.2 && <0.3,
         validity >=0.3 && <0.4,
         validity-containers >=0.1 && <0.2,
         validity-path >=0.1 && <0.2,
         validity-text >=0.1 && <0.2,
         validity-time >=0.0 && <0.1,
-        unordered-containers >=0.2 && <0.3,
         uuid >=1.3 && <1.4
     default-language: Haskell2010
     default-extensions: NoImplicitPrelude

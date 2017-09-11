@@ -11,12 +11,21 @@ module Wolf.Data
     , personUuidText
     , personUuidString
     , nextRandomPersonUuid
+    , getPersonUuids
+    , Alias
+    , alias
+    , aliasText
+    , aliasString
     , Index
     , indexMap
     , indexKeys
     , indexTuples
     , lookupInIndex
+    , reverseIndexLookup
+    , reverseIndexLookupSingleAlias
     , addIndexEntry
+    , createNewPerson
+    , addAliases
     , lookupOrCreateNewPerson
     , getIndex
     , getIndexWithDefault
@@ -27,7 +36,9 @@ module Wolf.Data
     , personEntryProperties
     , newPersonEntry
     , PersonProperty(..)
+    , sameValues
     , PersonPropertyValue(..)
+    , sameContents
     , getPersonEntry
     , putPersonEntry
     -- * Notes
@@ -55,6 +66,15 @@ module Wolf.Data
     , createNewNoteUuid
     , readNote
     , writeNote
+    -- * Suggestions
+    , Suggestion(..)
+    , EntrySuggestion(..)
+    , sameEntrySuggestionData
+    , sameEntrySuggestion
+    , readPersonEntrySuggestions
+    , addPersonEntrySuggestions
+    , readUsedPersonEntrySuggestions
+    , recordUsedPersonEntrySuggestions
     ) where
 
 import Wolf.Data.Entry
@@ -62,4 +82,6 @@ import Wolf.Data.Index
 import Wolf.Data.Init
 import Wolf.Data.Note
 import Wolf.Data.NoteIndex
+import Wolf.Data.People
+import Wolf.Data.Suggestion
 import Wolf.Data.Types
