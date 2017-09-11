@@ -5,6 +5,7 @@ module Wolf.Cli.Command.Note where
 
 import Import
 
+import qualified Data.Set as S
 import qualified Data.Text.IO as T
 import Data.Time
 
@@ -40,7 +41,7 @@ note people =
                         Note
                         { noteContents = contents
                         , noteTimestamp = now
-                        , noteRelevantPeople = peopleUuids
+                        , noteRelevantPeople = S.fromList peopleUuids
                         }
                 putIndex index
                 noteUuid <- createNewNote n

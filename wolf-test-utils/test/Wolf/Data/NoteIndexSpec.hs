@@ -70,7 +70,7 @@ spec =
                             flip runReaderT sets $ do
                                 nid <- createNewNote note
                                 pnis <-
-                                    forM (noteRelevantPeople note) $ \personUuid ->
+                                    forM (toList $ noteRelevantPeople note) $ \personUuid ->
                                         (,) personUuid <$>
                                         getPersonNoteIndex personUuid
                                 pure (nid, pnis)

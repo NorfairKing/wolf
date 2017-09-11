@@ -107,7 +107,7 @@ createNewNote :: (MonadIO m, MonadReader DataSettings m) => Note -> m NoteUuid
 createNewNote n = do
     gni <- getNoteIndex
     pniTups <-
-        forM (noteRelevantPeople n) $ \personUuid ->
+        forM (toList $ noteRelevantPeople n) $ \personUuid ->
             (,) personUuid <$> getPersonNoteIndex personUuid
     go gni pniTups
   where
