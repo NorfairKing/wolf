@@ -30,7 +30,7 @@ clientPostRegister = accountClient
 
 clientGetPersonEntry :: BasicAuthData -> PersonUuid -> ClientM PersonEntry
 clientPostNewPerson :: BasicAuthData -> PersonEntry -> ClientM PersonUuid
-clientGetPersonByAlias :: BasicAuthData -> Text -> ClientM PersonUuid
+clientGetPersonByAlias :: BasicAuthData -> Alias -> ClientM PersonUuid
 clientPostSetPersonAlias :: BasicAuthData -> SetPersonAlias -> ClientM ()
 clientGetPersonQuery :: BasicAuthData -> PersonQuery -> ClientM [PersonUuid]
 clientGetPersonEntry :<|> clientPostNewPerson :<|> clientGetPersonByAlias :<|> clientPostSetPersonAlias :<|> clientGetPersonQuery =

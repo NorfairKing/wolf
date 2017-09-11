@@ -97,7 +97,10 @@ possiblyMultipleAt key pe =
     onValue _ = Nothing
 
 adaptToPerson ::
-       [Text] -> PersonEntry -> PersonContext -> Maybe ([Text], PersonProperty)
+       [Alias]
+    -> PersonEntry
+    -> PersonContext
+    -> Maybe ([Alias], PersonProperty)
 adaptToPerson aliases pe pc =
     case personContextEntry pc of
         Nothing -> Just (aliases, pp1)

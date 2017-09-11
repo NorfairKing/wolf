@@ -80,10 +80,7 @@ addAliases aliases uuid origIndex =
     if any (isJust . (`lookupInIndex` origIndex)) aliases
         then Nothing
         else let index =
-                     foldl
-                         (\ix alias -> addIndexEntry alias uuid ix)
-                         origIndex
-                         aliases
+                     foldl (\ix a -> addIndexEntry a uuid ix) origIndex aliases
              in Just index
 
 -- | Look up a `PersonUuid` in the 'Index' by its alias

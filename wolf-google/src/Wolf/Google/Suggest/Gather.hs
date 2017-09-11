@@ -7,6 +7,8 @@ import Lens.Micro
 
 import Network.Google.People
 
+import Wolf.Data
+
 import Wolf.Google.Suggest.Types
 
 gatherData :: Person -> GatheredPerson
@@ -18,12 +20,12 @@ gatherData p =
     , gatheredPersonPhoneNumbers = gatherPhoneNumbers p
     }
 
-gatherAliases :: Person -> [Text]
+gatherAliases :: Person -> [Alias]
 gatherAliases p =
     flip mapMaybe (p ^. perNames) $ \n -> do
         firstName <- n ^. nGivenName
         lastName <- n ^. nFamilyName
-        pure $ T.unwords [firstName, lastName]
+        pure $ alias $ T.unwords [firstName, lastName]
 
 gatherNames :: Person -> [GatheredName]
 gatherNames p =

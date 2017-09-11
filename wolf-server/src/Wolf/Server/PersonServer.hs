@@ -9,7 +9,6 @@ module Wolf.Server.PersonServer
 import Import
 
 import qualified Data.ByteString.Lazy as LB
-import Data.Text (Text)
 import qualified Data.Text.Encoding as TE
 
 import Control.Monad.Except
@@ -57,8 +56,8 @@ serveGetPersonByAlias acc key = do
             throwError $
             err404
             { errBody =
-                  "Person uuid for person with key " <>
-                  LB.fromStrict (TE.encodeUtf8 key) <>
+                  "Person uuid for person with alias " <>
+                  LB.fromStrict (TE.encodeUtf8 $ aliasText key) <>
                   " not found."
             }
         Just personUuid -> pure personUuid

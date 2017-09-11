@@ -5,7 +5,6 @@
 module Wolf.Data.Index.Types
     ( Alias(..)
     , alias
-    , aliasText
     , aliasString
     , Index(..)
     , newIndex

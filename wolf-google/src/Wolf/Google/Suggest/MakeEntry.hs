@@ -14,7 +14,7 @@ import Wolf.Data
 
 import Wolf.Google.Suggest.Types
 
-makeSuggestionProperty :: UTCTime -> GatheredPerson -> ([Text], PersonProperty)
+makeSuggestionProperty :: UTCTime -> GatheredPerson -> ([Alias], PersonProperty)
 makeSuggestionProperty now = suggestionProperty now . deduplicateGathering
 
 deduplicateGathering :: GatheredPerson -> GatheredPerson
@@ -26,11 +26,11 @@ deduplicateGathering GatheredPerson {..} =
     , gatheredPersonPhoneNumbers = nub gatheredPersonPhoneNumbers
     }
 
-suggestionProperty :: UTCTime -> GatheredPerson -> ([Text], PersonProperty)
+suggestionProperty :: UTCTime -> GatheredPerson -> ([Alias], PersonProperty)
 suggestionProperty now GatheredPerson {..} = (aliases, PMap $ ns ++ es ++ ps)
   where
     aliases =
-        nub $
+        map alias $
         flip mapMaybe gatheredPersonNames $ \GatheredName {..} ->
             fmap (\(fn, ln) -> T.unwords [fn, ln]) $
             (,) <$> gatheredNameFirstName <*> gatheredNameLastName

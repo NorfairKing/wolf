@@ -9,7 +9,7 @@ import Data.Aeson as JSON
 import Wolf.Data
 
 data GatheredPerson = GatheredPerson
-    { gatheredPersonAliases :: [Text]
+    { gatheredPersonAliases :: [Alias]
     , gatheredPersonNames :: [GatheredName]
     , gatheredPersonEmails :: [Text]
     , gatheredPersonPhoneNumbers :: [Text]
@@ -33,7 +33,7 @@ instance ToJSON GatheredName
 
 data PersonContext = PersonContext
     { personContextUuid :: PersonUuid
-    , personContextAliases :: [Text]
+    , personContextAliases :: [Alias]
     , personContextEntry :: Maybe PersonEntry
     } deriving (Show, Eq, Generic)
 
