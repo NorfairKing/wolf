@@ -35,13 +35,12 @@ review =
                 flip map entries $ \(nickName, personNote) ->
                     unlinesReport
                         [ colored [SetColor Foreground Dull Blue] $
-                          unwords
-                              [ aliasString nickName ++ ","
-                              , T.unpack $
-                                formatMomentNicely
+                          T.unwords
+                              [ aliasText nickName <> ","
+                              , formatMomentNicely
                                     now
                                     (noteTimestamp personNote)
                               ]
-                        , stringReport $ T.unpack $ noteContents personNote
+                        , textReport $ noteContents personNote
                         ]
-        liftIO $ putStr $ renderReport report
+        liftIO $ putReport report

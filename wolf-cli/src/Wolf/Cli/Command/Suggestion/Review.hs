@@ -145,10 +145,10 @@ showData s@Suggestion {..} = do
                 pure $
                     unlinesReport $
                     [ white "Relevant person:"
-                    , stringReport $
+                    , textReport $
                       case relevantAliases of
                           [] -> "No alias found for this person."
-                          (a:_) -> aliasString a
+                          (a:_) -> aliasText a
                     , "Score: " <> stringReport (show score)
                     ] ++
                     let yellow = colored [SetColor Foreground Dull Yellow]
@@ -159,10 +159,11 @@ showData s@Suggestion {..} = do
                                , case TE.decodeUtf8' $
                                       tmpEntryFileContents entry of
                                      Left err ->
-                                         colored [SetColor Foreground Dull Red] $
-                                         "Failed to decode entry UTF8 to Text: " ++
+                                         coloredString
+                                             [SetColor Foreground Dull Red] $
+                                         "Failed to decode entry UTF8 to Text: " <>
                                          show err
-                                     Right r -> stringReport $ T.unpack r
+                                     Right r -> textReport r
                                ]
     let infoReport =
             unlinesReport
@@ -170,7 +171,7 @@ showData s@Suggestion {..} = do
                 , renderSuggestion renderEntrySuggestion s
                 , relevantPersonReport
                 ]
-    liftIO $ putStr $ renderReport infoReport
+    liftIO $ putReport infoReport
 
 promptAboutAliases ::
        (MonadIO m, MonadReader Settings m) => [Alias] -> m [Alias]

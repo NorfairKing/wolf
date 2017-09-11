@@ -41,7 +41,7 @@ printSummaryReportFor ::
        (MonadReader DataSettings m, MonadIO m) => PersonUuid -> m ()
 printSummaryReportFor personUuid = do
     sr <- summaryReportFor personUuid
-    liftIO $ putStr $ renderReport $ summaryReportReport sr
+    liftIO $ putReport $ summaryReportReport sr
 
 summaryReportFor ::
        (MonadReader DataSettings m, MonadIO m) => PersonUuid -> m SummaryReport
@@ -81,21 +81,13 @@ summaryReportReport SummaryReport {..} =
           flip map summaryReportNotes $ \pn ->
               unlinesReport
                   [ colored [SetColor Foreground Dull Blue] $
-                    T.unpack $
                     formatMomentNicely summaryReportTimestamp (noteTimestamp pn) <>
                     ":"
-                  , fromString $ T.unpack $ noteContents pn
+                  , textReport $ noteContents pn
                   ]
         , case summaryReportPersonEntry of
               Nothing -> "No person entry."
               Just pe ->
                   fromString $
                   T.unpack $ TE.decodeUtf8 $ tmpEntryFileContents pe
-                  -- unlinesReport $
-                  -- flip map (personEntryTuples pe) $ \(prop, val) ->
-                  --     fromString $
-                  --     unwords
-                  --         [ T.unpack prop ++ ":"
-                  --         , T.unpack $ personPropertyValueContents val
-                  --         ]
         ]
