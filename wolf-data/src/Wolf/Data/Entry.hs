@@ -24,7 +24,6 @@ import Import
 
 import System.IO.Unsafe (unsafePerformIO)
 
-import Control.DeepSeq
 import Control.Exception (evaluate)
 import Control.Monad.Catch
 import Control.Monad.Trans.Resource

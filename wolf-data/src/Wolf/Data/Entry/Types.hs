@@ -38,6 +38,8 @@ sameProperties = sameValues `on` personEntryProperties
 -- | A 'PersonEntry' is valid if it does not have duplicate keys.
 instance Validity PersonEntry
 
+instance NFData PersonEntry
+
 instance FromJSON PersonEntry where
     parseJSON ob =
         (withObject "PersonEntry" $ \o -> do
@@ -79,6 +81,8 @@ instance Validity PersonProperty where
               in nub ls == ls
             ]
 
+instance NFData PersonProperty
+
 instance ToJSON PersonProperty where
     toJSON (PVal pv) = toJSON pv
     toJSON (PList pl) = toJSON pl
@@ -107,6 +111,8 @@ data PersonPropertyValue = PersonPropertyValue
     } deriving (Show, Eq, Ord, Generic)
 
 instance Validity PersonPropertyValue
+
+instance NFData PersonPropertyValue
 
 instance FromJSON PersonPropertyValue where
     parseJSON =

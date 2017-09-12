@@ -99,3 +99,18 @@ test-suite wolf-data-test
         Wolf.Data.SuggestionSpec
         Wolf.Data.TypesSpec
     ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
+
+benchmark wolf-data-bench
+    type: exitcode-stdio-1.0
+    main-is: Main.hs
+    build-depends:
+        base >=4.9 && <5,
+        QuickCheck -any,
+        criterion >=1.1 && <1.2,
+        deepseq >=1.4 && <1.5,
+        genvalidity -any,
+        wolf-data -any,
+        wolf-test-utils -any
+    default-language: Haskell2010
+    hs-source-dirs: bench
+    ghc-options: -rtsopts -with-rtsopts=-T -with-rtsopts=-M4G -Wall
