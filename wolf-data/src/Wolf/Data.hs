@@ -51,7 +51,7 @@ module Wolf.Data
     , deletePersonEntry
     -- * Notes
     , NoteUuid
-    , NoteIndex(..)
+    , NoteIndex
     , newNoteIndex
     , nextRandomNoteUuid
     , noteUuidText

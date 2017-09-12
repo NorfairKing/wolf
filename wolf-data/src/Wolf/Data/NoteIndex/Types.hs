@@ -6,13 +6,14 @@ module Wolf.Data.NoteIndex.Types where
 import Import
 
 import Data.Aeson as JSON
+import qualified Data.Set as S
 import Data.UUID as UUID
 import Data.UUID.V4 as UUID
 
 {-# ANN module ("HLint: ignore Use &&" :: Text) #-}
 
 newtype NoteIndex = NoteIndex
-    { noteIndexList :: [NoteUuid] -- TODO make this a set
+    { noteIndexSet :: Set NoteUuid
     } deriving (Show, Eq, Ord, Generic)
 
 instance Validity NoteIndex
@@ -22,14 +23,14 @@ instance FromJSON NoteIndex where
         (withObject "NoteIndex" $ \o -> NoteIndex <$> o .: "noteIndexList") ob -- TODO remove old JSON parsing
          <|>
         (withArray "NoteIndex" $ \a ->
-             (NoteIndex . toList) <$> traverse parseJSON a)
+             (NoteIndex . S.fromList . toList) <$> traverse parseJSON a)
             ob
 
 instance ToJSON NoteIndex where
-    toJSON = toJSON . noteIndexList
+    toJSON = toJSON . noteIndexSet
 
 newNoteIndex :: NoteIndex
-newNoteIndex = NoteIndex {noteIndexList = []}
+newNoteIndex = NoteIndex {noteIndexSet = S.empty}
 
 newtype NoteUuid = NoteUuid
     { unNoteUuid :: UUID

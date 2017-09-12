@@ -81,5 +81,5 @@ spec =
             it "generates a NoteUuid that was not in the index yet, but is now" $ \_ ->
                 forAll genValid $ \noteIndex -> do
                     (newUuid, newIndex) <- createNewNoteUuid noteIndex
-                    newUuid `shouldNotSatisfy` (`elem` noteIndexList noteIndex)
-                    newUuid `shouldSatisfy` (`elem` noteIndexList newIndex)
+                    newUuid `shouldNotSatisfy` containsNoteUuid noteIndex
+                    newUuid `shouldSatisfy` containsNoteUuid newIndex

@@ -1,7 +1,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 
 module Wolf.Data.NoteIndex
-    ( NoteIndex(..)
+    ( NoteIndex
     , newNoteIndex
     , NoteUuid
     , nextRandomNoteUuid
@@ -29,6 +29,8 @@ module Wolf.Data.NoteIndex
 
 import Import
 
+import qualified Data.Set as S
+
 import Wolf.Data.JSONUtils
 import Wolf.Data.Note
 import Wolf.Data.NoteIndex.Types
@@ -40,14 +42,14 @@ import Wolf.Data.Types
 --
 -- Nothing if the note uuid already existed in the index
 addToNoteIndex :: NoteIndex -> NoteUuid -> Maybe NoteIndex
-addToNoteIndex ni@(NoteIndex uuids) nuuid =
+addToNoteIndex ni nuuid =
     if ni `containsNoteUuid` nuuid
         then Nothing
-        else Just $ NoteIndex $ nuuid : uuids
+        else Just $ NoteIndex $ S.insert nuuid $ noteIndexSet ni
 
 -- | Check if a given note index contains a given note uuid
 containsNoteUuid :: NoteIndex -> NoteUuid -> Bool
-containsNoteUuid noteIndex noteUuid = noteUuid `elem` noteIndexList noteIndex
+containsNoteUuid noteIndex noteUuid = noteUuid `S.member` noteIndexSet noteIndex
 
 -- | Retrieve the global note index
 getNoteIndex :: (MonadIO m, MonadReader DataSettings m) => m NoteIndex
@@ -61,7 +63,7 @@ putNoteIndex noteIndex = do
 
 -- | Retrieve all note uuids
 getNoteUuids :: (MonadIO m, MonadReader DataSettings m) => m [NoteUuid]
-getNoteUuids = noteIndexList <$> getNoteIndex
+getNoteUuids = (toList . noteIndexSet) <$> getNoteIndex
 
 -- | Retrieve all notes
 getNotes :: (MonadIO m, MonadReader DataSettings m) => m [Note]
@@ -88,7 +90,8 @@ putPersonNoteIndex personUuid noteIndex = do
 -- | Get all notes' uuid's for a given person
 getPersonNoteUuids ::
        (MonadIO m, MonadReader DataSettings m) => PersonUuid -> m [NoteUuid]
-getPersonNoteUuids personUuid = noteIndexList <$> getPersonNoteIndex personUuid
+getPersonNoteUuids personUuid =
+    (toList . noteIndexSet) <$> getPersonNoteIndex personUuid
 
 -- | Retrieve all notes for a given person
 getPersonNotes ::
@@ -132,9 +135,6 @@ createNewNoteUuid ::
     -> m (NoteUuid, NoteIndex)
 createNewNoteUuid noteIndex = do
     noteUuid <- nextRandomNoteUuid
-    if noteIndex `containsNoteUuid` noteUuid
-        then createNewNoteUuid noteIndex -- Just try again
-        else pure
-                 ( noteUuid
-                 , noteIndex
-                   {noteIndexList = sort $ noteUuid : noteIndexList noteIndex})
+    case addToNoteIndex noteIndex noteUuid of
+        Nothing -> createNewNoteUuid noteIndex
+        Just newIndex -> pure (noteUuid, newIndex)
