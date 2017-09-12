@@ -10,7 +10,6 @@ import Import
 
 import qualified Data.ByteString as SB
 import qualified Data.Text as T
-import qualified Data.Text.Encoding as TE
 import qualified Data.Text.IO as T
 import Data.Time
 
@@ -19,9 +18,6 @@ import System.Console.ANSI as ANSI
 import Wolf.Data
 import Wolf.Data.Git
 
-import Wolf.Cli.Command.Entry.Internal
-       (ForEditor(..), parseEntryFileContents, reconstructPersonEntry,
-        tmpEntryFileContents)
 import Wolf.Cli.Command.Suggestion.Internal
        (renderEntrySuggestion, renderSuggestion)
 import Wolf.Cli.Editor
@@ -91,7 +87,7 @@ reviewSingle s = do
                                         "Unable to add this person, one of the chosen aliases was already asigned."
                                 Just (personUuid, index) -> do
                                     case mergedEntry of
-                                        Nothing -> pure ()
+                                        Nothing -> deletePersonEntry personUuid
                                         Just e -> putPersonEntry personUuid e
                                     putIndex index
                                     pure $
@@ -156,14 +152,7 @@ showData s@Suggestion {..} = do
                            Nothing -> [yellow "No entry found."]
                            Just entry ->
                                [ yellow "Entry: "
-                               , case TE.decodeUtf8' $
-                                      tmpEntryFileContents entry of
-                                     Left err ->
-                                         coloredString
-                                             [SetColor Foreground Dull Red] $
-                                         "Failed to decode entry UTF8 to Text: " <>
-                                         show err
-                                     Right r -> textReport r
+                               , textReport $ entryContents entry
                                ]
     let infoReport =
             unlinesReport
@@ -245,13 +234,7 @@ promptAboutEntry mEntry =
             liftIO $ T.putStrLn "The suggestion is to have no entry."
             pure Nothing
         Just entry -> do
-            liftIO $
-                case TE.decodeUtf8' $ tmpEntryFileContents entry of
-                    Left err ->
-                        T.putStrLn $
-                        "Failed to decode UTF8 Text in entry contents: " <>
-                        T.pack (show err)
-                    Right contents -> T.putStrLn contents
+            liftIO $ T.putStrLn $ entryContents entry
             yn <-
                 liftIO $
                 promptYesNo
@@ -262,32 +245,29 @@ promptAboutEntry mEntry =
                 No -> do
                     tef <- tmpEntryFile
                     liftIO $
-                        SB.writeFile (toFilePath tef) $
-                        tmpEntryFileContents entry
+                        SB.writeFile (toFilePath tef) $ entryContentsBS entry
                     er <- startEditorOn tef
                     case er of
                         EditingFailure err ->
                             liftIO $ die $ "Failed to edit; " <> T.unpack err
                         EditingSuccess -> do
                             contents <- liftIO $ SB.readFile $ toFilePath tef
-                            case parseEntryFileContents contents of
-                                Left err ->
+                            now <- liftIO getCurrentTime
+                            case updatePersonEntry now entry contents of
+                                UpdateParseFailure ype ->
                                     liftIO $
                                     die $
-                                    "Unable to parse entry file: " <> show err
-                                Right (ForEditor personEntryMap) -> do
-                                    now <- liftIO getCurrentTime
-                                    case reconstructPersonEntry
-                                             now
-                                             entry
-                                             personEntryMap of
-                                        Nothing ->
-                                            liftIO $
-                                            die $
-                                            unwords
-                                                [ "Failed to reconstruct a person entry: edit resulted in an invalid person entry"
-                                                ]
-                                        Just pe -> pure $ Just pe
+                                    "Unable to parse entry file: " <>
+                                    prettyPrintEntryParseException ype
+                                UpdateValidityFailure ->
+                                    liftIO $
+                                    die $
+                                    unwords
+                                        [ "Failed to reconstruct a person entry: edit resulted in an invalid person entry"
+                                        ]
+                                UpdateSuccess pe -> pure $ Just pe
+                                UpdateUnchanged -> pure $ Just entry
+                                UpdateWasDeletion -> pure Nothing
 
 tmpEntryFile :: MonadIO m => m (Path Abs File)
 tmpEntryFile = liftIO $ resolveFile' "/tmp/suggestion-entry.yaml"

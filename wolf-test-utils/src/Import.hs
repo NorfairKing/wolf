@@ -30,6 +30,7 @@ import Test.QuickCheck as X
 import Test.Validity as X
 import Test.Validity.Aeson as X
 
+import Data.GenValidity.ByteString as X ()
 import Data.GenValidity.Containers as X
 import Data.GenValidity.Path as X ()
 import Data.GenValidity.Text as X

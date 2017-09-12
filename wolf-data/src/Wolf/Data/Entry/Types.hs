@@ -6,6 +6,7 @@ module Wolf.Data.Entry.Types
     ( PersonEntry
     , personEntry
     , personEntryProperties
+    , sameProperties
     , newPersonEntry
     , PersonProperty(..)
     , sameValues
@@ -30,6 +31,9 @@ newtype PersonEntry = PersonEntry
 -- | Make a person entry, return 'Nothing' if it wouldn't be valid.
 personEntry :: PersonProperty -> Maybe PersonEntry
 personEntry = constructValid . PersonEntry
+
+sameProperties :: PersonEntry -> PersonEntry -> Bool
+sameProperties = sameValues `on` personEntryProperties
 
 -- | A 'PersonEntry' is valid if it does not have duplicate keys.
 instance Validity PersonEntry
@@ -56,7 +60,7 @@ instance ToJSON PersonEntry where
     toJSON PersonEntry {..} = object ["properties" .= personEntryProperties]
 
 newPersonEntry :: PersonEntry
-newPersonEntry = PersonEntry {personEntryProperties = PMap []}
+newPersonEntry = PersonEntry {personEntryProperties = PList []}
 
 data PersonProperty
     = PVal PersonPropertyValue

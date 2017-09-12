@@ -25,6 +25,7 @@ module Wolf.Data.Index
     -- ** Person Entry
     , getPersonEntry
     , putPersonEntry
+    , deletePersonEntry
     ) where
 
 import Import
@@ -133,3 +134,10 @@ putPersonEntry ::
 putPersonEntry personUuid pe = do
     pef <- personEntryFile personUuid
     writeJSON pef pe
+
+-- | Delete a person's entry by its 'PersonUuid'.
+deletePersonEntry ::
+       (MonadIO m, MonadReader DataSettings m) => PersonUuid -> m ()
+deletePersonEntry personUuid = do
+    pef <- personEntryFile personUuid
+    liftIO $ removeFile pef

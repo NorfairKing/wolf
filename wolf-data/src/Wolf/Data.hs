@@ -34,13 +34,21 @@ module Wolf.Data
     , PersonEntry
     , personEntry
     , personEntryProperties
+    , sameProperties
     , newPersonEntry
     , PersonProperty(..)
     , sameValues
     , PersonPropertyValue(..)
     , sameContents
+    , entryContents
+    , entryContentsBS
+    , updatePersonEntry
+    , UpdateResult(..)
+    , EntryParseException
+    , prettyPrintEntryParseException
     , getPersonEntry
     , putPersonEntry
+    , deletePersonEntry
     -- * Notes
     , NoteUuid
     , NoteIndex(..)

@@ -4,7 +4,6 @@
 
 module Wolf.Cli.Command.Entry
     ( entry
-    , tmpEntryFileContents
     ) where
 
 import Import
@@ -44,8 +43,9 @@ entry person =
                                     ]
                 Just pe -> pure (pe, pe)
         ensureDir $ parent tmpFile
-        let tmpFileContents = tmpEntryFileContents inFilePersonEntry
-        liftIO $ SB.writeFile (toFilePath tmpFile) tmpFileContents
+        liftIO $
+            SB.writeFile (toFilePath tmpFile) $
+            entryContentsBS inFilePersonEntry
         editResult <- startEditorOn tmpFile
         case editResult of
             EditingFailure reason ->
@@ -58,28 +58,24 @@ entry person =
                     ]
             EditingSuccess -> do
                 contents <- liftIO $ SB.readFile $ toFilePath tmpFile
-                case parseEntryFileContents contents of
-                    Left err ->
+                now <- liftIO getCurrentTime
+                case updatePersonEntry now origPersonEntry contents of
+                    UpdateParseFailure ype ->
                         liftIO $
-                        die $ "Unable to parse entry file: " <> show err
-                    Right (ForEditor personEntryMap) -> do
-                        now <- liftIO getCurrentTime
-                        case reconstructPersonEntry
-                                 now
-                                 origPersonEntry
-                                 personEntryMap of
-                            Nothing ->
-                                liftIO $
-                                die $
-                                unwords
-                                    [ "Failed to reconstruct a person entry: edit resulted in an invalid person entry"
-                                    ]
-                            Just pe ->
-                                unless (pe == origPersonEntry) $ do
-                                    putPersonEntry personUuid pe
-                                    putIndex index
-                                    makeGitCommit $
-                                        unwords
-                                            [ "Added/changed entry for"
-                                            , aliasString person
-                                            ]
+                        die $
+                        "Unable to parse entry file:\n" ++
+                        prettyPrintEntryParseException ype
+                    UpdateValidityFailure ->
+                        liftIO $
+                        die
+                            "Unable to reconstruct entry after update: Invalid entry."
+                    UpdateUnchanged ->
+                        liftIO $ putStrLn "Entry was not changed."
+                    UpdateSuccess pe -> do
+                        putPersonEntry personUuid pe
+                        putIndex index
+                        makeGitCommit $
+                            unwords
+                                ["Added/changed entry for", aliasString person]
+                    UpdateWasDeletion ->
+                        liftIO $ putStrLn "Empty entry will not be saved."
