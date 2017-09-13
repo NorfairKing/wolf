@@ -2,9 +2,10 @@ module Wolf.Data
     ( DataSettings(..)
     -- * Init
     , InitData(..)
-    , getInitData
+    , readInitData
     , initWolf
     , withInitCheck
+    , withInitCheck_
     -- * Global index
     , PersonUuid
     , personUuidLBs
@@ -83,9 +84,14 @@ module Wolf.Data
     , addPersonEntrySuggestions
     , readUsedPersonEntrySuggestions
     , recordUsedPersonEntrySuggestions
+    -- * Export
+    , Export
+    , exportInitData
+    , export
     ) where
 
 import Wolf.Data.Entry
+import Wolf.Data.Export
 import Wolf.Data.Index
 import Wolf.Data.Init
 import Wolf.Data.Note
