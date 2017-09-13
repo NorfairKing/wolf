@@ -1,12 +1,22 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE RecordWildCards #-}
 
-module Wolf.Data.Init where
+module Wolf.Data.Init
+    ( InitData
+    , initDataDir
+    , initTimestamp
+    , initWolf
+    , getInitData
+    , writeInitData
+    , genInitData
+    , withInitCheck
+    ) where
 
 import Import
 
 import Data.Time
 
+import Wolf.Data.Init.Types
 import Wolf.Data.JSONUtils
 import Wolf.Data.Path
 import Wolf.Data.Types

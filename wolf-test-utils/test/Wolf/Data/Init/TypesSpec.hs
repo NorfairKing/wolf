@@ -1,6 +1,6 @@
 {-# LANGUAGE TypeApplications #-}
 
-module Wolf.Data.TypesSpec
+module Wolf.Data.Init.TypesSpec
     ( spec
     ) where
 
@@ -12,6 +12,6 @@ import Wolf.Data.Gen ()
 
 spec :: Spec
 spec = do
-    eqSpec @DataSettings
-    genValidSpec @DataSettings
-    jsonSpecOnValid @DataSettings
+    eqSpec @InitData
+    genValidSpec @InitData
+    jsonSpecOnValid @InitData

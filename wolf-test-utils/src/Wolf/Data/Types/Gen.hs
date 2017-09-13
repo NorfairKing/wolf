@@ -6,6 +6,6 @@ import Import
 
 import Wolf.Data.Types
 
-instance GenUnchecked InitData
+instance GenUnchecked DataSettings
 
-instance GenValid InitData
+instance GenValid DataSettings
