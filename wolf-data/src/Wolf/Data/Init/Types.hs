@@ -21,8 +21,9 @@ instance Validity InitData
 instance FromJSON InitData where
     parseJSON =
         withObject "InitData" $ \o ->
-            InitData <$> o .: "initDataDir" <*> o .: "initTimestamp"
+            InitData <$> (o .: "initDataDir" <|> o .: "data-dir") <*>
+            (o .: "initTimestamp" <|> o .: "timestamp")
 
 instance ToJSON InitData where
     toJSON InitData {..} =
-        object ["initDataDir" .= initDataDir, "initTimestamp" .= initTimestamp]
+        object ["data-dir" .= initDataDir, "timestamp" .= initTimestamp]
