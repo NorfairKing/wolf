@@ -10,4 +10,4 @@ import Wolf.Data.Git
 import Wolf.Data.Init
 
 git :: (MonadReader Settings m, MonadIO m) => [String] -> m ()
-git = runData . withInitCheck . runGit
+git = runData . withInitCheck_ . runGit

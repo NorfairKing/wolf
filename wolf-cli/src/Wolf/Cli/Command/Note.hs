@@ -18,7 +18,7 @@ import Wolf.Data.Git
 note :: (MonadIO m, MonadReader Settings m) => [Alias] -> m ()
 note people =
     runData $
-    withInitCheck $ do
+    withInitCheck_ $ do
         origIndex <- getIndexWithDefault
         tnf <- tmpNoteFile
         liftIO $ ignoringAbsence $ removeFile tnf

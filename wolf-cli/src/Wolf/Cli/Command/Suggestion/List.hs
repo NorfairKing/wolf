@@ -14,6 +14,8 @@ import Wolf.Cli.Report
 import Wolf.Cli.Utils
 
 listSuggestions :: (MonadIO m, MonadReader Settings m) => m ()
-listSuggestions = do
-    sugs <- runData readPersonEntrySuggestions
-    liftIO $ mapM_ (putReport . renderSuggestion renderEntrySuggestion) sugs
+listSuggestions =
+    runData $
+    withInitCheck_ $ do
+        sugs <- readPersonEntrySuggestions
+        liftIO $ mapM_ (putReport . renderSuggestion renderEntrySuggestion) sugs

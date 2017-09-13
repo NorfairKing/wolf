@@ -106,6 +106,7 @@ getPersonNotes personUuid = do
 -- - Generating a new UUID
 -- - Adding the note uuid to the global note index
 -- - Adding the note uuid to the right people's note indices
+-- - Writing the note to a file
 createNewNote :: (MonadIO m, MonadReader DataSettings m) => Note -> m NoteUuid
 createNewNote n = do
     gni <- getNoteIndex

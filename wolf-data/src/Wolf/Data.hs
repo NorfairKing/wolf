@@ -87,6 +87,7 @@ module Wolf.Data
     -- * Export
     , Export
     , exportInitData
+    , exportPersonIndex
     , export
     ) where
 

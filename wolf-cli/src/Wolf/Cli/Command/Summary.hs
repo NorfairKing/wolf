@@ -26,7 +26,7 @@ import Wolf.Data.Time
 summary :: (MonadIO m, MonadReader Settings m) => Alias -> m ()
 summary person =
     runData $
-    withInitCheck $ do
+    withInitCheck_ $ do
         index <- getIndexWithDefault
         case lookupInIndex person index of
             Nothing ->

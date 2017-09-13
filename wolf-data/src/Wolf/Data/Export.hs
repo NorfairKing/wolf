@@ -3,12 +3,14 @@
 module Wolf.Data.Export
     ( Export
     , exportInitData
+    , exportPersonIndex
     , export
     ) where
 
 import Import
 
 import Wolf.Data.Export.Types
+import Wolf.Data.Index
 import Wolf.Data.Init
 import Wolf.Data.Types
 
@@ -18,4 +20,6 @@ export = do
     case mid of
         Nothing -> pure Nothing
         Just initData -> do
-            pure $ Just Export {exportInitData = initData}
+            mi <- getIndex
+            pure $
+                Just Export {exportInitData = initData, exportPersonIndex = mi}

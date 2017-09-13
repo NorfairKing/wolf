@@ -18,7 +18,7 @@ import Wolf.Data
 randomPerson :: (MonadIO m, MonadReader Settings m) => m ()
 randomPerson =
     runData $
-    withInitCheck $ do
+    withInitCheck_ $ do
         index <- getIndexWithDefault
         let es = M.elems $ indexMap index
         el <- liftIO $ randomRIO (0, length es - 1)
