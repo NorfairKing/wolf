@@ -8,4 +8,5 @@ import Wolf.Data.Init.Types
 
 instance GenUnchecked InitData
 
-instance GenValid InitData
+instance GenValid InitData where
+    genValid = InitData <$> genValid <*> genValid
