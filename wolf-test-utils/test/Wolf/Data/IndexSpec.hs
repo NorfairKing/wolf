@@ -6,8 +6,7 @@ import TestImport
 
 import Wolf.Data.Index
 
-import Wolf.Data.Entry.Types.Gen ()
-import Wolf.Data.Index.Types.Gen ()
+import Wolf.Data.Gen ()
 import Wolf.Data.TestUtils
 
 spec :: Spec
