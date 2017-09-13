@@ -30,6 +30,7 @@ main =
         , genValidBench @NoteUuid
         , genValidBench @Note
         , genValidBench @(Suggestion EntrySuggestion)
+        , genValidBench @Export
         ]
 
 genValidBench ::

@@ -1,6 +1,7 @@
 module Wolf.Data.Gen where
 
 import Wolf.Data.Entry.Types.Gen ()
+import Wolf.Data.Export.Types.Gen ()
 import Wolf.Data.Index.Types.Gen ()
 import Wolf.Data.Init.Types.Gen ()
 import Wolf.Data.Note.Types.Gen ()

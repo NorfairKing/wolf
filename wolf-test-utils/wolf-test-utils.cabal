@@ -13,6 +13,7 @@ author: Tom Sydney Kerckhove
 library
     exposed-modules:
         Wolf.Data.Entry.Types.Gen
+        Wolf.Data.Export.Types.Gen
         Wolf.Data.Index.Types.Gen
         Wolf.Data.Note.Types.Gen
         Wolf.Data.NoteIndex.Types.Gen
@@ -90,6 +91,8 @@ test-suite wolf-data-test
         TestImport
         Wolf.Data.Entry.TypesSpec
         Wolf.Data.EntrySpec
+        Wolf.Data.Export.TypesSpec
+        Wolf.Data.ExportSpec
         Wolf.Data.IndexSpec
         Wolf.Data.Index.TypesSpec
         Wolf.Data.Note.TypesSpec
