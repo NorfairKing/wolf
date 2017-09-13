@@ -10,8 +10,7 @@ import Wolf.Data
 import Wolf.Cli.Command.Note
 import Wolf.Cli.OptParse.Types
 
-import Wolf.Data.Index.Types.Gen ()
-import Wolf.Data.Types.Gen ()
+import Wolf.Data.Gen ()
 
 spec :: Spec
 spec =

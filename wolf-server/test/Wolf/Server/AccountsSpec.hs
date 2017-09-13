@@ -14,8 +14,7 @@ import Wolf.API
 import Wolf.Server.Accounts
 
 import Wolf.API.Gen ()
-import Wolf.Data.Entry.Types.Gen ()
-import Wolf.Data.Types.Gen ()
+import Wolf.Data.Gen ()
 
 import Wolf.Server.TestUtils
 

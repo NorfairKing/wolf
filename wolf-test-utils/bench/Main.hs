@@ -14,7 +14,7 @@ import Test.QuickCheck
 import Criterion.Main as Criterion
 
 import Wolf.Data
-import Wolf.Data.Entry.Types.Gen ()
+import Wolf.Data.Gen ()
 
 main :: IO ()
 main =

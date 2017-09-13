@@ -8,7 +8,7 @@ import TestImport
 
 import Wolf.Data.Suggestion.Types
 
-import Wolf.Data.Suggestion.Types.Gen ()
+import Wolf.Data.Gen ()
 
 spec :: Spec
 spec = do

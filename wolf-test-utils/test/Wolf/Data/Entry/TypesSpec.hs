@@ -8,7 +8,7 @@ import TestImport
 
 import Wolf.Data.Entry.Types
 
-import Wolf.Data.Entry.Types.Gen ()
+import Wolf.Data.Gen ()
 
 spec :: Spec
 spec = do

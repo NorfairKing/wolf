@@ -8,7 +8,7 @@ import qualified Data.Text.Encoding as TE
 
 import Wolf.Data.Entry
 
-import Wolf.Data.Entry.Types.Gen ()
+import Wolf.Data.Gen ()
 
 spec :: Spec
 spec = do

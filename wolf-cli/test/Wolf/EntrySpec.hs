@@ -13,9 +13,7 @@ import Wolf.Cli.Command.Entry
 import Wolf.Cli.OptParse.Types
 
 import Wolf.Command.Entry.Gen ()
-import Wolf.Data.Entry.Types.Gen ()
-import Wolf.Data.Index.Types.Gen ()
-import Wolf.Data.Types.Gen ()
+import Wolf.Data.Gen ()
 
 spec :: Spec
 spec =
