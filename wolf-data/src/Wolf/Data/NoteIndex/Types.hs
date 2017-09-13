@@ -18,6 +18,8 @@ newtype NoteIndex = NoteIndex
 
 instance Validity NoteIndex
 
+instance NFData NoteIndex
+
 instance FromJSON NoteIndex where
     parseJSON ob =
         (withObject "NoteIndex" $ \o -> NoteIndex <$> o .: "noteIndexList") ob -- TODO remove old JSON parsing
@@ -38,6 +40,8 @@ newtype NoteUuid = NoteUuid
 
 instance Validity NoteUuid where
     isValid = const True
+
+instance NFData NoteUuid
 
 instance FromJSON NoteUuid where
     parseJSON =

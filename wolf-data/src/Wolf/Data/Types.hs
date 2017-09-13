@@ -14,6 +14,8 @@ newtype DataSettings = DataSettings
 
 instance Validity DataSettings
 
+instance NFData DataSettings
+
 instance FromJSON DataSettings where
     parseJSON =
         withObject "DataSettings" $ \o -> DataSettings <$> o .: "wolf-data-dir"

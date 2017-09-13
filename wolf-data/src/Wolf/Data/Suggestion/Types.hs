@@ -25,6 +25,8 @@ data Suggestion a = Suggestion
 
 instance Validity a => Validity (Suggestion a)
 
+instance NFData a => NFData (Suggestion a)
+
 instance FromJSON a => FromJSON (Suggestion a) where
     parseJSON =
         withObject "Suggestion" $ \o ->
@@ -45,6 +47,8 @@ data EntrySuggestion = EntrySuggestion
     } deriving (Show, Eq, Generic)
 
 instance Validity EntrySuggestion
+
+instance NFData EntrySuggestion
 
 instance FromJSON EntrySuggestion where
     parseJSON =

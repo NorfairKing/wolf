@@ -49,6 +49,8 @@ parsePersonUuidString = fmap PersonUuid . UUID.fromString
 instance Validity PersonUuid where
     isValid = const True
 
+instance NFData PersonUuid
+
 instance FromJSON PersonUuid where
     parseJSON =
         withText "PersonUuid" $ \t ->

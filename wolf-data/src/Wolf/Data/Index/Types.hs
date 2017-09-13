@@ -34,6 +34,8 @@ instance IsString Alias where
 
 instance Validity Alias
 
+instance NFData Alias
+
 instance FromJSON Alias
 
 instance ToJSON Alias
@@ -43,6 +45,8 @@ newtype Index = Index
     } deriving (Show, Eq, Ord, Generic)
 
 instance Validity Index
+
+instance NFData Index
 
 instance FromJSON Index
 

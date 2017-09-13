@@ -19,9 +19,17 @@ import Wolf.Data.Gen ()
 main :: IO ()
 main =
     Criterion.defaultMain
-        [ genValidBench @PersonPropertyValue
+        [ genValidBench @DataSettings
+        , genValidBench @InitData
+        , genValidBench @PersonUuid
+        , genValidBench @Alias
+        , genValidBench @Index
+        , genValidBench @PersonPropertyValue
         , genValidBench @PersonProperty
         , genValidBench @PersonEntry
+        , genValidBench @NoteUuid
+        , genValidBench @Note
+        , genValidBench @(Suggestion EntrySuggestion)
         ]
 
 genValidBench ::

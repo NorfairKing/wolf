@@ -18,6 +18,8 @@ data InitData = InitData
 
 instance Validity InitData
 
+instance NFData InitData
+
 instance FromJSON InitData where
     parseJSON =
         withObject "InitData" $ \o ->

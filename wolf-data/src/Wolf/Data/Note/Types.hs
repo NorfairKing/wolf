@@ -20,6 +20,8 @@ data Note = Note
 
 instance Validity Note
 
+instance NFData Note
+
 instance FromJSON Note where
     parseJSON ob =
         (withObject "Note" $ \o ->
