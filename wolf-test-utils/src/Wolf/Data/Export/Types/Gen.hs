@@ -20,4 +20,5 @@ instance GenValid Export where
         Export <$> genValid <*> genValid <*> genValid <*> genValid <*> genValid <*>
         genValid <*>
         genValid <*>
+        genValid <*>
         genValid

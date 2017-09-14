@@ -25,6 +25,9 @@ export = do
         Just initData -> do
             mi <- getIndex
             people <- getPersonUuids
+            entries <-
+                mapMaybe (\(p, e) -> (,) p <$> e) <$>
+                mapM (\p -> (,) p <$> getPersonEntry p) people
             noteIndex <- getNoteIndex
             noteIxs <- mapM (\p -> (,) p <$> getPersonNoteIndex p) people
             notes <- getNotes
@@ -35,6 +38,7 @@ export = do
                     Export
                     { exportInitData = initData
                     , exportPersonIndex = mi
+                    , exportPersonEntries = entries
                     , exportPeople = people
                     , exportNoteIndex = noteIndex
                     , exportNoteIndices = noteIxs

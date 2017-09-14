@@ -10,6 +10,7 @@ import Import
 
 import Data.Aeson
 
+import Wolf.Data.Entry.Types
 import Wolf.Data.Index.Types
 import Wolf.Data.Init.Types
 import Wolf.Data.Note.Types
@@ -21,6 +22,7 @@ data Export = Export
     { exportInitData :: InitData
     , exportPersonIndex :: Maybe Index
     , exportPeople :: [PersonUuid]
+    , exportPersonEntries :: [(PersonUuid, PersonEntry)]
     , exportNoteIndex :: NoteIndex
     , exportNoteIndices :: [(PersonUuid, NoteIndex)]
     , exportNotes :: [Note]
@@ -37,6 +39,7 @@ instance FromJSON Export where
         withObject "Export" $ \o ->
             Export <$> o .: "init-data" <*> o .: "person-index" <*>
             o .: "people" <*>
+            o .: "person-entries" <*>
             o .: "note-index" <*>
             o .: "note-indices" <*>
             o .: "notes" <*>
@@ -49,6 +52,7 @@ instance ToJSON Export where
             [ "init-data" .= exportInitData
             , "person-index" .= exportPersonIndex
             , "people" .= exportPeople
+            , "person-entries" .= exportPersonEntries
             , "note-index" .= exportNoteIndex
             , "note-indices" .= exportNoteIndices
             , "notes" .= exportNotes
