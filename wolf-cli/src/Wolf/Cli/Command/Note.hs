@@ -48,7 +48,7 @@ note people =
                 makeGitCommit $
                     unwords
                         [ "Added note on"
-                        , show people
+                        , intercalate ", " $ map aliasString people
                         , "with uuid"
                         , noteUuidString noteUuid
                         ]
