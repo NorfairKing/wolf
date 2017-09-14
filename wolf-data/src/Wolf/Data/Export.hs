@@ -12,6 +12,7 @@ import Import
 import Wolf.Data.Export.Types
 import Wolf.Data.Index
 import Wolf.Data.Init
+import Wolf.Data.Note
 import Wolf.Data.NoteIndex
 import Wolf.Data.People
 import Wolf.Data.Suggestion
@@ -23,14 +24,17 @@ export = do
     case mid of
         Nothing -> pure Nothing
         Just initData -> do
-            mi <- getIndex
+            mi <- getIndexWithDefault
             people <- getPersonUuids
             entries <-
                 mapMaybe (\(p, e) -> (,) p <$> e) <$>
                 mapM (\p -> (,) p <$> getPersonEntry p) people
             noteIndex <- getNoteIndex
             noteIxs <- mapM (\p -> (,) p <$> getPersonNoteIndex p) people
-            notes <- getNotes
+            noteUuids <- getNoteUuids
+            notes <-
+                mapMaybe (\(p, e) -> (,) p <$> e) <$>
+                mapM (\uuid -> (,) uuid <$> readNote uuid) noteUuids
             entrySuggestions <- readPersonEntrySuggestions
             usedEntrySuggestions <- readUsedPersonEntrySuggestions
             pure $

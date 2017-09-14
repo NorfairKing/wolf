@@ -2,6 +2,7 @@
 
 module Wolf.Data.NoteIndex
     ( NoteIndex
+    , noteIndexSet
     , newNoteIndex
     , NoteUuid
     , nextRandomNoteUuid
@@ -10,6 +11,7 @@ module Wolf.Data.NoteIndex
     -- * Manipulating indices purely
     , addToNoteIndex
     , containsNoteUuid
+    , isSubNoteIndexOf
     -- * Manipulate the global note index
     , getNoteIndex
     , putNoteIndex
@@ -46,10 +48,6 @@ addToNoteIndex ni nuuid =
     if ni `containsNoteUuid` nuuid
         then Nothing
         else Just $ NoteIndex $ S.insert nuuid $ noteIndexSet ni
-
--- | Check if a given note index contains a given note uuid
-containsNoteUuid :: NoteIndex -> NoteUuid -> Bool
-containsNoteUuid noteIndex noteUuid = noteUuid `S.member` noteIndexSet noteIndex
 
 -- | Retrieve the global note index
 getNoteIndex :: (MonadIO m, MonadReader DataSettings m) => m NoteIndex

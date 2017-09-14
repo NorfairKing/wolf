@@ -53,12 +53,14 @@ module Wolf.Data
     -- * Notes
     , NoteUuid
     , NoteIndex
+    , noteIndexSet
     , newNoteIndex
     , nextRandomNoteUuid
     , noteUuidText
     , noteUuidString
     , addToNoteIndex
     , containsNoteUuid
+    , isSubNoteIndexOf
     -- ** Global note index
     , getNoteIndex
     , putNoteIndex

@@ -34,6 +34,13 @@ instance ToJSON NoteIndex where
 newNoteIndex :: NoteIndex
 newNoteIndex = NoteIndex {noteIndexSet = S.empty}
 
+-- | Check if a given note index contains a given note uuid
+containsNoteUuid :: NoteIndex -> NoteUuid -> Bool
+containsNoteUuid noteIndex noteUuid = noteUuid `S.member` noteIndexSet noteIndex
+
+isSubNoteIndexOf :: NoteIndex -> NoteIndex -> Bool
+isSubNoteIndexOf ni1 ni2 = all (containsNoteUuid ni2) (noteIndexSet ni1)
+
 newtype NoteUuid = NoteUuid
     { unNoteUuid :: UUID
     } deriving (Show, Eq, Ord, Generic)

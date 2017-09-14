@@ -7,11 +7,11 @@ import TestImport
 import Wolf.Data.Note
 import Wolf.Data.NoteIndex
 
-import Wolf.Data.Gen ()
+import Wolf.Data.Gen
 import Wolf.Data.TestUtils
 
 spec :: Spec
-spec =
+spec = do
     withDataSetsGen $ do
         describe "getNoteIndex" $
             it "retrieves the note index that was just written" $ \gen ->
@@ -75,9 +75,16 @@ spec =
                         forM_ pnis $ \(_, personNoteIndex) ->
                             personNoteIndex `shouldSatisfy`
                             (`containsNoteUuid` noteUuid)
-        describe "createNewNoteUuid" $
-            it "generates a NoteUuid that was not in the index yet, but is now" $ \_ ->
-                forAll genValid $ \noteIndex -> do
-                    (newUuid, newIndex) <- createNewNoteUuid noteIndex
-                    newUuid `shouldNotSatisfy` containsNoteUuid noteIndex
-                    newUuid `shouldSatisfy` containsNoteUuid newIndex
+    describe "createNewNoteUuid" $
+        it "generates a NoteUuid that was not in the index yet, but is now" $
+        forAll genValid $ \noteIndex -> do
+            (newUuid, newIndex) <- createNewNoteUuid noteIndex
+            newUuid `shouldNotSatisfy` containsNoteUuid noteIndex
+            newUuid `shouldSatisfy` containsNoteUuid newIndex
+    describe "subNoteIndex" $ do
+        it "generates valid note indices" $
+            forAll genValid $ genGeneratesValid . subNoteIndex
+        it "generates sub note indices" $
+            forAll genValid $ \ni ->
+                forAll (subNoteIndex ni) $ \sni ->
+                    sni `shouldSatisfy` (`isSubNoteIndexOf` ni)

@@ -9,6 +9,7 @@ module Wolf.Data.Export.Types
 import Import
 
 import Data.Aeson
+import qualified Data.Set as S
 
 import Wolf.Data.Entry.Types
 import Wolf.Data.Index.Types
@@ -20,17 +21,37 @@ import Wolf.Data.Suggestion.Types
 
 data Export = Export
     { exportInitData :: InitData
-    , exportPersonIndex :: Maybe Index
+    , exportPersonIndex :: Index
     , exportPeople :: [PersonUuid]
     , exportPersonEntries :: [(PersonUuid, PersonEntry)]
     , exportNoteIndex :: NoteIndex
     , exportNoteIndices :: [(PersonUuid, NoteIndex)]
-    , exportNotes :: [Note]
+    , exportNotes :: [(NoteUuid, Note)]
     , exportEntrySuggestions :: [Suggestion EntrySuggestion]
     , exportUsedEntrySuggestions :: [Suggestion EntrySuggestion]
     } deriving (Show, Eq, Generic)
 
-instance Validity Export
+instance Validity Export where
+    isValid Export {..} =
+        and
+            [ isValid exportInitData
+            , isValid exportPersonIndex
+            , isValid exportPeople
+            , isValid exportPersonEntries
+            , isValid exportNoteIndex
+            , isValid exportNoteIndices
+            , isValid exportNotes
+            , isValid exportEntrySuggestions
+            , isValid exportUsedEntrySuggestions
+            , all (`elem` exportPeople) $ indexMap exportPersonIndex
+            , all (`elem` exportPeople) $ map fst exportPersonEntries
+            , all (`elem` exportPeople) $ map fst exportNoteIndices
+            , S.fromList (map fst exportNotes) == noteIndexSet exportNoteIndex
+            , all (`isSubNoteIndexOf` exportNoteIndex) $
+              map snd exportNoteIndices
+            , null $
+              exportEntrySuggestions `intersect` exportUsedEntrySuggestions
+            ]
 
 instance NFData Export
 
