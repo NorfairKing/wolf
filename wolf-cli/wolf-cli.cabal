@@ -16,6 +16,7 @@ library
         Wolf.Cli.Command.Alias
         Wolf.Cli.Command.Entry
         Wolf.Cli.Command.Entry.Internal
+        Wolf.Cli.Command.Export
         Wolf.Cli.Command.Git
         Wolf.Cli.Command.Init
         Wolf.Cli.Command.Note

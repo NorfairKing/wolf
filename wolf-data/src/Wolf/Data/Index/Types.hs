@@ -21,7 +21,15 @@ import Wolf.Data.People.Types
 
 newtype Alias = Alias
     { aliasText :: Text
-    } deriving (Show, Eq, Ord, Generic, FromJSONKey, ToJSONKey)
+    } deriving ( Show
+               , Eq
+               , Ord
+               , Generic
+               , FromJSONKey
+               , ToJSONKey
+               , FromJSON
+               , ToJSON
+               )
 
 alias :: Text -> Alias
 alias = Alias
@@ -35,10 +43,6 @@ instance IsString Alias where
 instance Validity Alias
 
 instance NFData Alias
-
-instance FromJSON Alias
-
-instance ToJSON Alias
 
 newtype Index = Index
     { indexMap :: Map Alias PersonUuid
