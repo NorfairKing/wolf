@@ -5,7 +5,6 @@ module Wolf.Data.TestUtils
     ( runData
     , withDataSetsGen
     , ensureClearRepository
-    , setupRepo
     , assertRepoValid
     ) where
 
@@ -35,9 +34,6 @@ ensureClearRepository :: (MonadIO m, MonadReader DataSettings m) => m ()
 ensureClearRepository = do
     dd <- asks dataSetWolfDir
     liftIO $ ignoringAbsence $ removeDirRecur dd
-
-setupRepo :: (MonadIO m, MonadReader DataSettings m) => Export -> m ()
-setupRepo = importRepo -- TODO remove this
 
 assertRepoValid :: DataSettings -> IO ()
 assertRepoValid sets = do

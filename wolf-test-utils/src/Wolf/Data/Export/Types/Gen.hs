@@ -18,9 +18,9 @@ import Wolf.Data.NoteIndex.Types.Gen
 import Wolf.Data.People.Types.Gen ()
 import Wolf.Data.Suggestion.Types.Gen ()
 
-instance GenUnchecked Export
+instance GenUnchecked Repo
 
-instance GenValid Export where
+instance GenValid Repo where
     genValid = do
         eid <- genValid
         -- Any list of persons
@@ -61,14 +61,14 @@ instance GenValid Export where
         ees <- genValid
         eues <- genListOf $ genValid `suchThat` (`notElem` ees)
         pure
-            Export
-            { exportInitData = eid
-            , exportPersonIndex = epi
-            , exportPeople = eps
-            , exportPersonEntries = epes
-            , exportNoteIndex = eni
-            , exportNoteIndices = enis
-            , exportNotes = ens
-            , exportEntrySuggestions = ees
-            , exportUsedEntrySuggestions = eues
+            Repo
+            { repoInitData = eid
+            , repoPersonIndex = epi
+            , repoPeople = eps
+            , repoPersonEntries = epes
+            , repoNoteIndex = eni
+            , repoNoteIndices = enis
+            , repoNotes = ens
+            , repoEntrySuggestions = ees
+            , repoUsedEntrySuggestions = eues
             }

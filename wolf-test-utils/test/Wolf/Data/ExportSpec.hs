@@ -24,6 +24,6 @@ spec =
                 e `shouldBe` Nothing
         it "only generates valid exports when a repository has been initialised" $ \gen ->
             forAll gen $ \sets -> do
-                forAll genValid $ \export -> do
-                    runData sets $ setupRepo export
+                forAll genValid $ \repo -> do
+                    runData sets $ importRepo repo
                     assertRepoValid sets

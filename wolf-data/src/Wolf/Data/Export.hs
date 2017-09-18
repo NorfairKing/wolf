@@ -1,9 +1,9 @@
 {-# LANGUAGE FlexibleContexts #-}
 
 module Wolf.Data.Export
-    ( Export
-    , exportInitData
-    , exportPersonIndex
+    ( Repo
+    , repoInitData
+    , repoPersonIndex
     , exportRepo
     ) where
 
@@ -18,7 +18,7 @@ import Wolf.Data.People
 import Wolf.Data.Suggestion
 import Wolf.Data.Types
 
-exportRepo :: (MonadIO m, MonadReader DataSettings m) => m (Maybe Export)
+exportRepo :: (MonadIO m, MonadReader DataSettings m) => m (Maybe Repo)
 exportRepo = do
     mid <- readInitData
     case mid of
@@ -39,14 +39,14 @@ exportRepo = do
             usedEntrySuggestions <- readUsedPersonEntrySuggestions
             pure $
                 Just
-                    Export
-                    { exportInitData = initData
-                    , exportPersonIndex = mi
-                    , exportPersonEntries = entries
-                    , exportPeople = people
-                    , exportNoteIndex = noteIndex
-                    , exportNoteIndices = noteIxs
-                    , exportNotes = notes
-                    , exportEntrySuggestions = entrySuggestions
-                    , exportUsedEntrySuggestions = usedEntrySuggestions
+                    Repo
+                    { repoInitData = initData
+                    , repoPersonIndex = mi
+                    , repoPersonEntries = entries
+                    , repoPeople = people
+                    , repoNoteIndex = noteIndex
+                    , repoNoteIndices = noteIxs
+                    , repoNotes = notes
+                    , repoEntrySuggestions = entrySuggestions
+                    , repoUsedEntrySuggestions = usedEntrySuggestions
                     }

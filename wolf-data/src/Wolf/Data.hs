@@ -86,13 +86,12 @@ module Wolf.Data
     , addPersonEntrySuggestions
     , readUsedPersonEntrySuggestions
     , recordUsedPersonEntrySuggestions
-    -- * Export
-    , Export
-    , exportInitData
-    , exportPersonIndex
-    , exportRepo
-    -- * Import
+    -- * Import and Export
+    , Repo
+    , repoInitData
+    , repoPersonIndex
     , importRepo
+    , exportRepo
     ) where
 
 import Wolf.Data.Entry

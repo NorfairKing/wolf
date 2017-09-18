@@ -12,6 +12,6 @@ import Wolf.Data.Gen ()
 
 spec :: Spec
 spec = do
-    eqSpec @Export
-    genValidSpec @Export
-    jsonSpecOnValid @Export
+    eqSpec @Repo
+    genValidSpec @Repo
+    jsonSpecOnValid @Repo

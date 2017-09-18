@@ -3,7 +3,7 @@
 {-# LANGUAGE RecordWildCards #-}
 
 module Wolf.Data.Export.Types
-    ( Export(..)
+    ( Repo(..)
     ) where
 
 import Import
@@ -19,47 +19,44 @@ import Wolf.Data.NoteIndex.Types
 import Wolf.Data.People.Types
 import Wolf.Data.Suggestion.Types
 
-data Export = Export
-    { exportInitData :: InitData
-    , exportPersonIndex :: Index
-    , exportPeople :: [PersonUuid]
-    , exportPersonEntries :: [(PersonUuid, PersonEntry)]
-    , exportNoteIndex :: NoteIndex
-    , exportNoteIndices :: [(PersonUuid, NoteIndex)]
-    , exportNotes :: [(NoteUuid, Note)]
-    , exportEntrySuggestions :: [Suggestion EntrySuggestion]
-    , exportUsedEntrySuggestions :: [Suggestion EntrySuggestion]
+data Repo = Repo
+    { repoInitData :: InitData
+    , repoPersonIndex :: Index
+    , repoPeople :: [PersonUuid]
+    , repoPersonEntries :: [(PersonUuid, PersonEntry)]
+    , repoNoteIndex :: NoteIndex
+    , repoNoteIndices :: [(PersonUuid, NoteIndex)]
+    , repoNotes :: [(NoteUuid, Note)]
+    , repoEntrySuggestions :: [Suggestion EntrySuggestion]
+    , repoUsedEntrySuggestions :: [Suggestion EntrySuggestion]
     } deriving (Show, Eq, Generic)
 
-instance Validity Export where
-    isValid Export {..} =
+instance Validity Repo where
+    isValid Repo {..} =
         and
-            [ isValid exportInitData
-            , isValid exportPersonIndex
-            , isValid exportPeople
-            , isValid exportPersonEntries
-            , isValid exportNoteIndex
-            , isValid exportNoteIndices
-            , isValid exportNotes
-            , isValid exportEntrySuggestions
-            , isValid exportUsedEntrySuggestions
-            , all (`elem` exportPeople) $ indexMap exportPersonIndex
-            , all (`elem` exportPeople) $ map fst exportPersonEntries
-            , all (`elem` exportPeople) $ map fst exportNoteIndices
-            , S.fromList (map fst exportNotes) == noteIndexSet exportNoteIndex
-            , all (`isSubNoteIndexOf` exportNoteIndex) $
-              map snd exportNoteIndices
-            , null $
-              exportEntrySuggestions `intersect` exportUsedEntrySuggestions
+            [ isValid repoInitData
+            , isValid repoPersonIndex
+            , isValid repoPeople
+            , isValid repoPersonEntries
+            , isValid repoNoteIndex
+            , isValid repoNoteIndices
+            , isValid repoNotes
+            , isValid repoEntrySuggestions
+            , isValid repoUsedEntrySuggestions
+            , all (`elem` repoPeople) $ indexMap repoPersonIndex
+            , all (`elem` repoPeople) $ map fst repoPersonEntries
+            , all (`elem` repoPeople) $ map fst repoNoteIndices
+            , S.fromList (map fst repoNotes) == noteIndexSet repoNoteIndex
+            , all (`isSubNoteIndexOf` repoNoteIndex) $ map snd repoNoteIndices
+            , null $ repoEntrySuggestions `intersect` repoUsedEntrySuggestions
             ]
 
-instance NFData Export
+instance NFData Repo
 
-instance FromJSON Export where
+instance FromJSON Repo where
     parseJSON =
-        withObject "Export" $ \o ->
-            Export <$> o .: "init-data" <*> o .: "person-index" <*>
-            o .: "people" <*>
+        withObject "Repo" $ \o ->
+            Repo <$> o .: "init-data" <*> o .: "person-index" <*> o .: "people" <*>
             o .: "person-entries" <*>
             o .: "note-index" <*>
             o .: "note-indices" <*>
@@ -67,16 +64,16 @@ instance FromJSON Export where
             o .: "entry-suggestions" <*>
             o .: "used-entry-suggestions"
 
-instance ToJSON Export where
-    toJSON Export {..} =
+instance ToJSON Repo where
+    toJSON Repo {..} =
         object
-            [ "init-data" .= exportInitData
-            , "person-index" .= exportPersonIndex
-            , "people" .= exportPeople
-            , "person-entries" .= exportPersonEntries
-            , "note-index" .= exportNoteIndex
-            , "note-indices" .= exportNoteIndices
-            , "notes" .= exportNotes
-            , "entry-suggestions" .= exportEntrySuggestions
-            , "used-entry-suggestions" .= exportUsedEntrySuggestions
+            [ "init-data" .= repoInitData
+            , "person-index" .= repoPersonIndex
+            , "people" .= repoPeople
+            , "person-entries" .= repoPersonEntries
+            , "note-index" .= repoNoteIndex
+            , "note-indices" .= repoNoteIndices
+            , "notes" .= repoNotes
+            , "entry-suggestions" .= repoEntrySuggestions
+            , "used-entry-suggestions" .= repoUsedEntrySuggestions
             ]
