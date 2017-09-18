@@ -75,6 +75,15 @@ spec = do
                         forM_ pnis $ \(_, personNoteIndex) ->
                             personNoteIndex `shouldSatisfy`
                             (`containsNoteUuid` noteUuid)
+        describe "createNewNote" $
+            it "leaves a valid repository valid" $ \gen ->
+                forAll gen $ \sets ->
+                    forAll genValid $ \export -> do
+                        forAll genValid $ \note -> do
+                            runData sets $ do
+                                setupRepo export
+                                void $ createNewNote note
+                            assertRepoValid sets
     describe "createNewNoteUuid" $
         it "generates a NoteUuid that was not in the index yet, but is now" $
         forAll genValid $ \noteIndex -> do
