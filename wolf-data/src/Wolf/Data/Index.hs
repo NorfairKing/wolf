@@ -45,10 +45,6 @@ indexKeys = M.keys . indexMap
 indexTuples :: Index -> [(Alias, PersonUuid)]
 indexTuples = M.toList . indexMap
 
--- | Look up a `PersonUuid` in the 'Index' by its alias
-lookupInIndex :: Alias -> Index -> Maybe PersonUuid
-lookupInIndex person index = M.lookup person (indexMap index)
-
 reverseIndexLookup :: PersonUuid -> Index -> [Alias]
 reverseIndexLookup uuid index =
     map fst $ filter ((== uuid) . snd) (M.toList $ indexMap index)
@@ -58,11 +54,6 @@ reverseIndexLookupSingleAlias uuid i =
     case reverseIndexLookup uuid i of
         [] -> Nothing
         (a:_) -> Just a
-
--- | Add a 'PersonUuid' to the 'Index' at an alias
-addIndexEntry :: Alias -> PersonUuid -> Index -> Index
-addIndexEntry person uuid origIndex =
-    origIndex {indexMap = M.insert person uuid $ indexMap origIndex}
 
 -- | Create a new person, if the given aliases was unasigned
 createNewPerson ::

@@ -23,11 +23,19 @@ instance GenUnchecked Export
 instance GenValid Export where
     genValid = do
         eid <- genValid
-        -- Any person index
-        epi <- genValid
-        -- The available person Id's are exactly the ones in the index.
-        -- TODO: leave some people out of the index.
-        let eps = M.elems $ indexMap epi
+        -- Any list of persons
+        eps <- genValid
+        -- The person index consists of (some) people from the global index
+        -- and some occur multiple times.
+        epi <-
+            let go ix puuid = do
+                    b <- genValid
+                    if b
+                        then pure ix
+                        else do
+                            a <- genValid
+                            go (addIndexEntry a puuid ix) puuid
+            in foldM go newIndex eps
         -- For some people, make a person entry.
         epes <-
             fmap catMaybes $
@@ -49,6 +57,7 @@ instance GenValid Export where
                     else pure Nothing
         -- For each noteuuid, make a note.
         ens <- forM noteUuids $ \uuid -> (,) uuid <$> genValid
+        -- Two distinct lists of suggestions
         ees <- genValid
         eues <- genListOf $ genValid `suchThat` (`notElem` ees)
         pure
