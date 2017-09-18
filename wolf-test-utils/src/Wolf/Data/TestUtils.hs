@@ -1,4 +1,9 @@
-module Wolf.Data.TestUtils where
+{-# LANGUAGE FlexibleContexts #-}
+
+module Wolf.Data.TestUtils
+    ( withDataSetsGen
+    , ensureClearRepository
+    ) where
 
 import Import
 
@@ -16,3 +21,8 @@ withDataSetsGen = beforeAll mkGen . afterAll_ cleanup
     cleanup = do
         sbd <- resolveTestSandbox
         ignoringAbsence $ removeDirRecur sbd
+
+ensureClearRepository :: (MonadIO m, MonadReader DataSettings m) => m ()
+ensureClearRepository = do
+    dd <- asks dataSetWolfDir
+    liftIO $ ignoringAbsence $ removeDirRecur dd

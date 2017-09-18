@@ -17,7 +17,10 @@ spec =
     describe "export" $ do
         it "exports 'Nothing' if no wolf repository has been initialised" $ \gen ->
             forAll gen $ \sets -> do
-                e <- runReaderT export sets
+                e <-
+                    flip runReaderT sets $ do
+                        ensureClearRepository
+                        export
                 e `shouldBe` Nothing
         it "only generates valid exports when a repository has been initialised" $ \gen ->
             forAll gen $ \sets ->
@@ -26,6 +29,7 @@ spec =
                         forAll genValid $ \(sugs, usedSugs) -> do
                             e <-
                                 flip runReaderT sets $ do
+                                    ensureClearRepository
                                     initWolf
                                     oldIndex <- getIndexWithDefault
                                     let func ix (al, entry) = do
