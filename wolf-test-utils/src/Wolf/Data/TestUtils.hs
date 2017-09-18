@@ -12,9 +12,6 @@ module Wolf.Data.TestUtils
 import Import
 
 import Wolf.Data
-import Wolf.Data.Export.Types
-import Wolf.Data.Init
-import Wolf.Data.Suggestion
 
 import Wolf.Data.Gen ()
 
@@ -40,18 +37,9 @@ ensureClearRepository = do
     liftIO $ ignoringAbsence $ removeDirRecur dd
 
 setupRepo :: (MonadIO m, MonadReader DataSettings m) => Export -> m ()
-setupRepo Export {..} = do
-    writeInitData exportInitData
-    putIndex exportPersonIndex
-    forM_ exportPersonEntries $ \(puuid, pindex) -> putPersonEntry puuid pindex
-    putNoteIndex exportNoteIndex
-    forM_ exportNoteIndices $ \(puuid, nindex) ->
-        putPersonNoteIndex puuid nindex
-    forM_ exportNotes $ \(nuuid, note) -> writeNote nuuid note
-    writePersonEntrySuggestions exportEntrySuggestions
-    writeUsedPersonEntrySuggestions exportUsedEntrySuggestions
+setupRepo = importRepo -- TODO remove this
 
 assertRepoValid :: DataSettings -> IO ()
 assertRepoValid sets = do
-    e <- runData sets export
+    e <- runData sets exportRepo
     e `shouldSatisfy` isValid

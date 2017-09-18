@@ -90,7 +90,9 @@ module Wolf.Data
     , Export
     , exportInitData
     , exportPersonIndex
-    , export
+    , exportRepo
+    -- * Import
+    , importRepo
     ) where
 
 import Wolf.Data.Entry
@@ -102,3 +104,4 @@ import Wolf.Data.NoteIndex
 import Wolf.Data.People
 import Wolf.Data.Suggestion
 import Wolf.Data.Types
+import Wolf.Data.Import

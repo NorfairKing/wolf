@@ -93,8 +93,9 @@ test-suite wolf-data-test
         Wolf.Data.EntrySpec
         Wolf.Data.Export.TypesSpec
         Wolf.Data.ExportSpec
-        Wolf.Data.IndexSpec
+        Wolf.Data.ImportSpec
         Wolf.Data.Index.TypesSpec
+        Wolf.Data.IndexSpec
         Wolf.Data.Note.TypesSpec
         Wolf.Data.NoteIndex.TypesSpec
         Wolf.Data.NoteIndexSpec

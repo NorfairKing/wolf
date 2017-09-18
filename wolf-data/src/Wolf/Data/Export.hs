@@ -4,7 +4,7 @@ module Wolf.Data.Export
     ( Export
     , exportInitData
     , exportPersonIndex
-    , export
+    , exportRepo
     ) where
 
 import Import
@@ -18,8 +18,8 @@ import Wolf.Data.People
 import Wolf.Data.Suggestion
 import Wolf.Data.Types
 
-export :: (MonadIO m, MonadReader DataSettings m) => m (Maybe Export)
-export = do
+exportRepo :: (MonadIO m, MonadReader DataSettings m) => m (Maybe Export)
+exportRepo = do
     mid <- readInitData
     case mid of
         Nothing -> pure Nothing

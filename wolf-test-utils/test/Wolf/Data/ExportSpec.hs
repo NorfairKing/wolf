@@ -20,10 +20,10 @@ spec =
                 e <-
                     flip runReaderT sets $ do
                         ensureClearRepository
-                        export
+                        exportRepo
                 e `shouldBe` Nothing
         it "only generates valid exports when a repository has been initialised" $ \gen ->
             forAll gen $ \sets -> do
-            forAll genValid $ \export -> do
+                forAll genValid $ \export -> do
                     runData sets $ setupRepo export
                     assertRepoValid sets

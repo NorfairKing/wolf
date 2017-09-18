@@ -18,6 +18,8 @@ library
         Wolf.Data.Export
         Wolf.Data.Export.Types
         Wolf.Data.Git
+        Wolf.Data.Import
+        Wolf.Data.Import.Types
         Wolf.Data.Index
         Wolf.Data.Index.Types
         Wolf.Data.Init
