@@ -25,5 +25,8 @@ spec =
         it "only generates valid exports when a repository has been initialised" $ \gen ->
             forAll gen $ \sets -> do
                 forAll genValid $ \repo -> do
-                    runData sets $ importRepo repo
-                    assertRepoValid sets
+                    repo' <-
+                        runData sets $ do
+                            importRepo repo
+                            exportRepo
+                    repo' `shouldBe` Just repo
