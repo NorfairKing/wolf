@@ -4,8 +4,8 @@ module Wolf.Data.NoteIndexSpec
 
 import TestImport
 
-import Wolf.Data.Note
 import Wolf.Data.Import
+import Wolf.Data.Note
 import Wolf.Data.NoteIndex
 
 import Wolf.Data.Gen
@@ -79,7 +79,7 @@ spec = do
         describe "createNewNote" $
             it "leaves a valid repository valid" $ \gen ->
                 forAll gen $ \sets ->
-                    forAll genValid $ \repo -> do
+                    forAll genValid $ \repo ->
                         forAll genValid $ \note -> do
                             runData sets $ do
                                 importRepo repo

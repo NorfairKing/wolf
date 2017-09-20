@@ -1,2 +1,3 @@
-module Wolf.Data.Import.Types () where
-
+module Wolf.Data.Import.Types
+    (
+    ) where

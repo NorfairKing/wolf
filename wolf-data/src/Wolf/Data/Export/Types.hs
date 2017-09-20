@@ -22,7 +22,6 @@ import Wolf.Data.Suggestion.Types
 data Repo = Repo
     { repoInitData :: InitData
     , repoPersonIndex :: Index
-    , repoPeople :: [PersonUuid]
     , repoPersonEntries :: [(PersonUuid, PersonEntry)]
     , repoNoteIndex :: NoteIndex
     , repoNoteIndices :: [(PersonUuid, NoteIndex)]
@@ -36,16 +35,12 @@ instance Validity Repo where
         and
             [ isValid repoInitData
             , isValid repoPersonIndex
-            , isValid repoPeople
             , isValid repoPersonEntries
             , isValid repoNoteIndex
             , isValid repoNoteIndices
             , isValid repoNotes
             , isValid repoEntrySuggestions
             , isValid repoUsedEntrySuggestions
-            , all (`elem` repoPeople) $ indexMap repoPersonIndex
-            , all (`elem` repoPeople) $ map fst repoPersonEntries
-            , all (`elem` repoPeople) $ map fst repoNoteIndices
             , S.fromList (map fst repoNotes) == noteIndexSet repoNoteIndex
             , all (`isSubNoteIndexOf` repoNoteIndex) $ map snd repoNoteIndices
             , null $ repoEntrySuggestions `intersect` repoUsedEntrySuggestions
@@ -56,7 +51,7 @@ instance NFData Repo
 instance FromJSON Repo where
     parseJSON =
         withObject "Repo" $ \o ->
-            Repo <$> o .: "init-data" <*> o .: "person-index" <*> o .: "people" <*>
+            Repo <$> o .: "init-data" <*> o .: "person-index" <*>
             o .: "person-entries" <*>
             o .: "note-index" <*>
             o .: "note-indices" <*>
@@ -69,7 +64,6 @@ instance ToJSON Repo where
         object
             [ "init-data" .= repoInitData
             , "person-index" .= repoPersonIndex
-            , "people" .= repoPeople
             , "person-entries" .= repoPersonEntries
             , "note-index" .= repoNoteIndex
             , "note-indices" .= repoNoteIndices

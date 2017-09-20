@@ -4,7 +4,6 @@ module Wolf.Data.Export.Types.Gen where
 
 import Import
 
-import qualified Data.Map as M
 import qualified Data.Set as S
 
 import Wolf.Data.Export.Types
@@ -64,7 +63,6 @@ instance GenValid Repo where
             Repo
             { repoInitData = eid
             , repoPersonIndex = epi
-            , repoPeople = eps
             , repoPersonEntries = epes
             , repoNoteIndex = eni
             , repoNoteIndices = enis

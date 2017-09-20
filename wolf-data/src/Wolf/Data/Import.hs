@@ -7,7 +7,6 @@ module Wolf.Data.Import
 
 import Import
 
-import Wolf.Data.Entry
 import Wolf.Data.Export.Types
 import Wolf.Data.Index
 import Wolf.Data.Init
@@ -20,9 +19,9 @@ importRepo :: (MonadIO m, MonadReader DataSettings m) => Repo -> m ()
 importRepo Repo {..} = do
     writeInitData repoInitData
     putIndex repoPersonIndex
-    forM_ repoPersonEntries $ \(puuid, pindex) -> putPersonEntry puuid pindex
+    mapM_ (uncurry putPersonEntry) repoPersonEntries
     putNoteIndex repoNoteIndex
-    forM_ repoNoteIndices $ \(puuid, nindex) -> putPersonNoteIndex puuid nindex
-    forM_ repoNotes $ \(nuuid, note) -> writeNote nuuid note
+    mapM_ (uncurry putPersonNoteIndex) repoNoteIndices
+    mapM_ (uncurry writeNote) repoNotes
     writePersonEntrySuggestions repoEntrySuggestions
     writeUsedPersonEntrySuggestions repoUsedEntrySuggestions

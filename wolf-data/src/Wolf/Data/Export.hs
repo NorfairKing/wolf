@@ -43,7 +43,6 @@ exportRepo = do
                     { repoInitData = initData
                     , repoPersonIndex = mi
                     , repoPersonEntries = entries
-                    , repoPeople = people
                     , repoNoteIndex = noteIndex
                     , repoNoteIndices = noteIxs
                     , repoNotes = notes

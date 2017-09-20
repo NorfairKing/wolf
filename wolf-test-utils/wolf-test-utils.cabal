@@ -38,6 +38,7 @@ library
         genvalidity-text -any,
         genvalidity-time -any,
         genvalidity-path -any,
+        quickcheck-text -any,
         hspec >=2.4 && <2.5,
         mtl >=2.2 && <2.3,
         path >=0.5 && <0.6,

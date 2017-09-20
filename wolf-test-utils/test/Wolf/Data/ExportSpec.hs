@@ -23,10 +23,11 @@ spec =
                         exportRepo
                 e `shouldBe` Nothing
         it "only generates valid exports when a repository has been initialised" $ \gen ->
-            forAll gen $ \sets -> do
+            forAll gen $ \sets ->
                 forAll genValid $ \repo -> do
                     repo' <-
                         runData sets $ do
+                            ensureClearRepository
                             importRepo repo
                             exportRepo
                     repo' `shouldBe` Just repo
