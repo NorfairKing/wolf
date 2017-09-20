@@ -7,6 +7,7 @@ module Wolf.Data.ExportSpec
 import TestImport
 
 import Wolf.Data
+import Wolf.Data.Export.Types
 import Wolf.Data.Gen ()
 
 import Wolf.Data.TestUtils
@@ -22,12 +23,21 @@ spec =
                         ensureClearRepository
                         exportRepo
                 e `shouldBe` Nothing
-        it "only generates valid exports when a repository has been initialised" $ \gen ->
-            forAll gen $ \sets ->
-                forAll genValid $ \repo -> do
-                    repo' <-
-                        runData sets $ do
-                            ensureClearRepository
-                            importRepo repo
-                            exportRepo
-                    repo' `shouldBe` Just repo
+        let roundtrip func name =
+                it ("roundtrips the " ++ name) $ \gen ->
+                    forAll gen $ \sets ->
+                        forAllValid $ \repo -> do
+                            repo' <-
+                                runData sets $ do
+                                    ensureClearRepository
+                                    importRepo repo
+                                    exportRepo
+                            (func <$> repo') `shouldBe` Just (func repo)
+        roundtrip repoInitData "init data"
+        roundtrip repoPersonIndex "person index"
+        roundtrip repoNoteIndex "note index"
+        roundtrip repoNoteIndices "note indinces"
+        roundtrip repoNotes "notes"
+        roundtrip repoEntrySuggestions "entry suggestions"
+        roundtrip repoUsedEntrySuggestions "used entry suggestions"
+        roundtrip id "entire repo"

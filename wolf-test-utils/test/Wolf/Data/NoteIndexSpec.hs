@@ -17,7 +17,7 @@ spec = do
         describe "getNoteIndex" $
             it "retrieves the note index that was just written" $ \gen ->
                 forAll gen $ \sets ->
-                    forAll genValid $ \noteIndex -> do
+                    forAllValid $ \noteIndex -> do
                         ni <-
                             flip runReaderT sets $ do
                                 putNoteIndex noteIndex
@@ -26,14 +26,14 @@ spec = do
         describe "putNoteIndex" $
             it "does not crash" $ \gen ->
                 forAll gen $ \sets ->
-                    forAll genUnchecked $ \noteIndex ->
+                    forAllUnchecked $ \noteIndex ->
                         runReaderT (putNoteIndex noteIndex) sets `shouldReturn`
                         ()
         describe "getPersonNoteIndex" $
             it "retrieves the note index that was just written" $ \gen ->
                 forAll gen $ \sets ->
-                    forAll genValid $ \personUuid ->
-                        forAll genValid $ \noteIndex -> do
+                    forAllValid $ \personUuid ->
+                        forAllValid $ \noteIndex -> do
                             ni <-
                                 flip runReaderT sets $ do
                                     putPersonNoteIndex personUuid noteIndex
@@ -42,8 +42,8 @@ spec = do
         describe "putPersonNoteIndex" $
             it "does not crash" $ \gen ->
                 forAll gen $ \sets ->
-                    forAll genValid $ \personUuid ->
-                        forAll genUnchecked $ \noteIndex ->
+                    forAllValid $ \personUuid ->
+                        forAllUnchecked $ \noteIndex ->
                             runReaderT
                                 (putPersonNoteIndex personUuid noteIndex)
                                 sets `shouldReturn`
@@ -51,12 +51,12 @@ spec = do
         describe "createNewNoteUuid" $ do
             it "does not crash and generates a valid noteUuid" $ \gen ->
                 forAll gen $ \sets ->
-                    forAll genValid $ \note -> do
+                    forAllValid $ \note -> do
                         noteUuid <- runReaderT (createNewNote note) sets
                         noteUuid `shouldSatisfy` isValid
             it "will leave the new note uuid in the global note index" $ \gen ->
                 forAll gen $ \sets ->
-                    forAll genValid $ \note -> do
+                    forAllValid $ \note -> do
                         (noteUuid, gni) <-
                             flip runReaderT sets $
                             (,) <$> createNewNote note <*> getNoteIndex
@@ -64,7 +64,7 @@ spec = do
             it
                 "will leave the new note uuid in the each of the relevant people's note index" $ \gen ->
                 forAll gen $ \sets ->
-                    forAll genValid $ \note -> do
+                    forAllValid $ \note -> do
                         (noteUuid, pnis) <-
                             flip runReaderT sets $ do
                                 nid <- createNewNote note
@@ -79,22 +79,22 @@ spec = do
         describe "createNewNote" $
             it "leaves a valid repository valid" $ \gen ->
                 forAll gen $ \sets ->
-                    forAll genValid $ \repo ->
-                        forAll genValid $ \note -> do
+                    forAllValid $ \repo ->
+                        forAllValid $ \note -> do
                             runData sets $ do
                                 importRepo repo
                                 void $ createNewNote note
                             assertRepoValid sets
     describe "createNewNoteUuid" $
         it "generates a NoteUuid that was not in the index yet, but is now" $
-        forAll genValid $ \noteIndex -> do
+        forAllValid $ \noteIndex -> do
             (newUuid, newIndex) <- createNewNoteUuid noteIndex
             newUuid `shouldNotSatisfy` containsNoteUuid noteIndex
             newUuid `shouldSatisfy` containsNoteUuid newIndex
     describe "subNoteIndex" $ do
         it "generates valid note indices" $
-            forAll genValid $ genGeneratesValid . subNoteIndex
+            forAllValid $ \ni -> genGeneratesValid (subNoteIndex ni) shrinkValid
         it "generates sub note indices" $
-            forAll genValid $ \ni ->
+            forAllValid $ \ni ->
                 forAll (subNoteIndex ni) $ \sni ->
                     sni `shouldSatisfy` (`isSubNoteIndexOf` ni)

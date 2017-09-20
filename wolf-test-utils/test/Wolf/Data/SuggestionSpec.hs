@@ -15,7 +15,7 @@ spec =
         describe "readPersonEntrySuggestions" $
             it "reads the suggestions that were just written" $ \gen ->
                 forAll gen $ \sets ->
-                    forAll genValid $ \sugs -> do
+                    forAllValid $ \sugs -> do
                         sugs' <-
                             flip runReaderT sets $ do
                                 writePersonEntrySuggestions sugs
@@ -24,7 +24,7 @@ spec =
         describe "readUsedPersonEntrySuggestions" $
             it "reads the suggestions that were just written" $ \gen ->
                 forAll gen $ \sets ->
-                    forAll genValid $ \sugs -> do
+                    forAllValid $ \sugs -> do
                         sugs' <-
                             flip runReaderT sets $ do
                                 writeUsedPersonEntrySuggestions sugs

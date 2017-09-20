@@ -15,6 +15,10 @@ instance GenUnchecked UUID where
     genUnchecked =
         let genWord = fromIntegral <$> (genUnchecked :: Gen Int)
         in fromWords <$> genWord <*> genWord <*> genWord <*> genWord
+    shrinkUnchecked u =
+        [ fromWords w1 w2 w3 w4
+        | (w1, w2, w3, w4) <- shrinkUnchecked (toWords u)
+        ]
 
 instance GenValid UUID
 
