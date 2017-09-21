@@ -6,6 +6,7 @@ module Wolf.Data.NoteIndex.Types where
 import Import
 
 import Data.Aeson as JSON
+import Data.Aeson.Types as JSON
 import qualified Data.Set as S
 import Data.UUID as UUID
 import Data.UUID.V4 as UUID
@@ -50,15 +51,26 @@ instance Validity NoteUuid where
 
 instance NFData NoteUuid
 
+instance FromJSONKey NoteUuid where
+    fromJSONKey = FromJSONKeyTextParser textJSONParseNoteUUID
+
+instance ToJSONKey NoteUuid where
+    toJSONKey = toJSONKeyText (UUID.toText . unNoteUuid)
+
 instance FromJSON NoteUuid where
-    parseJSON =
-        withText "NoteUuid" $ \t ->
-            case UUID.fromText t of
-                Nothing -> fail "Invalid Text when parsing UUID"
-                Just u -> pure $ NoteUuid u
+    parseJSON = jsonParseNoteUUID
 
 instance ToJSON NoteUuid where
     toJSON (NoteUuid u) = JSON.String $ UUID.toText u
+
+jsonParseNoteUUID :: Value -> Parser NoteUuid
+jsonParseNoteUUID = withText "NoteUuid" textJSONParseNoteUUID
+
+textJSONParseNoteUUID :: Text -> Parser NoteUuid
+textJSONParseNoteUUID t =
+    case UUID.fromText t of
+        Nothing -> fail "Invalid Text when parsing UUID"
+        Just u -> pure $ NoteUuid u
 
 nextRandomNoteUuid :: MonadIO m => m NoteUuid
 nextRandomNoteUuid = liftIO $ NoteUuid <$> UUID.nextRandom

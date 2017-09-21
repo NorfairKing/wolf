@@ -20,6 +20,7 @@ module Wolf.Data.NoteIndex
     , getNotes
     -- * Manipulate a person's note index
     , getPersonNoteIndex
+    , getPersonNoteIndexWithDefault
     , putPersonNoteIndex
     -- ** Convenience functions for a person's notes
     , getPersonNoteUuids
@@ -70,10 +71,17 @@ getNotes = do
     catMaybes <$> mapM readNote nuuids
 
 -- | Retrieve a person's note index
-getPersonNoteIndex ::
+getPersonNoteIndexWithDefault ::
        (MonadIO m, MonadReader DataSettings m) => PersonUuid -> m NoteIndex
-getPersonNoteIndex personUuid =
+getPersonNoteIndexWithDefault personUuid =
     personNoteIndexFile personUuid >>= readJSONWithDefault newNoteIndex
+
+getPersonNoteIndex ::
+       (MonadIO m, MonadReader DataSettings m)
+    => PersonUuid
+    -> m (Maybe NoteIndex)
+getPersonNoteIndex personUuid =
+    personNoteIndexFile personUuid >>= readJSONWithMaybe
 
 -- | Save a person's note index
 putPersonNoteIndex ::
@@ -89,7 +97,7 @@ putPersonNoteIndex personUuid noteIndex = do
 getPersonNoteUuids ::
        (MonadIO m, MonadReader DataSettings m) => PersonUuid -> m [NoteUuid]
 getPersonNoteUuids personUuid =
-    (toList . noteIndexSet) <$> getPersonNoteIndex personUuid
+    (toList . noteIndexSet) <$> getPersonNoteIndexWithDefault personUuid
 
 -- | Retrieve all notes for a given person
 getPersonNotes ::
@@ -110,7 +118,7 @@ createNewNote n = do
     gni <- getNoteIndex
     pniTups <-
         forM (toList $ noteRelevantPeople n) $ \personUuid ->
-            (,) personUuid <$> getPersonNoteIndex personUuid
+            (,) personUuid <$> getPersonNoteIndexWithDefault personUuid
     go gni pniTups
   where
     go gni pniTups = do

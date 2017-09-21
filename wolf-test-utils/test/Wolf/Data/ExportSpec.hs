@@ -36,7 +36,7 @@ spec =
         roundtrip repoInitData "init data"
         roundtrip repoPersonIndex "person index"
         roundtrip repoNoteIndex "note index"
-        roundtrip repoNoteIndices "note indinces"
+        roundtrip repoNoteIndices "note indices"
         roundtrip repoNotes "notes"
         roundtrip repoEntrySuggestions "entry suggestions"
         roundtrip repoUsedEntrySuggestions "used entry suggestions"

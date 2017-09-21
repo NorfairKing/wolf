@@ -4,6 +4,7 @@ module Wolf.Data.Export.Types.Gen where
 
 import Import
 
+import qualified Data.Map as M
 import qualified Data.Set as S
 
 import Wolf.Data.Export.Types
@@ -37,7 +38,7 @@ instance GenValid Repo where
             in foldM go newIndex eps
         -- For some people, make a person entry.
         epes <-
-            fmap catMaybes $
+            fmap (M.fromList . catMaybes) $
             forM eps $ \p -> do
                 b <- genValid
                 if b
@@ -48,14 +49,14 @@ instance GenValid Repo where
         let noteUuids = S.toList $ noteIndexSet eni
         -- For some people, make a note index with a sub note index of the global note index.
         enis <-
-            fmap catMaybes $
+            fmap (M.fromList . catMaybes) $
             forM eps $ \p -> do
                 b <- genValid
                 if b
                     then (Just . (,) p) <$> subNoteIndex eni
                     else pure Nothing
         -- For each noteuuid, make a note.
-        ens <- forM noteUuids $ \uuid -> (,) uuid <$> genValid
+        ens <- fmap M.fromList $ forM noteUuids $ \uuid -> (,) uuid <$> genValid
         -- Two distinct lists of suggestions
         ees <- genValid
         eues <- genListOf $ genValid `suchThat` (`notElem` ees)

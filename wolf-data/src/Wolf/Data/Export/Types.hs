@@ -9,7 +9,7 @@ module Wolf.Data.Export.Types
 import Import
 
 import Data.Aeson
-import qualified Data.Set as S
+import qualified Data.Map as M
 
 import Wolf.Data.Entry.Types
 import Wolf.Data.Index.Types
@@ -22,10 +22,10 @@ import Wolf.Data.Suggestion.Types
 data Repo = Repo
     { repoInitData :: InitData
     , repoPersonIndex :: Index
-    , repoPersonEntries :: [(PersonUuid, PersonEntry)]
+    , repoPersonEntries :: Map PersonUuid PersonEntry
     , repoNoteIndex :: NoteIndex
-    , repoNoteIndices :: [(PersonUuid, NoteIndex)]
-    , repoNotes :: [(NoteUuid, Note)]
+    , repoNoteIndices :: Map PersonUuid NoteIndex
+    , repoNotes :: Map NoteUuid Note
     , repoEntrySuggestions :: [Suggestion EntrySuggestion]
     , repoUsedEntrySuggestions :: [Suggestion EntrySuggestion]
     } deriving (Show, Eq, Generic)
@@ -41,8 +41,8 @@ instance Validity Repo where
             , isValid repoNotes
             , isValid repoEntrySuggestions
             , isValid repoUsedEntrySuggestions
-            , S.fromList (map fst repoNotes) == noteIndexSet repoNoteIndex
-            , all (`isSubNoteIndexOf` repoNoteIndex) $ map snd repoNoteIndices
+            , M.keysSet repoNotes == noteIndexSet repoNoteIndex
+            , all (`isSubNoteIndexOf` repoNoteIndex) $ M.elems repoNoteIndices
             , null $ repoEntrySuggestions `intersect` repoUsedEntrySuggestions
             ]
 

@@ -9,6 +9,8 @@ module Wolf.Data.Export
 
 import Import
 
+import qualified Data.Map as M
+
 import Wolf.Data.Export.Types
 import Wolf.Data.Index
 import Wolf.Data.Init
@@ -26,15 +28,19 @@ exportRepo = do
         Just initData -> do
             mi <- getIndexWithDefault
             people <- getPersonUuids
-            entries <-
-                mapMaybe (\(p, e) -> (,) p <$> e) <$>
-                mapM (\p -> (,) p <$> getPersonEntry p) people
+            let mKeyed ::
+                       (Ord a, Monad m)
+                    => (a -> m (Maybe b))
+                    -> [a]
+                    -> m (Map a b)
+                mKeyed func ls =
+                    (M.fromList . mapMaybe (\(p, e) -> (,) p <$> e)) <$>
+                    mapM (\p -> (,) p <$> func p) ls
+            entries <- mKeyed getPersonEntry people
             noteIndex <- getNoteIndex
-            noteIxs <- mapM (\p -> (,) p <$> getPersonNoteIndex p) people
+            noteIxs <- mKeyed getPersonNoteIndex people
             noteUuids <- getNoteUuids
-            notes <-
-                mapMaybe (\(p, e) -> (,) p <$> e) <$>
-                mapM (\uuid -> (,) uuid <$> readNote uuid) noteUuids
+            notes <- mKeyed readNote noteUuids
             entrySuggestions <- readPersonEntrySuggestions
             usedEntrySuggestions <- readUsedPersonEntrySuggestions
             pure $

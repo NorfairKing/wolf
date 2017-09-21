@@ -38,7 +38,7 @@ spec = do
                                 flip runReaderT sets $ do
                                     putPersonNoteIndex personUuid noteIndex
                                     getPersonNoteIndex personUuid
-                            ni `shouldBe` noteIndex
+                            ni `shouldBe` Just noteIndex
         describe "putPersonNoteIndex" $
             it "does not crash" $ \gen ->
                 forAll gen $ \sets ->
@@ -71,12 +71,44 @@ spec = do
                                 pnis <-
                                     forM (toList $ noteRelevantPeople note) $ \personUuid ->
                                         (,) personUuid <$>
-                                        getPersonNoteIndex personUuid
+                                        getPersonNoteIndexWithDefault personUuid
                                 pure (nid, pnis)
                         forM_ pnis $ \(_, personNoteIndex) ->
                             personNoteIndex `shouldSatisfy`
                             (`containsNoteUuid` noteUuid)
-        describe "createNewNote" $
+        describe "createNewNote" $ do
+            it "adds exactly one new note to the global note index: the new one" $ \gen ->
+                forAll gen $ \sets ->
+                    forAllValid $ \repo ->
+                        forAllValid $ \note -> do
+                            (old, n, new) <-
+                                runData sets $ do
+                                    importRepo repo
+                                    old <- getNoteIndex
+                                    n <- createNewNote note
+                                    new <- getNoteIndex
+                                    pure (old, n, new)
+                            addToNoteIndex old n `shouldBe` Just new
+            it
+                "adds exactly one new note uuid to each person's note index: the new one" $ \gen ->
+                forAll gen $ \sets ->
+                    forAllValid $ \repo ->
+                        forAllValid $ \note -> do
+                            (olds, n, news) <-
+                                runData sets $ do
+                                    importRepo repo
+                                    olds <-
+                                        mapM
+                                            getPersonNoteIndexWithDefault
+                                            (toList $ noteRelevantPeople note)
+                                    n <- createNewNote note
+                                    news <-
+                                        mapM
+                                            getPersonNoteIndexWithDefault
+                                            (toList $ noteRelevantPeople note)
+                                    pure (olds, n, news)
+                            forM_ (zip olds news) $ \(old, new) ->
+                                addToNoteIndex old n `shouldBe` Just new
             it "leaves a valid repository valid" $ \gen ->
                 forAll gen $ \sets ->
                     forAllValid $ \repo ->
