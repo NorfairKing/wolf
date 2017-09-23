@@ -9,6 +9,7 @@ packages:
 - wolf-test-utils
 
 - /home/syd/cs-syd/code/open-source/validity/genvalidity
+- /home/syd/cs-syd/code/open-source/validity/genvalidity-aeson
 - /home/syd/cs-syd/code/open-source/validity/genvalidity-bytestring
 - /home/syd/cs-syd/code/open-source/validity/genvalidity-containers
 - /home/syd/cs-syd/code/open-source/validity/genvalidity-hspec
@@ -18,14 +19,21 @@ packages:
 - /home/syd/cs-syd/code/open-source/validity/genvalidity-hspec-hashable
 - /home/syd/cs-syd/code/open-source/validity/genvalidity-path
 - /home/syd/cs-syd/code/open-source/validity/genvalidity-property
+- /home/syd/cs-syd/code/open-source/validity/genvalidity-scientific
 - /home/syd/cs-syd/code/open-source/validity/genvalidity-text
 - /home/syd/cs-syd/code/open-source/validity/genvalidity-time
+- /home/syd/cs-syd/code/open-source/validity/genvalidity-unordered-containers
+- /home/syd/cs-syd/code/open-source/validity/genvalidity-vector
 - /home/syd/cs-syd/code/open-source/validity/validity
+- /home/syd/cs-syd/code/open-source/validity/validity-aeson
 - /home/syd/cs-syd/code/open-source/validity/validity-bytestring
 - /home/syd/cs-syd/code/open-source/validity/validity-containers
 - /home/syd/cs-syd/code/open-source/validity/validity-path
+- /home/syd/cs-syd/code/open-source/validity/validity-scientific
 - /home/syd/cs-syd/code/open-source/validity/validity-text
 - /home/syd/cs-syd/code/open-source/validity/validity-time
+- /home/syd/cs-syd/code/open-source/validity/validity-unordered-containers
+- /home/syd/cs-syd/code/open-source/validity/validity-vector
 
 extra-deps:
 - brick-0.24.2
