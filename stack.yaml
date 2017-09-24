@@ -23,6 +23,7 @@ packages:
 - /home/syd/cs-syd/code/open-source/validity/genvalidity-text
 - /home/syd/cs-syd/code/open-source/validity/genvalidity-time
 - /home/syd/cs-syd/code/open-source/validity/genvalidity-unordered-containers
+- /home/syd/cs-syd/code/open-source/validity/genvalidity-uuid
 - /home/syd/cs-syd/code/open-source/validity/genvalidity-vector
 - /home/syd/cs-syd/code/open-source/validity/validity
 - /home/syd/cs-syd/code/open-source/validity/validity-aeson
@@ -33,6 +34,7 @@ packages:
 - /home/syd/cs-syd/code/open-source/validity/validity-text
 - /home/syd/cs-syd/code/open-source/validity/validity-time
 - /home/syd/cs-syd/code/open-source/validity/validity-unordered-containers
+- /home/syd/cs-syd/code/open-source/validity/validity-uuid
 - /home/syd/cs-syd/code/open-source/validity/validity-vector
 
 extra-deps:

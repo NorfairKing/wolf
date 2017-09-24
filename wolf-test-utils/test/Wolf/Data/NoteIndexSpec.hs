@@ -114,6 +114,7 @@ spec = do
                     forAllValid $ \repo ->
                         forAllValid $ \note -> do
                             runData sets $ do
+                                ensureClearRepository
                                 importRepo repo
                                 void $ createNewNote note
                             assertRepoValid sets

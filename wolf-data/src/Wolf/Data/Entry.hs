@@ -77,6 +77,8 @@ data UpdateResult a
 instance Validity a => Validity (UpdateResult a) where
     isValid (UpdateSuccess a) = isValid a
     isValid _ = True
+    validate (UpdateSuccess a) = a <?!> "UpdateSuccess"
+    validate ur = validateByCheckingName "UpdateResult" ur
 
 data EntryParseException
     = EntryYamlParseException YamlParseException

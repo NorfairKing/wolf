@@ -36,5 +36,9 @@ ensureClearRepository = do
 
 assertRepoValid :: DataSettings -> IO ()
 assertRepoValid sets = do
-    e <- runData sets exportRepo
-    e `shouldSatisfy` isValid
+    mr <- runData sets exportRepo
+    case mr of
+        Nothing ->
+            expectationFailure
+                "Failed to assert that the repo was valid: No repo found."
+        Just r -> shouldBeValid r
