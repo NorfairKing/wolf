@@ -61,13 +61,13 @@ instance Validity Repo where
             , mconcat $
               flip map (M.toList repoNoteIndices) $ \(personUuid, noteIndex) ->
                   noteIndex `isSubNoteIndexOf` repoNoteIndex <?@>
-                  (unlines
-                       [ "The person note index for person"
-                       , personUuidString personUuid
-                       , "is a sub-noteindex of the global note index."
-                       , "Person note index: " ++ show noteIndex
-                       , "Global note index: " ++ show repoNoteIndex
-                       ])
+                  unlines
+                      [ "The person note index for person"
+                      , personUuidString personUuid
+                      , "is a sub-noteindex of the global note index."
+                      , "Person note index: " ++ show noteIndex
+                      , "Global note index: " ++ show repoNoteIndex
+                      ]
             , null (repoEntrySuggestions `intersect` repoUsedEntrySuggestions) <?@>
               "The entry suggestions and the used entry suggestions should not share suggestions."
             ]
