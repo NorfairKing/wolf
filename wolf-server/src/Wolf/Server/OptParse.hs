@@ -80,7 +80,7 @@ parseCommandServe = info parser modifier
                   , value Nothing
                   , help "the data directory to store data in"
                   ]))
-    modifier = fullDesc <> progDesc "Command example."
+    modifier = fullDesc <> progDesc "Serve."
 
 parseFlags :: Parser Flags
 parseFlags = pure Flags

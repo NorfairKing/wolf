@@ -1,8 +1,12 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module Wolf.Web.Server.OptParse
     ( getInstructions
     , Instructions
     , Dispatch(..)
     , Settings(..)
+    , ServeSettings(..)
+    , DataSettings(..)
     ) where
 
 import Import
@@ -20,8 +24,21 @@ getInstructions = do
     combineToInstructions cmd flags config
 
 combineToInstructions :: Command -> Flags -> Configuration -> IO Instructions
-combineToInstructions CommandServe Flags Configuration =
-    pure (DispatchServe, Settings)
+combineToInstructions (CommandServe ServeFlags {..}) Flags Configuration = do
+    ds <-
+        case fromMaybe (SharedFlags ".") serveFlagDataFlags of
+            PersonalFlags fp -> PersonalSets <$> resolveDir' fp
+            SharedFlags fp -> SharedSets <$> resolveDir' fp
+    pure
+        ( DispatchServe
+              ServeSettings
+              { serveSetPort = fromMaybe defaultPort serveFlagPort
+              , serveSetDataSets = ds
+              }
+        , Settings)
+
+defaultPort :: Int
+defaultPort = 8000
 
 getConfiguration :: Command -> Flags -> IO Configuration
 getConfiguration _ _ = pure Configuration
@@ -60,8 +77,29 @@ parseCommand = hsubparser $ mconcat [command "serve" parseCommandServe]
 parseCommandServe :: ParserInfo Command
 parseCommandServe = info parser modifier
   where
-    parser = pure CommandServe
+    parser =
+        CommandServe <$>
+        (ServeFlags <$>
+         option
+             (Just <$> auto)
+             (mconcat [long "port", value Nothing, help "the port to serve on"]) <*>
+         (Just <$> parseDataFlags))
     modifier = fullDesc <> progDesc "Serve."
+
+parseDataFlags :: Parser DataFlags
+parseDataFlags =
+    (PersonalFlags <$>
+     strOption
+         (mconcat
+              [ long "personal-data-dir"
+              , help "The directory to serve from, for a personal server"
+              ])) <|>
+    (SharedFlags <$>
+     strOption
+         (mconcat
+              [ long "shared-data-dir"
+              , help "The directory to serve from, for a shared server"
+              ]))
 
 parseFlags :: Parser Flags
 parseFlags = pure Flags

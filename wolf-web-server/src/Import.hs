@@ -10,3 +10,6 @@ import Data.Monoid as X
 
 import Control.Applicative as X
 import Control.Monad as X
+
+import Path as X
+import Path.IO as X

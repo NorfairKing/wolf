@@ -1,0 +1,7 @@
+<h1> Wolf
+
+<ul>
+  $forall (uuid, alias) <- il
+    <li> 
+      #{aliasText alias}
+      #{personUuidText uuid}

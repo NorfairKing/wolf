@@ -9,6 +9,16 @@ library:
   dependencies:
   - yesod
   - optparse-applicative == 0.13.*
+  - wolf-server
+  - wolf-data
+  - wolf-api
+  - path-io
+  - path
+  - mtl
+  - servant-server
+  - data-default
+  - template-haskell
+  - containers
   source-dirs: src
   default-extensions: NoImplicitPrelude
 

@@ -21,6 +21,8 @@ module Wolf.Data
     , indexKeys
     , indexTuples
     , lookupInIndex
+    , reverseIndex
+    , reverseIndexSingleAlias
     , reverseIndexLookup
     , reverseIndexLookupSingleAlias
     , addIndexEntry
