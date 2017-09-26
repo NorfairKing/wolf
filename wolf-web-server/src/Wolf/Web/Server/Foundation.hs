@@ -15,6 +15,7 @@ import Import
 import Control.Monad.Except
 import Control.Monad.Reader
 
+import Text.Hamlet
 import Yesod
 
 import Wolf.Data
@@ -35,7 +36,15 @@ newtype App = App
 
 mkYesodData "App" $(parseRoutesFile "routes")
 
-instance Yesod App
+instance Yesod App where
+    defaultLayout widget = do
+        pc <-
+            widgetToPageContent $
+                -- addStylesheetRemote
+                --    "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+                --     "https://cdnjs.cloudflare.com/ajax/libs/bulma/0.5.3/css/bulma.min.css"
+            $(widgetFile "default-body")
+        withUrlRenderer $(hamletFile "templates/default-page.hamlet")
 
 runData :: ReaderT DataSettings IO a -> Handler a
 runData func = do

@@ -19,6 +19,7 @@ library:
   - data-default
   - template-haskell
   - containers
+  - shakespeare
   source-dirs: src
   default-extensions: NoImplicitPrelude
 
