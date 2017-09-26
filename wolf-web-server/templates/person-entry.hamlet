@@ -1,0 +1,9 @@
+<h1>
+  $maybe alias <-  malias
+    #{aliasText alias}
+  $nothing
+    #{personUuidText uuid}
+
+$maybe pe <- mpe
+  <pre>
+    #{entryContents pe}

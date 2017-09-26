@@ -56,6 +56,8 @@ module Wolf.Data
     , NoteIndex
     , newNoteIndex
     , nextRandomNoteUuid
+    , parsePersonUuid
+    , parsePersonUuidString
     , noteUuidText
     , noteUuidString
     , addToNoteIndex

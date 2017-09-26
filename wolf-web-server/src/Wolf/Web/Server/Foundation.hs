@@ -2,6 +2,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE ViewPatterns #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Wolf.Web.Server.Foundation
     ( module Wolf.Web.Server.Foundation
@@ -46,3 +47,7 @@ runData func = do
             dd <- runReaderT (accountDataDir uuid) wse
             let ds = DataSettings {dataSetWolfDir = dd}
             liftIO $ runReaderT func ds
+
+instance PathPiece PersonUuid where
+    fromPathPiece = parsePersonUuid
+    toPathPiece = personUuidText

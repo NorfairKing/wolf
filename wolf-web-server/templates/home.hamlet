@@ -1,7 +1,8 @@
-<h1> Wolf
+<h1>
+  Wolf
 
 <ul>
   $forall (uuid, alias) <- il
     <li> 
-      #{aliasText alias}
-      #{personUuidText uuid}
+      <a href=@{PersonEntryR uuid}>
+        #{aliasText alias}
