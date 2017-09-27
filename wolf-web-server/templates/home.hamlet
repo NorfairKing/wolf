@@ -7,5 +7,5 @@
 <ul>
   $forall (uuid, alias) <- il
     <li> 
-      <a href=@{PersonEntryR uuid}>
+      <a href=@{PersonR uuid}>
         #{aliasText alias}

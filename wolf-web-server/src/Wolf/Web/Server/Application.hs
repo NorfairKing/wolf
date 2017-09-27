@@ -9,6 +9,6 @@ import Yesod
 
 import Wolf.Web.Server.Foundation
 import Wolf.Web.Server.Handler.Home
-import Wolf.Web.Server.Handler.PersonEntry
+import Wolf.Web.Server.Handler.Person
 
 mkYesodDispatch "App" resourcesApp
