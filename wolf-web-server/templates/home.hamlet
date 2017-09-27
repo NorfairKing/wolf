@@ -1,0 +1,11 @@
+<section class="hero is-primary">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title">
+        Wolf
+
+<ul>
+  $forall (uuid, alias) <- il
+    <li> 
+      <a href=@{PersonR uuid}>
+        #{aliasText alias}

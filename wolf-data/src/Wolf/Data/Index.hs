@@ -11,6 +11,8 @@ module Wolf.Data.Index
     , indexKeys
     , indexTuples
     , lookupInIndex
+    , reverseIndex
+    , reverseIndexSingleAlias
     , reverseIndexLookup
     , reverseIndexLookupSingleAlias
     , addIndexEntry
@@ -31,6 +33,7 @@ module Wolf.Data.Index
 import Import
 
 import qualified Data.Map as M
+import qualified Data.Set as S
 
 import Wolf.Data.Entry.Types
 import Wolf.Data.Index.Types
@@ -44,6 +47,27 @@ indexKeys = M.keys . indexMap
 
 indexTuples :: Index -> [(Alias, PersonUuid)]
 indexTuples = M.toList . indexMap
+
+reverseIndex :: Index -> Map PersonUuid (Set Alias)
+reverseIndex = M.foldlWithKey go M.empty . indexMap
+  where
+    go :: Map PersonUuid (Set Alias)
+       -> Alias
+       -> PersonUuid
+       -> Map PersonUuid (Set Alias)
+    go m a u = M.alter add u m
+      where
+        add Nothing = Just $ S.singleton a
+        add (Just as) = Just $ S.insert a as
+
+reverseIndexSingleAlias :: Index -> Map PersonUuid Alias
+reverseIndexSingleAlias = M.foldlWithKey go M.empty . indexMap
+  where
+    go :: Map PersonUuid Alias -> Alias -> PersonUuid -> Map PersonUuid Alias
+    go m a u = M.alter add u m
+      where
+        add Nothing = Just a
+        add (Just a_) = Just a_
 
 reverseIndexLookup :: PersonUuid -> Index -> [Alias]
 reverseIndexLookup uuid index =

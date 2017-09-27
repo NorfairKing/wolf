@@ -6,6 +6,7 @@ packages:
 - wolf-data
 - wolf-google
 - wolf-server
+- wolf-web-server
 - wolf-test-utils
 
 extra-deps:

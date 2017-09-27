@@ -1,8 +1,12 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module Wolf.Server.OptParse
-    ( module Wolf.Server.OptParse
-    , module Wolf.Server.OptParse.Types
+module Wolf.Web.Server.OptParse
+    ( getInstructions
+    , Instructions
+    , Dispatch(..)
+    , Settings(..)
+    , ServeSettings(..)
+    , DataSettings(..)
     ) where
 
 import Import
@@ -11,7 +15,7 @@ import System.Environment (getArgs)
 
 import Options.Applicative
 
-import Wolf.Server.OptParse.Types
+import Wolf.Web.Server.OptParse.Types
 
 getInstructions :: IO Instructions
 getInstructions = do
@@ -21,12 +25,15 @@ getInstructions = do
 
 combineToInstructions :: Command -> Flags -> Configuration -> IO Instructions
 combineToInstructions (CommandServe ServeFlags {..}) Flags Configuration = do
-    dd <- resolveDir' $ fromMaybe "." serveFlagDataDir
+    ds <-
+        case fromMaybe (SharedFlags ".") serveFlagDataFlags of
+            PersonalFlags fp -> PersonalSets <$> resolveDir' fp
+            SharedFlags fp -> SharedSets <$> resolveDir' fp
     pure
         ( DispatchServe
               ServeSettings
               { serveSetPort = fromMaybe defaultPort serveFlagPort
-              , serveSetDataDir = dd
+              , serveSetDataSets = ds
               }
         , Settings)
 
@@ -37,7 +44,10 @@ getConfiguration :: Command -> Flags -> IO Configuration
 getConfiguration _ _ = pure Configuration
 
 getArguments :: IO Arguments
-getArguments = runArgumentsParser <$> getArgs >>= handleParseResult
+getArguments = do
+    args <- getArgs
+    let result = runArgumentsParser args
+    handleParseResult result
 
 runArgumentsParser :: [String] -> ParserResult Arguments
 runArgumentsParser = execParserPure prefs_ argParser
@@ -56,7 +66,7 @@ argParser :: ParserInfo Arguments
 argParser = info (helper <*> parseArgs) help_
   where
     help_ = fullDesc <> progDesc description
-    description = "Wolf server"
+    description = "Wolf web server"
 
 parseArgs :: Parser Arguments
 parseArgs = (,) <$> parseCommand <*> parseFlags
@@ -73,14 +83,23 @@ parseCommandServe = info parser modifier
          option
              (Just <$> auto)
              (mconcat [long "port", value Nothing, help "the port to serve on"]) <*>
-         option
-             (Just <$> str)
-             (mconcat
-                  [ long "data-dir"
-                  , value Nothing
-                  , help "the data directory to store data in"
-                  ]))
+         (Just <$> parseDataFlags))
     modifier = fullDesc <> progDesc "Serve."
+
+parseDataFlags :: Parser DataFlags
+parseDataFlags =
+    (PersonalFlags <$>
+     strOption
+         (mconcat
+              [ long "personal-data-dir"
+              , help "The directory to serve from, for a personal server"
+              ])) <|>
+    (SharedFlags <$>
+     strOption
+         (mconcat
+              [ long "shared-data-dir"
+              , help "The directory to serve from, for a shared server"
+              ]))
 
 parseFlags :: Parser Flags
 parseFlags = pure Flags

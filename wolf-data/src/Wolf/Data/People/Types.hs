@@ -21,10 +21,17 @@ import qualified Data.Text as T
 import Data.UUID as UUID
 import Data.UUID.V4 as UUID
 import Servant
+import Text.Read
 
 newtype PersonUuid = PersonUuid
     { unPersonUuid :: UUID
-    } deriving (Show, Eq, Ord, Generic)
+    } deriving (Eq, Ord, Generic)
+
+instance Show PersonUuid where
+    show (PersonUuid u) = show u
+
+instance Read PersonUuid where
+    readPrec = PersonUuid <$> readPrec
 
 personUuidBs :: PersonUuid -> ByteString
 personUuidBs (PersonUuid uuid) = UUID.toASCIIBytes uuid

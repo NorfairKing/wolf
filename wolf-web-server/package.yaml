@@ -1,0 +1,36 @@
+name:    wolf-web-server
+version: "0.0.0.0"
+
+
+dependencies:
+- base >= 4.9 && < 5
+
+library:
+  dependencies:
+  - yesod
+  - optparse-applicative == 0.13.*
+  - wolf-server
+  - wolf-data
+  - wolf-api
+  - path-io
+  - path
+  - mtl
+  - servant-server
+  - data-default
+  - template-haskell
+  - containers
+  - shakespeare
+  - time
+  source-dirs: src
+  default-extensions: NoImplicitPrelude
+
+executables:
+  wolf-web-server:
+    main: Main.hs
+    source-dirs: app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - wolf-web-server
