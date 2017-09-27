@@ -1,8 +1,11 @@
-<h1>
-  $maybe alias <-  malias
-    #{aliasText alias}
-  $nothing
-    #{personUuidText uuid}
+<section class="hero">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title"> 
+        $maybe alias <-  malias
+          #{aliasText alias}
+        $nothing
+          #{personUuidText uuid}
 
 $maybe pe <- mpe
   <pre>
