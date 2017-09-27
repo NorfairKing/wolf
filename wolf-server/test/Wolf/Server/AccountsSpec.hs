@@ -25,7 +25,7 @@ spec =
             it "gets an empty map in an empty state" $ \env ->
                 withEnv env getAccounts `shouldReturn` M.empty
             it "gets the accounts that were just stored" $ \env ->
-                forAll genValid $ \m -> do
+                forAllValid $ \m -> do
                     m' <-
                         withEnv env $ do
                             storeAccounts m
@@ -55,12 +55,12 @@ spec =
                                     ]
         describe "tryToAddNewAccount" $
             it "successfully adds a new account to an empty state" $ \env ->
-                forAll genValid $ \un -> do
+                forAllValid $ \un -> do
                     m <- withEnv env $ tryToAddNewAccount un
                     m `shouldSatisfy` isJust
         describe "lookupAccountUUID" $
             it "succesfully looks up newly registered accounts" $ \env ->
-                forAll genValid $ \un -> do
+                forAllValid $ \un -> do
                     mm <-
                         withEnv env $ do
                             m1 <- tryToAddNewAccount un
@@ -76,7 +76,7 @@ spec =
                         (Just u1, Just u2) -> u2 `shouldBe` u1
         describe "getAccount" $
             it "gets the account that was just stored" $ \env ->
-                forAll genValid $ \acc -> do
+                forAllValid $ \acc -> do
                     ma <-
                         withEnv env $ do
                             storeAccount acc

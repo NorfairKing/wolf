@@ -18,7 +18,7 @@ import Wolf.Data.Git
 note :: (MonadIO m, MonadReader Settings m) => [Alias] -> m ()
 note people =
     runData $
-    withInitCheck $ do
+    withInitCheck_ $ do
         origIndex <- getIndexWithDefault
         tnf <- tmpNoteFile
         liftIO $ ignoringAbsence $ removeFile tnf
@@ -48,7 +48,7 @@ note people =
                 makeGitCommit $
                     unwords
                         [ "Added note on"
-                        , show people
+                        , intercalate ", " $ map aliasString people
                         , "with uuid"
                         , noteUuidString noteUuid
                         ]

@@ -1,15 +1,15 @@
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE RecordWildCards #-}
 
 module Wolf.Data.Init
     ( InitData
     , initDataDir
     , initTimestamp
     , initWolf
-    , getInitData
+    , readInitData
     , writeInitData
     , genInitData
     , withInitCheck
+    , withInitCheck_
     ) where
 
 import Import
@@ -33,8 +33,8 @@ initWolf = do
     writeInitData d
 
 -- | Retrieve the 'InitData'
-getInitData :: (MonadIO m, MonadReader DataSettings m) => m (Maybe InitData)
-getInitData = initFile >>= readJSONWithMaybe
+readInitData :: (MonadIO m, MonadReader DataSettings m) => m (Maybe InitData)
+readInitData = initFile >>= readJSONWithMaybe
 
 writeInitData :: (MonadIO m, MonadReader DataSettings m) => InitData -> m ()
 writeInitData d = do
@@ -50,13 +50,14 @@ genInitData = do
 
 -- | Perform an action in a wolf repository,
 -- but only if it has been initialised, otherwise this will 'die'.
-withInitCheck :: (MonadIO m, MonadReader DataSettings m) => m () -> m ()
+withInitCheck ::
+       (MonadIO m, MonadReader DataSettings m) => (InitData -> m a) -> m a
 withInitCheck func = do
     iFile <- initFile
     mid <- readJSONWithDefault Nothing iFile
     wd <- wolfDir
     case mid of
-        Just InitData {..} -> func
+        Just dat -> func dat
         _ ->
             liftIO $
             die $
@@ -65,3 +66,6 @@ withInitCheck func = do
                 , toFilePath wd
                 , "yet."
                 ]
+
+withInitCheck_ :: (MonadIO m, MonadReader DataSettings m) => m () -> m ()
+withInitCheck_ = withInitCheck . const

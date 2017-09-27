@@ -8,6 +8,8 @@ module Wolf.Data.Index.Types
     , aliasString
     , Index(..)
     , newIndex
+    , lookupInIndex
+    , addIndexEntry
     ) where
 
 import Import
@@ -21,7 +23,15 @@ import Wolf.Data.People.Types
 
 newtype Alias = Alias
     { aliasText :: Text
-    } deriving (Show, Eq, Ord, Generic, FromJSONKey, ToJSONKey)
+    } deriving ( Show
+               , Eq
+               , Ord
+               , Generic
+               , FromJSONKey
+               , ToJSONKey
+               , FromJSON
+               , ToJSON
+               )
 
 alias :: Text -> Alias
 alias = Alias
@@ -35,10 +45,6 @@ instance IsString Alias where
 instance Validity Alias
 
 instance NFData Alias
-
-instance FromJSON Alias
-
-instance ToJSON Alias
 
 newtype Index = Index
     { indexMap :: Map Alias PersonUuid
@@ -54,3 +60,12 @@ instance ToJSON Index
 
 newIndex :: Index
 newIndex = Index {indexMap = M.empty}
+
+-- | Look up a `PersonUuid` in the 'Index' by its alias
+lookupInIndex :: Alias -> Index -> Maybe PersonUuid
+lookupInIndex person index = M.lookup person (indexMap index)
+
+-- | Add a 'PersonUuid' to the 'Index' at an alias
+addIndexEntry :: Alias -> PersonUuid -> Index -> Index
+addIndexEntry person uuid origIndex =
+    origIndex {indexMap = M.insert person uuid $ indexMap origIndex}

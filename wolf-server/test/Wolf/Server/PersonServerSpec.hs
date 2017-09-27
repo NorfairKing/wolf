@@ -19,7 +19,7 @@ spec =
     withWolfServer $ do
         describe "getPersonEntry" $
             it "gets the same person that was just posted" $ \cenv ->
-                forAll genValid $ \pe ->
+                forAllValid $ \pe ->
                     withValidNewUser cenv $ \ad -> do
                         pe' <-
                             runClientOrError cenv $ do
@@ -28,8 +28,8 @@ spec =
                         pe' `shouldBe` pe
         describe "getPersonByAlias" $
             it "gets the person that just had its alias set" $ \cenv ->
-                forAll genValid $ \pe ->
-                    forAll genValid $ \alias ->
+                forAllValid $ \pe ->
+                    forAllValid $ \alias ->
                         withValidNewUser cenv $ \ad -> do
                             (uuid, uuid') <-
                                 runClientOrError cenv $ do

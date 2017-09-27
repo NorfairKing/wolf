@@ -92,7 +92,7 @@ runClientOrError cenv func = do
 
 withValidNewUser :: ClientEnv -> (BasicAuthData -> IO ()) -> Property
 withValidNewUser cenv func =
-    forAll genValid $ \register -> do
+    forAllValid $ \register -> do
         errOrUuid <- runClient cenv $ clientPostRegister register
         case errOrUuid of
             Left err ->

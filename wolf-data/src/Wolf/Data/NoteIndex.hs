@@ -2,6 +2,7 @@
 
 module Wolf.Data.NoteIndex
     ( NoteIndex
+    , noteIndexSet
     , newNoteIndex
     , NoteUuid
     , nextRandomNoteUuid
@@ -10,6 +11,7 @@ module Wolf.Data.NoteIndex
     -- * Manipulating indices purely
     , addToNoteIndex
     , containsNoteUuid
+    , isSubNoteIndexOf
     -- * Manipulate the global note index
     , getNoteIndex
     , putNoteIndex
@@ -18,6 +20,7 @@ module Wolf.Data.NoteIndex
     , getNotes
     -- * Manipulate a person's note index
     , getPersonNoteIndex
+    , getPersonNoteIndexWithDefault
     , putPersonNoteIndex
     -- ** Convenience functions for a person's notes
     , getPersonNoteUuids
@@ -47,10 +50,6 @@ addToNoteIndex ni nuuid =
         then Nothing
         else Just $ NoteIndex $ S.insert nuuid $ noteIndexSet ni
 
--- | Check if a given note index contains a given note uuid
-containsNoteUuid :: NoteIndex -> NoteUuid -> Bool
-containsNoteUuid noteIndex noteUuid = noteUuid `S.member` noteIndexSet noteIndex
-
 -- | Retrieve the global note index
 getNoteIndex :: (MonadIO m, MonadReader DataSettings m) => m NoteIndex
 getNoteIndex = noteIndexFile >>= readJSONWithDefault newNoteIndex
@@ -72,10 +71,17 @@ getNotes = do
     catMaybes <$> mapM readNote nuuids
 
 -- | Retrieve a person's note index
-getPersonNoteIndex ::
+getPersonNoteIndexWithDefault ::
        (MonadIO m, MonadReader DataSettings m) => PersonUuid -> m NoteIndex
-getPersonNoteIndex personUuid =
+getPersonNoteIndexWithDefault personUuid =
     personNoteIndexFile personUuid >>= readJSONWithDefault newNoteIndex
+
+getPersonNoteIndex ::
+       (MonadIO m, MonadReader DataSettings m)
+    => PersonUuid
+    -> m (Maybe NoteIndex)
+getPersonNoteIndex personUuid =
+    personNoteIndexFile personUuid >>= readJSONWithMaybe
 
 -- | Save a person's note index
 putPersonNoteIndex ::
@@ -91,7 +97,7 @@ putPersonNoteIndex personUuid noteIndex = do
 getPersonNoteUuids ::
        (MonadIO m, MonadReader DataSettings m) => PersonUuid -> m [NoteUuid]
 getPersonNoteUuids personUuid =
-    (toList . noteIndexSet) <$> getPersonNoteIndex personUuid
+    (toList . noteIndexSet) <$> getPersonNoteIndexWithDefault personUuid
 
 -- | Retrieve all notes for a given person
 getPersonNotes ::
@@ -106,12 +112,13 @@ getPersonNotes personUuid = do
 -- - Generating a new UUID
 -- - Adding the note uuid to the global note index
 -- - Adding the note uuid to the right people's note indices
+-- - Writing the note to a file
 createNewNote :: (MonadIO m, MonadReader DataSettings m) => Note -> m NoteUuid
 createNewNote n = do
     gni <- getNoteIndex
     pniTups <-
         forM (toList $ noteRelevantPeople n) $ \personUuid ->
-            (,) personUuid <$> getPersonNoteIndex personUuid
+            (,) personUuid <$> getPersonNoteIndexWithDefault personUuid
     go gni pniTups
   where
     go gni pniTups = do

@@ -20,6 +20,7 @@ data Command
     | CommandReview
     | CommandRandomPerson
     | CommandSuggestion SuggestionFlags
+    | CommandExport
     deriving (Show, Eq)
 
 data SuggestionFlags
@@ -50,6 +51,7 @@ data Dispatch
     | DispatchReview
     | DispatchRandomPerson
     | DispatchSuggestion SuggestionSettings
+    | DispatchExport
     deriving (Show, Eq)
 
 data SuggestionSettings

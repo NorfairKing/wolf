@@ -2,9 +2,10 @@ module Wolf.Data
     ( DataSettings(..)
     -- * Init
     , InitData(..)
-    , getInitData
+    , readInitData
     , initWolf
     , withInitCheck
+    , withInitCheck_
     -- * Global index
     , PersonUuid
     , personUuidLBs
@@ -52,12 +53,14 @@ module Wolf.Data
     -- * Notes
     , NoteUuid
     , NoteIndex
+    , noteIndexSet
     , newNoteIndex
     , nextRandomNoteUuid
     , noteUuidText
     , noteUuidString
     , addToNoteIndex
     , containsNoteUuid
+    , isSubNoteIndexOf
     -- ** Global note index
     , getNoteIndex
     , putNoteIndex
@@ -83,9 +86,17 @@ module Wolf.Data
     , addPersonEntrySuggestions
     , readUsedPersonEntrySuggestions
     , recordUsedPersonEntrySuggestions
+    -- * Import and Export
+    , Repo
+    , repoInitData
+    , repoPersonIndex
+    , importRepo
+    , exportRepo
     ) where
 
 import Wolf.Data.Entry
+import Wolf.Data.Export
+import Wolf.Data.Import
 import Wolf.Data.Index
 import Wolf.Data.Init
 import Wolf.Data.Note

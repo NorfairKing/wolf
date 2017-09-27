@@ -11,7 +11,7 @@ import Wolf.Data.Git
 
 init :: (MonadIO m, MonadReader Settings m) => m ()
 init = do
-    mid <- runData getInitData
+    mid <- runData readInitData
     case mid of
         Just d ->
             liftIO $

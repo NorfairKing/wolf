@@ -19,7 +19,7 @@ import Wolf.Data.Time
 review :: (MonadIO m, MonadReader Settings m) => m ()
 review =
     runData $
-    withInitCheck $ do
+    withInitCheck_ $ do
         index <- getIndexWithDefault
         let tups =
                 nubBy (\t1 t2 -> snd t1 == snd t2) $ M.toList $ indexMap index
