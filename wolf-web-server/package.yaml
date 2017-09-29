@@ -7,20 +7,21 @@ dependencies:
 
 library:
   dependencies:
-  - yesod
-  - optparse-applicative == 0.13.*
-  - wolf-server
-  - wolf-data
-  - wolf-api
-  - path-io
-  - path
-  - mtl
-  - servant-server
-  - data-default
-  - template-haskell
   - containers
+  - data-default
+  - mtl
+  - optparse-applicative == 0.13.*
+  - path
+  - path-io
+  - servant-server
   - shakespeare
+  - template-haskell
   - time
+  - wolf-api
+  - wolf-data
+  - wolf-server
+  - yesod
+  - yesod-form
   source-dirs: src
   default-extensions: NoImplicitPrelude
 
@@ -34,3 +35,23 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - wolf-web-server
+
+tests:
+  wolf-web-server-test:
+    main: Spec.hs
+    source-dirs: test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - QuickCheck
+    - genvalidity
+    - genvalidity-hspec
+    - hspec
+    - mtl
+    - path
+    - path-io
+    - wolf-data
+    - wolf-web-server
+    - yesod-test

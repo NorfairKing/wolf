@@ -23,4 +23,4 @@ getPersonR uuid = do
             pure (mpe, ix, ns)
     now <- liftIO getCurrentTime
     let malias = reverseIndexLookupSingleAlias uuid ix
-    defaultLayout $(widgetFile "person")
+    defaultLayout $ withNavBar $(widgetFile "person")

@@ -1,8 +1,3 @@
-<nav .navbar .is-primary role="navigation" aria-label="main navigation">
-  <div .navbar-brand>
-    <div .nav-menu">
-      <a .nav-item href=@{HomeR}>
-        Wolf
 <section .hero .is-small>
   <div .hero-body>
     <div .container>
@@ -11,6 +6,9 @@
           #{aliasText alias}
         $nothing
           #{personUuidText uuid}
+
+<a .button href=@{PersonNewNoteR uuid}>
+  New note
 
 $maybe pe <- mpe
   <pre>
