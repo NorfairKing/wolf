@@ -9,7 +9,7 @@ import Yesod
 
 import Wolf.Web.Server.Foundation
 import Wolf.Web.Server.Handler.Home
+import Wolf.Web.Server.Handler.NewNote
 import Wolf.Web.Server.Handler.Person
-import Wolf.Web.Server.Handler.Person.NewNote
 
 mkYesodDispatch "App" resourcesApp

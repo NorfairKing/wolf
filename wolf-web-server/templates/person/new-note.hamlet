@@ -1,6 +1,0 @@
-<form .form method=post action=@{PersonNewNoteR uuid}>
-  <textarea class="textarea" name="contents" placeholder="e.g. Hello world">
-
-  <button .button type="submit">
-    Submit
-

@@ -17,6 +17,7 @@ import Data.String as X
 
 import Control.Arrow as X
 import Control.Monad as X
+import Control.Monad.Trans as X
 
 import Path as X
 import Path.IO as X
@@ -24,5 +25,3 @@ import Path.IO as X
 import Test.Hspec as X
 import Test.QuickCheck as X
 import Test.Validity as X
-
-import Data.GenValidity as X

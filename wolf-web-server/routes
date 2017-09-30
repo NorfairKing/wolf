@@ -1,4 +1,4 @@
 /                               HomeR           GET
 /people/#PersonUuid             PersonR         GET
-/people/#PersonUuid/new-note    PersonNewNoteR  GET POST
+/new-note                       NewNoteR        GET POST
 

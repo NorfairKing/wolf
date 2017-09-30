@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
@@ -47,6 +48,7 @@ instance Yesod App where
                 --    "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
                 $(widgetFile "default-body")
         withUrlRenderer $(hamletFile "templates/default-page.hamlet")
+    yesodMiddleware = defaultCsrfMiddleware . defaultYesodMiddleware
 
 runDataApp :: App -> ReaderT DataSettings IO a -> IO a
 runDataApp app func = do
@@ -73,3 +75,12 @@ instance PathPiece PersonUuid where
 
 withNavBar :: WidgetT App IO () -> WidgetT App IO ()
 withNavBar widget = $(widgetFile "with-nav-bar")
+
+genToken :: MonadHandler m => m Html
+genToken = do
+    req <- getRequest
+    let tokenKey = defaultCsrfParamName
+    pure $
+        case reqToken req of
+            Nothing -> mempty
+            Just n -> [shamlet|<input type=hidden name=#{tokenKey} value=#{n}>|]

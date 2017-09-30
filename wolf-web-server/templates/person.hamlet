@@ -7,9 +7,6 @@
         $nothing
           #{personUuidText uuid}
 
-<a .button href=@{PersonNewNoteR uuid}>
-  New note
-
 $maybe pe <- mpe
   <pre>
     #{entryContents pe}

@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleContexts #-}
+
 module Wolf.Web.Server.TestUtils where
 
 import TestImport
@@ -6,11 +7,11 @@ import TestImport
 import Yesod.Test
 
 import Control.Monad.Reader
-import Control.Monad.State
 
 import Wolf.Data
+import Wolf.Data.Gen ()
 
-import Wolf.Web.Server.Application
+import Wolf.Web.Server.Application ()
 import Wolf.Web.Server.Foundation
 
 -- TODO Also test the shared server automatically
@@ -18,13 +19,18 @@ wolfWebServerSpec :: YesodSpec App -> Spec
 wolfWebServerSpec =
     yesodSpecWithSiteGenerator $ do
         dd <- resolveDir' "/tmp/wolf-web-server-test"
-        let sds = PersonalServer DataSettings {dataSetWolfDir = dd}
-        pure $ App {appDataSettings = sds}
+        ignoringAbsence $ removeDirRecur dd
+        let ds = DataSettings {dataSetWolfDir = dd}
+        runReaderT setupTestData ds
+        let sds = PersonalServer ds
+        pure App {appDataSettings = sds}
 
-runTestData ::
-       (MonadIO m, MonadState (YesodExampleData App) m)
-    => ReaderT DataSettings IO a
-    -> m a
+setupTestData :: ReaderT DataSettings IO ()
+setupTestData = do
+    repo <- liftIO $ generate genValid
+    importRepo repo
+
+runTestData :: ReaderT DataSettings IO a -> YesodExample App a
 runTestData func = do
-    app <- gets yedSite
-    liftIO $ runDataApp app func
+    app_ <- getTestYesod
+    liftIO $ runDataApp app_ func

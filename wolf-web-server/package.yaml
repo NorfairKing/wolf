@@ -16,6 +16,7 @@ library:
   - servant-server
   - shakespeare
   - template-haskell
+  - text
   - time
   - wolf-api
   - wolf-data
@@ -54,4 +55,5 @@ tests:
     - path-io
     - wolf-data
     - wolf-web-server
+    - wolf-test-utils
     - yesod-test

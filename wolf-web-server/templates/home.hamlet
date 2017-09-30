@@ -4,6 +4,9 @@
       <h1 class="title">
         Wolf
 
+<a .button href=@{NewNoteR}>
+  New note
+
 <ul>
   $forall (uuid, alias) <- il
     <li> 
