@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Wolf.Web.Server.Handler.PersonRSpec where
 
 import TestImport
@@ -14,8 +16,12 @@ spec =
     wolfWebServerSpec $
     ydescribe "PersonRSpec" $
     yit "returns a 200 for each person" $ do
-        uuids <- runTestData getPersonUuids
-        -- TODO actually put some data in here.
-        forM_ uuids $ \uuid -> do
-            get $ PersonR uuid
-            statusIs 200
+        uuid <-
+            runTestData $ do
+                ix <- getIndexWithDefault
+                let al = alias "alias"
+                (uuid, ix') <- lookupOrCreateNewPerson al ix
+                putIndex ix'
+                pure uuid
+        get $ PersonR uuid
+        statusIs 200

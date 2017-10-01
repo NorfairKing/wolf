@@ -4,6 +4,7 @@ module Wolf.Web.Server.Handler.Person where
 
 import Import
 
+import Data.Ord
 import Data.Time
 
 import Yesod
@@ -19,7 +20,7 @@ getPersonR uuid = do
         runData $ do
             mpe <- getPersonEntry uuid
             ix <- getIndexWithDefault
-            ns <- getPersonNotes uuid
+            ns <- sortOn (Down . noteTimestamp) <$> getPersonNotes uuid
             pure (mpe, ix, ns)
     now <- liftIO getCurrentTime
     let malias = reverseIndexLookupSingleAlias uuid ix
