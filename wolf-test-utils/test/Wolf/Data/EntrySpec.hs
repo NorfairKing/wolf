@@ -25,7 +25,7 @@ spec = do
         it "produces valid bytestring for any entry" $
             producesValid entryContentsBS
         it "always produces bytestrings in UTF8 encoding" $
-            forAll genValid $ \pe ->
+            forAllValid $ \pe ->
                 case TE.decodeUtf8' $ entryContentsBS pe of
                     Left err ->
                         expectationFailure $
@@ -35,16 +35,16 @@ spec = do
     describe "updatePersonEntry" $ do
         it "Produces a valid result" $ producesValidsOnValids3 updatePersonEntry
         it "doesn't change anything if nothing changed" $
-            forAll genValid $ \pe ->
-                forAll genValid $ \now ->
+            forAllValid $ \pe ->
+                forAllValid $ \now ->
                     case updatePersonEntry now pe (entryContentsBS pe) of
                         UpdateUnchanged -> pure ()
                         r ->
                             expectationFailure $
                             "Should have been UpdateUnchanged, was: " ++ show r
         it "does not result in UpdateUnchanged if anything changed" $
-            forAll genValid $ \now ->
-                forAll genValid $ \peOld ->
+            forAllValid $ \now ->
+                forAllValid $ \peOld ->
                     forAll (genValid `suchThat` (not . sameProperties peOld)) $ \peNew ->
                         case updatePersonEntry now peOld (entryContentsBS peNew) of
                             UpdateUnchanged ->
@@ -52,9 +52,9 @@ spec = do
                                     "Should not have been UpdateUnchanged."
                             _ -> pure ()
         it "keeps all the new keys in the right order" $
-            forAll genValid $ \now ->
-                forAll genValid $ \peOld ->
-                    forAll genValid $ \ls2 ->
+            forAllValid $ \now ->
+                forAllValid $ \peOld ->
+                    forAllValid $ \ls2 ->
                         case personEntry (PMap ls2) of
                             Nothing -> pure () -- Fine.
                             Just peNew ->

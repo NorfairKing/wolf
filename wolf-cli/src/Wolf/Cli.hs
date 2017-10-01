@@ -6,6 +6,7 @@ import Import
 
 import Wolf.Cli.Command.Alias
 import Wolf.Cli.Command.Entry
+import Wolf.Cli.Command.Export
 import Wolf.Cli.Command.Git
 import Wolf.Cli.Command.Init
 import Wolf.Cli.Command.Note
@@ -30,3 +31,4 @@ dispatch (DispatchGit cmds) = git cmds
 dispatch DispatchReview = review
 dispatch DispatchRandomPerson = randomPerson
 dispatch (DispatchSuggestion ss) = suggestion ss
+dispatch DispatchExport = export

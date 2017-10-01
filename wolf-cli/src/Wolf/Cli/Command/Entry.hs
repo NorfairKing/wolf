@@ -21,7 +21,7 @@ import Wolf.Data.Git
 entry :: (MonadIO m, MonadReader Settings m) => Alias -> m ()
 entry person =
     runData $
-    withInitCheck $ do
+    withInitCheck_ $ do
         origIndex <- getIndexWithDefault
         (personUuid, index) <- lookupOrCreateNewPerson person origIndex
         tmpFile <- tmpPersonEntryFile personUuid

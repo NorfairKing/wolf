@@ -24,7 +24,7 @@ spec =
     withWolfServer $
     describe "postRegister" $ do
         it "does not crash" $ \cenv ->
-            forAll genValid $ \register -> do
+            forAllValid $ \register -> do
                 errOrUuid <- runClient cenv $ clientPostRegister register
                 case errOrUuid of
                     Left err ->
@@ -39,8 +39,8 @@ spec =
                                _ -> snf
                     Right uuid -> uuid `shouldSatisfy` isValid
         it "returns a 409 error if the username already exists" $ \cenv ->
-            forAll genValid $ \register ->
-                forAll genValid $ \secondPassword -> do
+            forAllValid $ \register ->
+                forAllValid $ \secondPassword -> do
                     void $ runClientOrError cenv $ clientPostRegister register
                     errOrUuid <-
                         runClient cenv $

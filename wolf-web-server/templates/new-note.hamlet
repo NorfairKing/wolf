@@ -1,0 +1,11 @@
+<form .form method=post action=@{NewNoteR}>
+  <textarea class="textarea" name="contents" placeholder="e.g. Hello world">
+  <select name="uuid">
+    $forall (uuid, alias) <- il
+      <option value=#{personUuidText uuid}>
+        #{aliasText alias}
+  ^{token}
+
+  <button .button type="submit">
+    Submit
+

@@ -1,0 +1,6 @@
+<nav .navbar .is-primary role="navigation" aria-label="main navigation">
+  <div .navbar-brand>
+    <div .nav-menu">
+      <a .nav-item href=@{HomeR}>
+        Wolf
+^{widget}

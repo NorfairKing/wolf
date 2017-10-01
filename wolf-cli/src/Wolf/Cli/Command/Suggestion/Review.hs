@@ -27,14 +27,18 @@ import Wolf.Cli.Report
 import Wolf.Cli.Utils
 
 reviewSuggestion :: (MonadIO m, MonadReader Settings m) => m ()
-reviewSuggestion = do
-    sugs <- runData readPersonEntrySuggestions
-    case sugs of
-        [] -> liftIO $ putStrLn "No suggestions to review."
-        (sug:_) -> reviewSingle sug
+reviewSuggestion =
+    runData $
+    withInitCheck_ $ do
+        sugs <- readPersonEntrySuggestions
+        case sugs of
+            [] -> liftIO $ putStrLn "No suggestions to review."
+            (sug:_) -> reviewSingle sug
 
 reviewSingle ::
-       (MonadIO m, MonadReader Settings m) => Suggestion EntrySuggestion -> m ()
+       (MonadIO m, MonadReader DataSettings m)
+    => Suggestion EntrySuggestion
+    -> m ()
 reviewSingle s = do
     showData s
     yn <-
@@ -46,21 +50,20 @@ reviewSingle s = do
         case entrySuggestionLikelyRelevantPerson $ suggestionData s of
             Nothing -> pure []
             Just (uuid, _) -> do
-                index <- runData getIndexWithDefault
+                index <- getIndexWithDefault
                 pure $ reverseIndexLookup uuid index
     case yn of
-        No ->
-            runData $ do
-                recordUsedPersonEntrySuggestions [s]
-                let message =
-                        unwords
-                            [ "Threw away a suggestion"
-                            , case oldAliases ++
-                                   entrySuggestionNewAliases (suggestionData s) of
-                                  [] -> "for a person without aliases."
-                                  (a:_) -> "for " ++ aliasString a ++ "."
-                            ]
-                makeGitCommit message
+        No -> do
+            recordUsedPersonEntrySuggestions [s]
+            let message =
+                    unwords
+                        [ "Threw away a suggestion"
+                        , case oldAliases ++
+                               entrySuggestionNewAliases (suggestionData s) of
+                              [] -> "for a person without aliases."
+                              (a:_) -> "for " ++ aliasString a ++ "."
+                        ]
+            makeGitCommit message
         Yes -> do
             newAliases <-
                 promptAboutAliases $
@@ -72,62 +75,61 @@ reviewSingle s = do
             mergedEntry <- getMergedEntry s >>= promptAboutEntry
             commitMessage <-
                 case entrySuggestionLikelyRelevantPerson $ suggestionData s of
-                    Nothing ->
-                        runData $ do
-                            let displayName =
-                                    case newAliases of
-                                        [] -> "an un-aliased person"
-                                        (a:_) -> a
-                            origIndex <- getIndexWithDefault
-                            mNewVersion <- createNewPerson newAliases origIndex
-                            case mNewVersion of
-                                Nothing ->
-                                    liftIO $
-                                    die
-                                        "Unable to add this person, one of the chosen aliases was already asigned."
-                                Just (personUuid, index) -> do
-                                    case mergedEntry of
-                                        Nothing -> deletePersonEntry personUuid
-                                        Just e -> putPersonEntry personUuid e
-                                    putIndex index
-                                    pure $
-                                        unwords
-                                            [ "Added entry for"
-                                            , aliasString displayName
-                                            , "via a suggestion from"
-                                            , T.unpack $ suggestionSuggestor s
-                                            ]
-                    Just (personUuid, _) ->
-                        runData $ do
-                            origIndex <- getIndexWithDefault
-                            let displayName =
-                                    case reverseIndexLookup personUuid origIndex ++
-                                         newAliases of
-                                        [] -> "an un-aliased person"
-                                        (a:_) -> a
-                            case addAliases newAliases personUuid origIndex of
-                                Nothing ->
-                                    liftIO $
-                                    die
-                                        "Unable to add aliases to this person, one of the chosen new aliases was already asigned."
-                                Just index -> do
-                                    case mergedEntry of
-                                        Nothing -> pure ()
-                                        Just e -> putPersonEntry personUuid e
-                                    putIndex index
-                                    pure $
-                                        unwords
-                                            [ "Changed entry for"
-                                            , aliasString displayName
-                                            , "via a suggestion from"
-                                            , T.unpack $ suggestionSuggestor s
-                                            ]
-            runData $ do
-                recordUsedPersonEntrySuggestions [s]
-                makeGitCommit commitMessage
+                    Nothing -> do
+                        let displayName =
+                                case newAliases of
+                                    [] -> "an un-aliased person"
+                                    (a:_) -> a
+                        origIndex <- getIndexWithDefault
+                        mNewVersion <- createNewPerson newAliases origIndex
+                        case mNewVersion of
+                            Nothing ->
+                                liftIO $
+                                die
+                                    "Unable to add this person, one of the chosen aliases was already asigned."
+                            Just (personUuid, index) -> do
+                                case mergedEntry of
+                                    Nothing -> deletePersonEntry personUuid
+                                    Just e -> putPersonEntry personUuid e
+                                putIndex index
+                                pure $
+                                    unwords
+                                        [ "Added entry for"
+                                        , aliasString displayName
+                                        , "via a suggestion from"
+                                        , T.unpack $ suggestionSuggestor s
+                                        ]
+                    Just (personUuid, _) -> do
+                        origIndex <- getIndexWithDefault
+                        let displayName =
+                                case reverseIndexLookup personUuid origIndex ++
+                                     newAliases of
+                                    [] -> "an un-aliased person"
+                                    (a:_) -> a
+                        case addAliases newAliases personUuid origIndex of
+                            Nothing ->
+                                liftIO $
+                                die
+                                    "Unable to add aliases to this person, one of the chosen new aliases was already asigned."
+                            Just index -> do
+                                case mergedEntry of
+                                    Nothing -> pure ()
+                                    Just e -> putPersonEntry personUuid e
+                                putIndex index
+                                pure $
+                                    unwords
+                                        [ "Changed entry for"
+                                        , aliasString displayName
+                                        , "via a suggestion from"
+                                        , T.unpack $ suggestionSuggestor s
+                                        ]
+            do recordUsedPersonEntrySuggestions [s]
+               makeGitCommit commitMessage
 
 showData ::
-       (MonadIO m, MonadReader Settings m) => Suggestion EntrySuggestion -> m ()
+       (MonadIO m, MonadReader DataSettings m)
+    => Suggestion EntrySuggestion
+    -> m ()
 showData s@Suggestion {..} = do
     let EntrySuggestion {..} = suggestionData
     let white = colored [SetColor Foreground Dull White]
@@ -135,9 +137,9 @@ showData s@Suggestion {..} = do
         case entrySuggestionLikelyRelevantPerson of
             Nothing -> pure $ white "No relevant person found."
             Just (uuid, score) -> do
-                index <- runData getIndexWithDefault
+                index <- getIndexWithDefault
                 let relevantAliases = reverseIndexLookup uuid index
-                mentry <- runData $ getPersonEntry uuid
+                mentry <- getPersonEntry uuid
                 pure $
                     unlinesReport $
                     [ white "Relevant person:"
@@ -163,7 +165,7 @@ showData s@Suggestion {..} = do
     liftIO $ putReport infoReport
 
 promptAboutAliases ::
-       (MonadIO m, MonadReader Settings m) => [Alias] -> m [Alias]
+       (MonadIO m, MonadReader DataSettings m) => [Alias] -> m [Alias]
 promptAboutAliases aliases = do
     yn <-
         liftIO $
@@ -197,7 +199,7 @@ tmpAliasFile :: MonadIO m => m (Path Abs File)
 tmpAliasFile = liftIO $ resolveFile' "/tmp/suggestion-aliases.txt"
 
 getMergedEntry ::
-       (MonadIO m, MonadReader Settings m)
+       (MonadIO m, MonadReader DataSettings m)
     => Suggestion EntrySuggestion
     -> m (Maybe PersonEntry)
 getMergedEntry s = do
@@ -205,7 +207,7 @@ getMergedEntry s = do
     oldEntry <-
         case entrySuggestionLikelyRelevantPerson of
             Nothing -> pure Nothing
-            Just (uuid, _) -> runData $ getPersonEntry uuid
+            Just (uuid, _) -> getPersonEntry uuid
     pure $ mergeCurrentEntryWithSuggestion oldEntry entrySuggestionEntry
 
 mergeCurrentEntryWithSuggestion ::
@@ -225,7 +227,7 @@ mergeCurrentEntryWithSuggestion (Just pe) sug =
     go (PMap vs1) (PMap vs2) = PMap $ nubBy ((==) `on` fst) $ vs1 ++ vs2
 
 promptAboutEntry ::
-       (MonadIO m, MonadReader Settings m)
+       (MonadIO m, MonadReader DataSettings m)
     => Maybe PersonEntry
     -> m (Maybe PersonEntry)
 promptAboutEntry mEntry =

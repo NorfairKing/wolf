@@ -23,7 +23,7 @@ import Wolf.Data.Types
 getPersonUuids :: (MonadIO m, MonadReader DataSettings m) => m [PersonUuid]
 getPersonUuids = do
     pd <- peopleDir
-    dirs <- liftIO $ fst <$> listDir pd
+    dirs <- liftIO $ fmap (fromMaybe []) $ forgivingAbsence $ fst <$> listDir pd
     let relDirs = mapMaybe (stripDir pd) dirs
     pure $
         mapMaybe

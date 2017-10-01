@@ -15,15 +15,23 @@ module Wolf.Data.People.Types
 import Import
 
 import Data.Aeson as JSON
+import Data.Aeson.Types as JSON
 import qualified Data.ByteString.Lazy as LB
 import qualified Data.Text as T
 import Data.UUID as UUID
 import Data.UUID.V4 as UUID
 import Servant
+import Text.Read
 
 newtype PersonUuid = PersonUuid
     { unPersonUuid :: UUID
-    } deriving (Show, Eq, Ord, Generic)
+    } deriving (Eq, Ord, Generic)
+
+instance Show PersonUuid where
+    show (PersonUuid u) = show u
+
+instance Read PersonUuid where
+    readPrec = PersonUuid <$> readPrec
 
 personUuidBs :: PersonUuid -> ByteString
 personUuidBs (PersonUuid uuid) = UUID.toASCIIBytes uuid
@@ -51,12 +59,23 @@ instance Validity PersonUuid where
 
 instance NFData PersonUuid
 
+instance FromJSONKey PersonUuid where
+    fromJSONKey = FromJSONKeyTextParser textJSONParsePersonUUID
+
+instance ToJSONKey PersonUuid where
+    toJSONKey = toJSONKeyText (UUID.toText . unPersonUuid)
+
 instance FromJSON PersonUuid where
-    parseJSON =
-        withText "PersonUuid" $ \t ->
-            case UUID.fromText t of
-                Nothing -> fail "Invalid Text when parsing UUID"
-                Just u -> pure $ PersonUuid u
+    parseJSON = jsonParsePersonUUID
+
+jsonParsePersonUUID :: Value -> Parser PersonUuid
+jsonParsePersonUUID = withText "PersonUuid" textJSONParsePersonUUID
+
+textJSONParsePersonUUID :: Text -> Parser PersonUuid
+textJSONParsePersonUUID t =
+    case UUID.fromText t of
+        Nothing -> fail "Invalid Text when parsing UUID"
+        Just u -> pure $ PersonUuid u
 
 instance ToJSON PersonUuid where
     toJSON (PersonUuid u) = JSON.String $ UUID.toText u

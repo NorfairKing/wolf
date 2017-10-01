@@ -15,7 +15,7 @@ spec =
         describe "getPersonEntry" $
             it "gets the entry that was just put" $ \gen ->
                 forAll gen $ \dataSets ->
-                    forAll genValid $ \(personUuid, personEntry) -> do
+                    forAllValid $ \(personUuid, personEntry) -> do
                         mpe <-
                             flip runReaderT dataSets $ do
                                 putPersonEntry personUuid personEntry
@@ -24,7 +24,7 @@ spec =
         describe "getIndex" $
             it "gets the index that was just put" $ \gen ->
                 forAll gen $ \dataSets ->
-                    forAll genValid $ \index -> do
+                    forAllValid $ \index -> do
                         index' <-
                             flip runReaderT dataSets $ do
                                 putIndex index

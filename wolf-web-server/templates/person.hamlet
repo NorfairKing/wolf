@@ -1,0 +1,22 @@
+<section .hero .is-small>
+  <div .hero-body>
+    <div .container>
+      <h1 .title>
+        $maybe alias <-  malias
+          #{aliasText alias}
+        $nothing
+          #{personUuidText uuid}
+
+$maybe pe <- mpe
+  <pre>
+    #{entryContents pe}
+
+$forall n <- ns
+  <div .columns>
+    <div .column .is-9>
+      #{noteContents n}
+    <div .column>
+      #{formatMomentNicely now (noteTimestamp n)}
+
+
+
