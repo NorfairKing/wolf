@@ -20,10 +20,10 @@ note people =
     runData $
     withInitCheck_ $ do
         origIndex <- getIndexWithDefault
-        tnf <- tmpNoteFile
-        liftIO $ ignoringAbsence $ removeFile tnf
         (peopleUuids, index) <-
             getRelevantPeopleUuidsAndNewIndex people origIndex
+        tnf <- tmpNoteFile peopleUuids
+        liftIO $ ignoringAbsence $ removeFile tnf
         editingResult <- startEditorOn tnf
         case editingResult of
             EditingFailure reason ->
@@ -64,7 +64,7 @@ getRelevantPeopleUuidsAndNewIndex (t:ts) origIndex = do
     (puuids, index') <- getRelevantPeopleUuidsAndNewIndex ts index
     pure (personUuid : puuids, index')
 
-tmpNoteFile :: MonadIO m => m (Path Abs File)
-tmpNoteFile = do
+tmpNoteFile :: MonadIO m => [PersonUuid] -> m (Path Abs File)
+tmpNoteFile uuids = do
     tmpDir <- liftIO getTempDir
-    liftIO $ resolveFile tmpDir "note.txt"
+    liftIO $ resolveFile tmpDir $ concatMap personUuidString uuids ++ ".txt"
