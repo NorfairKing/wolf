@@ -105,6 +105,7 @@ test-suite wolf-cli-test
     other-modules:
         TestImport
         TestUtils
+        Wolf.Cli.OptParse.Types.Gen
         Wolf.Command.Entry.Gen
         Wolf.EntrySpec
         Wolf.GitSpec

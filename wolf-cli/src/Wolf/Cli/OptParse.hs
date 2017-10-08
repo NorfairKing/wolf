@@ -41,7 +41,7 @@ combineToInstructions cmd Flags {..} Configuration = do
             CommandEntry person -> pure $ DispatchEntry $ alias person
             CommandGit args -> pure $ DispatchGit args
             CommandAlias old new -> pure $ DispatchAlias (alias old) (alias new)
-            CommandReview -> pure DispatchReview
+            CommandReview mpd -> pure $ DispatchReview $ fromMaybe LastWeek mpd
             CommandRandomPerson -> pure DispatchRandomPerson
             CommandSuggestion sfs ->
                 case sfs of
@@ -221,9 +221,15 @@ parseCommandAlias =
 
 parseCommandReview :: ParserInfo Command
 parseCommandReview =
-    let parser = pure CommandReview
+    let parser = CommandReview <$> periodDescriptionParser
         modifier = fullDesc <> progDesc "Review notes."
     in info parser modifier
+  where
+    periodDescriptionParser =
+        optional $
+        flag' LastDay (mconcat [long "last-day"]) <|>
+        flag' LastWeek (mconcat [long "last-week"]) <|>
+        flag' LastMonth (mconcat [long "last-month"])
 
 parseCommandRandomPerson :: ParserInfo Command
 parseCommandRandomPerson =

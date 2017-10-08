@@ -19,25 +19,28 @@ import Wolf.Cli.Utils
 import Wolf.Data
 import Wolf.Data.Time
 
-review :: (MonadIO m, MonadReader Settings m) => m ()
-review =
+review :: (MonadIO m, MonadReader Settings m) => PeriodDescription -> m ()
+review pd =
     runData $
     withInitCheck_ $ do
-        rr <- makeReviewReport
+        rr <- reviewReportFor pd
         liftIO $ putReport $ reviewReportReport rr
 
-makeReviewReport :: (MonadIO m, MonadReader DataSettings m) => m ReviewReport
-makeReviewReport = do
+reviewReportFor ::
+       (MonadIO m, MonadReader DataSettings m)
+    => PeriodDescription
+    -> m ReviewReport
+reviewReportFor pd = do
     ns <- getNotes
     ix <- getIndexWithDefault
     now <- liftIO getCurrentTime
-    pure $ reviewReport now ix ns
+    pure $ reviewReport pd now ix ns
 
-reviewReport :: UTCTime -> Index -> [Note] -> ReviewReport
-reviewReport now ix ns =
+reviewReport :: PeriodDescription -> UTCTime -> Index -> [Note] -> ReviewReport
+reviewReport pd now ix ns =
     let noteTups =
             M.fromList $
-            flip map ns $ \n@Note {..} ->
+            flip map (filter (inPeriod now pd . noteTimestamp) ns) $ \n@Note {..} ->
                 let as =
                         flip map (S.toList noteRelevantPeople) $ \uuid ->
                             fromMaybe
@@ -46,6 +49,17 @@ reviewReport now ix ns =
                                  reverseIndexLookupSingleAlias uuid ix)
                 in (n, as)
     in ReviewReport {reviewReportTimestamp = now, reviewReportNotes = noteTups}
+
+inPeriod :: UTCTime -> PeriodDescription -> UTCTime -> Bool
+inPeriod now pd time = now `diffUTCTime` time <= days
+  where
+    days =
+        (* oneDay) $
+        case pd of
+            LastDay -> 1
+            LastWeek -> 7
+            LastMonth -> 30
+    oneDay = 60 * 60 * 24 -- seconds
 
 data ReviewReport = ReviewReport
     { reviewReportTimestamp :: UTCTime
