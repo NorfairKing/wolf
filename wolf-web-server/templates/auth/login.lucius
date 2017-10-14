@@ -1,0 +1,4 @@
+.input-group-addon {
+  min-width: 40px;
+  text-align: left;
+}

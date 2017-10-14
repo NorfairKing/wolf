@@ -2,3 +2,5 @@
 /people/#PersonUuid             PersonR         GET
 /new-note                       NewNoteR        GET POST
 
+-- Subsites
+/auth                           AuthR Auth getAuth

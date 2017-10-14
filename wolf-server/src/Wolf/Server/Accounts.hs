@@ -1,7 +1,10 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Wolf.Server.Accounts
-    ( getAccounts
+    ( RegisterError(..)
+    , registerAccount
+    , getAccounts
     , storeAccounts
     , lookupAccountUUID
     , tryToAddNewAccount
@@ -19,6 +22,33 @@ import Wolf.Data.JSONUtils
 
 import Wolf.Server.Path
 import Wolf.Server.Types
+
+data RegisterError
+    = InvalidPassword
+    | UsernameExists
+    deriving (Show, Eq)
+
+registerAccount ::
+       (MonadIO m, MonadReader WolfServerEnv m)
+    => Register
+    -> m (Either RegisterError AccountUUID)
+registerAccount Register {..} = do
+    mh <- liftIO $ hashPassword registerPassword
+    case mh of
+        Nothing -> pure $ Left InvalidPassword
+        Just ph -> do
+            muuid <- tryToAddNewAccount registerUsername
+            case muuid of
+                Nothing -> pure $ Left UsernameExists
+                Just uuid -> do
+                    let acc =
+                            Account
+                            { accountUUID = uuid
+                            , accountUsername = registerUsername
+                            , accountPasswordHash = ph
+                            }
+                    storeAccount acc
+                    pure $ Right uuid
 
 -- | Retrieve global accounts data
 getAccounts ::

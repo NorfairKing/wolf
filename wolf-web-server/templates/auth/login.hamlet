@@ -1,0 +1,45 @@
+<div
+  class="container">
+  <h1> Thanks Login
+
+  <form
+    class="form"
+    method="post"
+    action=@{AuthR loginFormPostTargetR}>
+    <div class="form-group">
+      <label class="sr-only" for="login-email">
+        Email
+      <div class="input-group">
+        <span class="input-group-addon"><i class="fa fa-envelope fa" aria-hidden="true"></i></span>
+        <input
+          id="login-email"
+          class="form-control"
+          name="userkey"
+          placeholder="Username or Email"
+          required=""
+          value=""
+          type="text">
+    <div class="form-group">
+      <label class=sr-only" for="login-password">
+        Password
+      <div class="input-group">
+        <span class="input-group-addon"><i class="fa fa-lock fa" aria-hidden="true"></i></span>
+        <input
+          id="login-password"
+          class="form-control"
+          name="passphrase"
+          placeholder="Passphrase"
+          required=""
+          value=""
+          type="password">
+    ^{token}
+    <div class="form-group">
+      <button
+        id="login-submit"
+        type="submit"
+        class="btn btn-primary btn-lg btn-block">
+          Log in
+    <div class="form-group">
+      <a
+        href="@{AuthR registerR}"
+        class="btn btn-default btn-block"> Register

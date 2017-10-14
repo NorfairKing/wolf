@@ -1,5 +1,4 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeOperators #-}
 
 module Wolf.Server.AccountServer
@@ -21,23 +20,12 @@ accountServer :: ServerT AccountAPI WolfHandler
 accountServer = servePostRegister
 
 servePostRegister :: Register -> WolfHandler AccountUUID
-servePostRegister Register {..} = do
-    mh <- liftIO $ hashPassword registerPassword
-    case mh of
-        Nothing -> throwError $ err400 {errBody = "Failed to hash password."}
-        Just ph -> do
-            muuid <- tryToAddNewAccount registerUsername
-            case muuid of
-                Nothing ->
-                    throwError $
-                    err409
-                    {errBody = "Account with this username already exists."}
-                Just uuid -> do
-                    let acc =
-                            Account
-                            { accountUUID = uuid
-                            , accountUsername = registerUsername
-                            , accountPasswordHash = ph
-                            }
-                    storeAccount acc
-                    pure uuid
+servePostRegister reg = do
+    errOrId <- registerAccount reg
+    case errOrId of
+        Left InvalidPassword ->
+            throwError $ err400 {errBody = "Failed to hash password."}
+        Left UsernameExists ->
+            throwError $
+            err409 {errBody = "Account with this username already exists."}
+        Right uuid -> pure uuid
