@@ -76,14 +76,17 @@ instance YesodAuth App where
             PersonalServer _ -> pure $ Authenticated undefined
             SharedServer senv ->
                 if credsPlugin creds == wolfAuthPluginName
-                    then do
-                        mec <-
-                            flip runReaderT senv $
-                            lookupAccountUUID $ credsIdent creds
-                        pure $
-                            case mec of
-                                Nothing -> UserError "Username not found"
-                                Just uuid -> Authenticated uuid
+                    then case username $ credsIdent creds of
+                             Nothing ->
+                                 pure $ UserError Msg.NoIdentifierProvided
+                             Just un -> do
+                                 mec <-
+                                     flip runReaderT senv $ lookupAccountUUID un
+                                 pure $
+                                     case mec of
+                                         Nothing ->
+                                             UserError $ Msg.IdentifierNotFound $ usernameText un
+                                         Just uuid -> Authenticated uuid
                     else pure $
                          ServerError $
                          T.unwords
@@ -190,7 +193,18 @@ postNewAccountR = do
         PersonalServer _ -> notFound
         SharedServer senv -> do
             let newAccountInputForm =
-                    NewAccount <$> ireq (checkM username textField) "username" <*>
+                    NewAccount <$>
+                    ireq
+                        (checkMMap
+                             (\t ->
+                                  pure $
+                                  case username t of
+                                      Nothing ->
+                                          Left ("Invalid username" :: Text)
+                                      Just un -> Right un)
+                             usernameText
+                             textField)
+                        "username" <*>
                     ireq passwordField "passphrase" <*>
                     ireq passwordField "passphrase-confirm"
             tm <- getRouteToParent
