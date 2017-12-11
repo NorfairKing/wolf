@@ -4,6 +4,10 @@
       <h1 class="title">
         Wolf
 
+$if multiUser
+  <a .button href=@{AuthR registerR}>
+    Register
+
 <a .button href=@{NewNoteR}>
   New note
 

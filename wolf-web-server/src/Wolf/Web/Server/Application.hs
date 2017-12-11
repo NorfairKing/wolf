@@ -6,6 +6,7 @@
 module Wolf.Web.Server.Application where
 
 import Yesod
+import Yesod.Auth
 
 import Wolf.Web.Server.Foundation
 import Wolf.Web.Server.Handler.Home

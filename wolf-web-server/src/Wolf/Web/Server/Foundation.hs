@@ -85,7 +85,9 @@ instance YesodAuth App where
                                  pure $
                                      case mec of
                                          Nothing ->
-                                             UserError $ Msg.IdentifierNotFound $ usernameText un
+                                             UserError $
+                                             Msg.IdentifierNotFound $
+                                             usernameText un
                                          Just uuid -> Authenticated uuid
                     else pure $
                          ServerError $
@@ -232,29 +234,6 @@ postNewAccountR = do
                     case errOrUuid of
                         _ -> redirect LoginR
 
--- createNewAccount ::
---        NewAccount -> (Route Auth -> Route App) -> WolfHandler Account
--- createNewAccount (NewAccount mu email pwd _) tm = do
---     let reg = Register {registerName =
---     case mu of
---         Nothing -> pure ()
---         Just u -> do
---             muser <- loadUser u
---             case muser of
---                 Just _ -> do
---                     setMessageI $ MsgUsernameExists u
---                     redirect $ tm registerR
---                 Nothing -> return ()
---     hashed <- hashPassword pwd
---     mnew <- addNewUser mu email hashed
---     new <-
---         case mnew of
---             Left err -> do
---                 setMessage $ toHtml err
---                 redirect $ tm registerR
---             Right x -> return x
---     render <- getUrlRender
---     return new
 runDataApp :: App -> ReaderT DataSettings IO a -> Handler a
 runDataApp app func = do
     let sds = appDataSettings app
@@ -293,3 +272,11 @@ genToken = do
         case reqToken req of
             Nothing -> mempty
             Just n -> [shamlet|<input type=hidden name=#{tokenKey} value=#{n}>|]
+
+isMultiUser :: Handler Bool
+isMultiUser = do
+    sds <- asks appDataSettings
+    pure $
+        case sds of
+            PersonalServer _ -> False
+            SharedServer _ -> True
