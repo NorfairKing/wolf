@@ -1,9 +1,15 @@
 <h1>
-        Wolf
+  Wolf
 
 $if multiUser
-  <a .button href=@{AuthR registerR}>
-    Register
+  $if loggedIn
+    <a href=@{AuthR LogoutR}>
+      Logout
+  $else
+    <a href=@{AuthR loginR}>
+      Login
+    <a href=@{AuthR registerR}>
+      Register
 
 <a href=@{NewNoteR}>
   New note

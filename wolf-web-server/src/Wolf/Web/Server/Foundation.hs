@@ -113,6 +113,9 @@ wolfAuthPlugin = AuthPlugin wolfAuthPluginName dispatch loginWidget
         token <- genToken
         $(widgetFile "auth/login")
 
+loginR :: AuthRoute
+loginR = PluginR wolfAuthPluginName ["login"]
+
 data LoginData = LoginData
     { loginUserkey :: Text
     , loginPassword :: Text
