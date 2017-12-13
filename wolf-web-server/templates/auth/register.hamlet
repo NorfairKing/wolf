@@ -1,60 +1,43 @@
-<div
-  class="container main-center">
-  <h1> 
-    Wolf Registration
-  <form
-    class="form"
-    method="post"
-    action="@{AuthR registerR}">
+<h1> 
+  Wolf Registration
+<form
+  method="post"
+  action="@{AuthR registerR}">
 
-    <div class="form-group">
-      <label class="sr-only" for="login-email">
-          Email
-      <div class="input-group">
-        <span class="input-group-addon"><i class="fa fa-person" aria-hidden="true"></i></span>
-        <input
-          id="login-email"
-          class="form-control fa-person"
-          name="username"
-          placeholder="Username"
-          required=""
-          value=""
-          type="text">
+  <label for="login-email">
+    Email
+  <input
+    id="login-email"
+    name="username"
+    placeholder="Username"
+    required=""
+    value=""
+    type="text">
 
-    <div class="form-group">
-      <label class="sr-only" for="login-passphrase1">
-          Passphrase
-      <div class="input-group">
-        <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
-        <input
-          id="login-passphrase1"
-          class="form-control fa-lock"
-          name="passphrase"
-          placeholder="Passphrase"
-          required=""
-          value=""
-          type="password">
+  <label for="login-passphrase1">
+    Passphrase
+  <input
+    id="login-passphrase1"
+    name="passphrase"
+    placeholder="Passphrase"
+    required=""
+    value=""
+    type="password">
 
-    <div class="form-group">
-      <label class="sr-only" for="login-passphrase2">
-          Confirm Passphrase
-      <div class="input-group">
-        <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
-        <input
-          id="login-passphrase2"
-          class="form-control fa-lock"
-          name="passphrase-confirm"
-          placeholder="Confirm Passphrase"
-          required=""
-          value=""
-          type="password">
+  <label for="login-passphrase2">
+    Confirm Passphrase
+  <input
+    id="login-passphrase2"
+    name="passphrase-confirm"
+    placeholder="Confirm Passphrase"
+    required=""
+    value=""
+    type="password">
 
-    ^{token}
+  ^{token}
 
-    <div class="form-group">
-      <button
-        id="login-submit"
-        type="submit"
-        class="btn btn-primary btn-block">
-          Register
+  <button
+    id="login-submit"
+    type="submit">
+    Register
 

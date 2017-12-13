@@ -1,7 +1,3 @@
-<div
-  class="container-fluid">
-  <p class="well"> #{mr msg}
-  <a
-    class="btn btn-lg btn-success"
-    href=@{HomeR}>
-    Go back
+#{mr msg}
+<a href=@{HomeR}>
+  Go back

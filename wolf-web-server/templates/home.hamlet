@@ -1,14 +1,11 @@
-<section class="hero is-primary">
-  <div class="hero-body">
-    <div class="container">
-      <h1 class="title">
+<h1>
         Wolf
 
 $if multiUser
   <a .button href=@{AuthR registerR}>
     Register
 
-<a .button href=@{NewNoteR}>
+<a href=@{NewNoteR}>
   New note
 
 <ul>

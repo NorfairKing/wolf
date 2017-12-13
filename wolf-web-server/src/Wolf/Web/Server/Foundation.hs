@@ -57,11 +57,7 @@ mkYesodData "App" $(parseRoutesFile "routes")
 
 instance Yesod App where
     defaultLayout widget = do
-        pc <-
-            widgetToPageContent $ do
-                addStylesheetRemote
-                    "https://cdnjs.cloudflare.com/ajax/libs/bulma/0.5.3/css/bulma.min.css"
-                $(widgetFile "default-body")
+        pc <- widgetToPageContent $(widgetFile "default-body")
         withUrlRenderer $(hamletFile "templates/default-page.hamlet")
     yesodMiddleware = defaultCsrfMiddleware . defaultYesodMiddleware
     authRoute _ = Just $ AuthR LoginR
