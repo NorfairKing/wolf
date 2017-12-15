@@ -18,6 +18,7 @@ import qualified Data.Map as M
 import Data.Map (Map)
 
 import Wolf.API
+import Wolf.Data.Git
 import Wolf.Data.JSONUtils
 
 import Wolf.Server.Path
@@ -48,6 +49,9 @@ registerAccount Register {..} = do
                             , accountPasswordHash = ph
                             }
                     storeAccount acc
+                    add <- accountDataDir $ accountUUID acc
+                    ensureDir add
+                    runGitIn add ["init"]
                     pure $ Right uuid
 
 -- | Retrieve global accounts data
@@ -108,3 +112,4 @@ storeAccount :: (MonadIO m, MonadReader WolfServerEnv m) => Account -> m ()
 storeAccount acc = do
     adf <- accountDataFile $ accountUUID acc
     writeJSON adf acc
+
