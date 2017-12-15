@@ -1,0 +1,8 @@
+<form method=post action=@{NewPersonR}>
+  <textarea name="alias" placeholder="John Smith">
+
+  ^{token}
+
+  <button type="submit">
+    Submit
+

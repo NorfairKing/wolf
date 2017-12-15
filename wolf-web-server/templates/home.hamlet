@@ -11,6 +11,8 @@ $if multiUser
     <a href=@{AuthR registerR}>
       Register
 
+<a href=@{NewPersonR}>
+  New person
 <a href=@{NewNoteR}>
   New note
 

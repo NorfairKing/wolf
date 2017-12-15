@@ -279,3 +279,10 @@ isMultiUser = do
         case sds of
             PersonalServer _ -> False
             SharedServer _ -> True
+
+aliasField :: Field Handler Alias
+aliasField =
+    checkMMap
+        (pure . (Right :: a -> Either Text a) . alias)
+        aliasText
+        textField
