@@ -1,5 +1,6 @@
+<h1> New Person
 <form method=post action=@{NewPersonR}>
-  <textarea name="alias" placeholder="John Smith">
+  <input type="text" name="alias" placeholder="John Smith">
 
   ^{token}
 
