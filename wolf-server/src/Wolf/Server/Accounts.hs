@@ -112,4 +112,3 @@ storeAccount :: (MonadIO m, MonadReader WolfServerEnv m) => Account -> m ()
 storeAccount acc = do
     adf <- accountDataFile $ accountUUID acc
     writeJSON adf acc
-

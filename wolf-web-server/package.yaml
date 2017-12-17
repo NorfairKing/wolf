@@ -9,6 +9,7 @@ library:
   dependencies:
   - containers
   - data-default
+  - http-client
   - mtl
   - optparse-applicative == 0.13.*
   - path

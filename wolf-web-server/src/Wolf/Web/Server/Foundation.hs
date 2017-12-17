@@ -22,6 +22,7 @@ import Control.Monad.Except
 import Control.Monad.Reader
 import Control.Monad.Trans.Maybe
 
+import qualified Network.HTTP.Client as Http
 import Text.Hamlet
 import Yesod
 import Yesod.Auth
@@ -51,6 +52,7 @@ data ServerDataSettings
 
 data App = App
     { appDataSettings :: ServerDataSettings
+    , appHttpManager :: Http.Manager
     }
 
 mkYesodData "App" $(parseRoutesFile "routes")
@@ -66,6 +68,7 @@ instance YesodAuth App where
     type AuthId App = AccountUUID
     loginDest _ = HomeR
     logoutDest _ = HomeR
+    authHttpManager = appHttpManager
     authenticate creds = do
         ds <- asks appDataSettings
         case ds of
@@ -95,8 +98,7 @@ instance YesodAuth App where
     maybeAuthId =
         runMaybeT $ do
             s <- MaybeT $ lookupSession credsKey
-            aid <- MaybeT $ return $ fromPathPiece s
-            return aid
+            MaybeT $ return $ fromPathPiece s
 
 wolfAuthPluginName :: Text
 wolfAuthPluginName = "wolf-auth-plugin"
@@ -208,7 +210,6 @@ postNewAccountR = do
                         "username" <*>
                     ireq passwordField "passphrase" <*>
                     ireq passwordField "passphrase-confirm"
-            tm <- getRouteToParent
             mr <- lift getMessageRender
             result <- lift $ runInputPostResult newAccountInputForm
             mdata <-
@@ -231,7 +232,8 @@ postNewAccountR = do
                 Right reg -> do
                     errOrUuid <- flip runReaderT senv $ registerAccount reg
                     case errOrUuid of
-                        _ -> redirect LoginR
+                        Left _ -> redirect registerR
+                        Right _ -> redirect LoginR
 
 runDataApp :: App -> ReaderT DataSettings IO a -> Handler a
 runDataApp app func = do
@@ -282,7 +284,4 @@ isMultiUser = do
 
 aliasField :: Field Handler Alias
 aliasField =
-    checkMMap
-        (pure . (Right :: a -> Either Text a) . alias)
-        aliasText
-        textField
+    checkMMap (pure . (Right :: a -> Either Text a) . alias) aliasText textField
