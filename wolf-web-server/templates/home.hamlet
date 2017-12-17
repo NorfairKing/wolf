@@ -2,10 +2,10 @@
   Wolf
 
 $if multiUser
-  $if loggedIn
+  $maybe _ <- mauth
     <a href=@{AuthR LogoutR}>
       Logout
-  $else
+  $nothing
     <a href=@{AuthR loginR}>
       Login
     <a href=@{AuthR registerR}>
@@ -21,3 +21,7 @@ $if multiUser
     <li> 
       <a href=@{PersonR uuid}>
         #{aliasText alias}
+
+$maybe i <- mauth
+  <pre>
+    /git/#{accountUUIDText i}.git

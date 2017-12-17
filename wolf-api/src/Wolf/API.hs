@@ -37,6 +37,7 @@ import Import
 import Data.Aeson as JSON
 import Data.Aeson.Types as JSON (toJSONKeyText)
 import qualified Data.ByteString.Base16 as Base16
+import Text.Read
 import Data.Char as Char
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
@@ -58,10 +59,16 @@ type AccountAPI = PostRegister
 
 newtype AccountUUID = AccountUUID
     { unAccountUUID :: UUID
-    } deriving (Show, Eq, Generic)
+    } deriving (Eq, Ord, Generic)
 
 instance Validity AccountUUID where
     isValid = const True
+
+instance Show AccountUUID where
+    show (AccountUUID u) = show u
+
+instance Read AccountUUID where
+    readPrec = AccountUUID <$> readPrec
 
 instance FromJSON AccountUUID where
     parseJSON =

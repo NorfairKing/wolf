@@ -12,6 +12,7 @@ import Yesod
 import Yesod.Auth
 
 import Wolf.Data
+import Wolf.API
 
 import Wolf.Web.Server.Foundation
 
@@ -22,7 +23,7 @@ getHomeR = do
     let il =
             sortOn snd $ M.toList $ reverseIndexSingleAlias ix :: [( PersonUuid
                                                                    , Alias)]
-    loggedIn <- isJust <$> maybeAuthId
+    mauth <- maybeAuthId
     defaultLayout $ do
         setTitle "Wolf"
         $(widgetFile "home")

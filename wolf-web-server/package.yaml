@@ -7,6 +7,7 @@ dependencies:
 
 library:
   dependencies:
+  - bytestring
   - containers
   - data-default
   - http-client
@@ -24,8 +25,14 @@ library:
   - wolf-data
   - wolf-server
   - yesod
-  - yesod-form
   - yesod-auth
+  - yesod-form
+  - process
+  - wai
+  - conduit-extra
+  - yesod-core
+  - http-types
+  - case-insensitive
   source-dirs: src
   default-extensions: NoImplicitPrelude
 
