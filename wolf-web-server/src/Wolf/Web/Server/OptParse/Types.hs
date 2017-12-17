@@ -28,6 +28,11 @@ data Configuration =
     Configuration
     deriving (Show, Eq)
 
+data Environment = Environment
+    { envPort :: Maybe Int
+    , envDataFlags :: Maybe DataFlags
+    } deriving (Show, Eq)
+
 newtype Dispatch =
     DispatchServe ServeSettings
     deriving (Show, Eq)

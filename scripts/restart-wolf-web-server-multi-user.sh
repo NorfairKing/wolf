@@ -5,4 +5,8 @@ set -x
 cd $HOME
 
 killall wolf-web-server || true
-wolf-web-server serve --shared-data-dir="/tmp/shared-wolf" --port 8000 &
+
+PORT=8000
+SHARED_DATA_DIR=/tmp/shared-wolf
+
+wolf-web-server serve &
