@@ -1,0 +1,43 @@
+<h1> 
+  Wolf Registration
+<form
+  method="post"
+  action="@{AuthR registerR}">
+
+  <label for="login-email">
+    Email
+  <input
+    id="login-email"
+    name="username"
+    placeholder="Username"
+    required=""
+    value=""
+    type="text">
+
+  <label for="login-passphrase1">
+    Passphrase
+  <input
+    id="login-passphrase1"
+    name="passphrase"
+    placeholder="Passphrase"
+    required=""
+    value=""
+    type="password">
+
+  <label for="login-passphrase2">
+    Confirm Passphrase
+  <input
+    id="login-passphrase2"
+    name="passphrase-confirm"
+    placeholder="Confirm Passphrase"
+    required=""
+    value=""
+    type="password">
+
+  ^{token}
+
+  <button
+    id="login-submit"
+    type="submit">
+    Register
+

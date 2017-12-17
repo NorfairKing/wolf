@@ -1,0 +1,30 @@
+<h1> Wolf Login
+
+<form
+  method="post"
+  action=@{AuthR loginFormPostTargetR}>
+    <label for="login-email">
+      Email
+    <input
+      id="login-email"
+      name="userkey"
+      placeholder="Username or Email"
+      required=""
+      value=""
+      type="text">
+    <label for="login-password">
+      Password
+    <input
+      id="login-password"
+      name="passphrase"
+      placeholder="Passphrase"
+      required=""
+      value=""
+      type="password">
+  ^{token}
+  <button
+    id="login-submit"
+    type="submit">
+    Log in
+  <a href="@{AuthR registerR}">
+    Register

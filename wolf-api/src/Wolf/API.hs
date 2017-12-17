@@ -11,6 +11,7 @@ module Wolf.API
     , Register(..)
     , AccountUUID
     , newAccountUUID
+    , parseAccountUUID
     , accountUUIDString
     , accountUUIDText
     , Username
@@ -74,6 +75,9 @@ instance ToJSON AccountUUID where
 
 newAccountUUID :: IO AccountUUID
 newAccountUUID = AccountUUID <$> UUID.nextRandom
+
+parseAccountUUID :: Text -> Maybe AccountUUID
+parseAccountUUID = fmap AccountUUID . UUID.fromText
 
 accountUUIDString :: AccountUUID -> String
 accountUUIDString = UUID.toString . unAccountUUID

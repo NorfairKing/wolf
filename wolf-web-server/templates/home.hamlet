@@ -1,10 +1,19 @@
-<section class="hero is-primary">
-  <div class="hero-body">
-    <div class="container">
-      <h1 class="title">
-        Wolf
+<h1>
+  Wolf
 
-<a .button href=@{NewNoteR}>
+$if multiUser
+  $if loggedIn
+    <a href=@{AuthR LogoutR}>
+      Logout
+  $else
+    <a href=@{AuthR loginR}>
+      Login
+    <a href=@{AuthR registerR}>
+      Register
+
+<a href=@{NewPersonR}>
+  New person
+<a href=@{NewNoteR}>
   New note
 
 <ul>

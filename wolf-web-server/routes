@@ -1,4 +1,7 @@
 /                               HomeR           GET
 /people/#PersonUuid             PersonR         GET
 /new-note                       NewNoteR        GET POST
+/new-person                     NewPersonR      GET POST
 
+-- Subsites
+/auth                           AuthR Auth getAuth

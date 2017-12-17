@@ -1,0 +1,9 @@
+<h1> New Person
+<form method=post action=@{NewPersonR}>
+  <input type="text" name="alias" placeholder="John Smith">
+
+  ^{token}
+
+  <button type="submit">
+    Submit
+

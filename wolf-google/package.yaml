@@ -1,0 +1,69 @@
+name: wolf-google
+version: '0.0.0.0'
+category: CsSyd
+author: Tom Sydney Kerckhove
+maintainer: syd.kerckhove@gmail.com
+copyright: ! 'Copyright: (c) 2017 Tom Sydney Kerckhove'
+license: AllRightsReserved
+homepage: http://cs-syd.eu
+dependencies:
+- base >=4.9 && <=5
+library:
+  source-dirs: src/
+  default-extensions:
+  - NoImplicitPrelude
+  ghc-options: -Wall
+  exposed-modules:
+  - Import
+  - Wolf.Google
+  - Wolf.Google.OptParse
+  - Wolf.Google.OptParse.Types
+  - Wolf.Google.Suggest
+  - Wolf.Google.Suggest.Adapt
+  - Wolf.Google.Suggest.Call
+  - Wolf.Google.Suggest.Finalise
+  - Wolf.Google.Suggest.Gather
+  - Wolf.Google.Suggest.MakeEntry
+  - Wolf.Google.Suggest.Types
+  dependencies:
+  - aeson >=1.0 && <1.1
+  - aeson-pretty >=0.8 && <0.9
+  - bytestring >=0.10 && <0.11
+  - containers >=0.5 && <0.6
+  - exceptions >=0.8 && <0.9
+  - gogol >=0.3 && <0.4
+  - gogol-people >=0.3 && <0.4
+  - http-client >=0.5 && <0.6
+  - microlens >=0.4 && <0.5
+  - mtl >=2.2 && <2.3
+  - optparse-applicative >=0.13
+  - process >=1.4 && <1.5
+  - text >=1.2 && <1.3
+  - time >=1.6 && <1.7
+  - vector >=0.11 && <0.12
+  - wolf-cli
+  - wolf-data
+executables:
+  wolf-google:
+    main: Main.hs
+    source-dirs: app/
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - wolf-google
+tests:
+  wolf-google-test:
+    main: Spec.hs
+    source-dirs: test/
+    default-extensions:
+    - NoImplicitPrelude
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -Wall
+    dependencies:
+    - wolf-google
+    - hspec

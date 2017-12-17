@@ -9,6 +9,7 @@ library:
   dependencies:
   - containers
   - data-default
+  - http-client
   - mtl
   - optparse-applicative == 0.13.*
   - path
@@ -18,11 +19,13 @@ library:
   - template-haskell
   - text
   - time
+  - transformers
   - wolf-api
   - wolf-data
   - wolf-server
   - yesod
   - yesod-form
+  - yesod-auth
   source-dirs: src
   default-extensions: NoImplicitPrelude
 
