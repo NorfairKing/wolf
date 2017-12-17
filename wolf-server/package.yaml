@@ -1,0 +1,98 @@
+name: wolf-server
+version: '0.0.0.0'
+category: CsSyd
+author: Tom Sydney Kerckhove
+maintainer: syd.kerckhove@gmail.com
+copyright: ! 'Copyright: (c) 2017 Tom Sydney Kerckhove'
+license: AllRightsReserved
+homepage: http://cs-syd.eu
+dependencies:
+- base >=4.9 && <=5
+library:
+  source-dirs: src/
+  default-extensions:
+  - NoImplicitPrelude
+  ghc-options: -Wall
+  exposed-modules:
+  - Wolf.Server
+  - Wolf.Server.AccountServer
+  - Wolf.Server.Accounts
+  - Wolf.Server.OptParse
+  - Wolf.Server.OptParse.Types
+  - Wolf.Server.Path
+  - Wolf.Server.PersonServer
+  - Wolf.Server.Serve
+  - Wolf.Server.Types
+  - Wolf.Server.Utils
+  dependencies:
+  - bytestring >=0.10 && <0.11
+  - containers >=0.5 && <0.6
+  - git >=0.2 && <0.3
+  - mtl >=2.2 && <2.3
+  - optparse-applicative >=0.13
+  - path >=0.5 && <0.6
+  - path-io >=1.2 && <1.3
+  - servant >=0.9 && <0.10
+  - servant-server >=0.9 && <0.10
+  - system-filepath >=0.4 && <0.5
+  - text >=1.2 && <1.3
+  - unordered-containers >=0.2 && <0.3
+  - uuid >=1.3 && <1.4
+  - validity >=0.4 && <0.5
+  - validity-containers >=0.2 && <0.3
+  - validity-text >=0.2 && <0.3
+  - validity-time >=0.1 && <0.2
+  - wai >=3.2 && <3.3
+  - warp >=3.2 && <3.3
+  - wolf-api >=0.0 && <0.1
+  - wolf-cli >=0.0 && <0.1
+  - wolf-data >=0.0 && <0.1
+executables:
+  wolf-server:
+    main: Main.hs
+    source-dirs: app/
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - wolf-server
+tests:
+  wolf-server-test:
+    main: Spec.hs
+    source-dirs: test/
+    default-extensions:
+    - NoImplicitPrelude
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -Wall
+    dependencies:
+    - wolf-server
+    - QuickCheck
+    - bytestring
+    - containers
+    - genvalidity
+    - genvalidity-bytestring
+    - genvalidity-containers
+    - genvalidity-hspec
+    - genvalidity-hspec-aeson
+    - genvalidity-text
+    - genvalidity-time
+    - hspec
+    - http-client >=0.5 && <0.6
+    - http-types >=0.9 && <0.10
+    - mtl
+    - path
+    - path-io
+    - servant
+    - servant-client
+    - servant-server
+    - text
+    - wai
+    - warp
+    - wolf-api
+    - wolf-client
+    - wolf-test-utils
+    - wolf-data
