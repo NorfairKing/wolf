@@ -8,31 +8,34 @@ dependencies:
 library:
   dependencies:
   - bytestring
+  - case-insensitive
+  - conduit-extra
   - containers
   - data-default
   - http-client
+  - http-types
   - mtl
   - optparse-applicative == 0.13.*
   - path
   - path-io
+  - process
   - servant-server
   - shakespeare
   - template-haskell
   - text
   - time
   - transformers
+  - unix
+  - wai
+  - wai-extra
+  - wai-git-http
   - wolf-api
   - wolf-data
   - wolf-server
   - yesod
   - yesod-auth
-  - yesod-form
-  - process
-  - wai
-  - conduit-extra
   - yesod-core
-  - http-types
-  - case-insensitive
+  - yesod-form
   source-dirs: src
   default-extensions: NoImplicitPrelude
 

@@ -37,12 +37,12 @@ import Import
 import Data.Aeson as JSON
 import Data.Aeson.Types as JSON (toJSONKeyText)
 import qualified Data.ByteString.Base16 as Base16
-import Text.Read
 import Data.Char as Char
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 import Data.UUID as UUID
 import Data.UUID.V4 as UUID
+import Text.Read
 
 import qualified Crypto.BCrypt as BCrypt
 

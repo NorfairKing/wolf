@@ -38,7 +38,6 @@ import Wolf.Server.Types hiding (WolfHandler)
 import Wolf.Web.Server.Constants
 import Wolf.Web.Server.Widget
 
-
 type WolfWidget = WolfWidget' ()
 
 type WolfWidget' = WidgetT App IO

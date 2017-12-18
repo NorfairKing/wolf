@@ -11,8 +11,8 @@ import qualified Data.Map as M
 import Yesod
 import Yesod.Auth
 
-import Wolf.Data
 import Wolf.API
+import Wolf.Data
 
 import Wolf.Web.Server.Foundation
 
