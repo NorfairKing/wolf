@@ -17,6 +17,7 @@ library:
   - Wolf.Server
   - Wolf.Server.AccountServer
   - Wolf.Server.Accounts
+  - Wolf.Server.Auth
   - Wolf.Server.OptParse
   - Wolf.Server.OptParse.Types
   - Wolf.Server.Path

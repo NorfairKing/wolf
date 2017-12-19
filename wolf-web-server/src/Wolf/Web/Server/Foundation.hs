@@ -53,6 +53,7 @@ data ServerDataSettings
 data App = App
     { appDataSettings :: ServerDataSettings
     , appHttpManager :: Http.Manager
+    , appGit :: WaiSubsite
     }
 
 mkYesodData "App" $(parseRoutesFile "routes")

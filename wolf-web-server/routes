@@ -5,3 +5,4 @@
 
 -- Subsites
 /auth                           AuthR Auth getAuth
+/git                            GitR WaiSubsite appGit

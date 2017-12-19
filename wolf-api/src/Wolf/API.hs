@@ -42,6 +42,7 @@ import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 import Data.UUID as UUID
 import Data.UUID.V4 as UUID
+import Text.Read
 
 import qualified Crypto.BCrypt as BCrypt
 
@@ -58,10 +59,16 @@ type AccountAPI = PostRegister
 
 newtype AccountUUID = AccountUUID
     { unAccountUUID :: UUID
-    } deriving (Show, Eq, Generic)
+    } deriving (Eq, Ord, Generic)
 
 instance Validity AccountUUID where
     isValid = const True
+
+instance Show AccountUUID where
+    show (AccountUUID u) = show u
+
+instance Read AccountUUID where
+    readPrec = AccountUUID <$> readPrec
 
 instance FromJSON AccountUUID where
     parseJSON =

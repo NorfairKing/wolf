@@ -34,4 +34,7 @@ extra-deps:
 - validity-time-0.1.0.0
 - validity-uuid-0.0.0.0
 - word-wrap-0.4.1
+- sockaddr-0.0.0
+- /home/syd/wai-git-http
+
 resolver: lts-8.17
