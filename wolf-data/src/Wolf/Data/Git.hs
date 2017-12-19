@@ -1,6 +1,6 @@
 {-# LANGUAGE FlexibleContexts #-}
 
-module Wolf.Data.Git where
+module Wolf.Data.Git (gitInit, makeGitCommit, runGit, runGitIn) where
 
 import Import
 

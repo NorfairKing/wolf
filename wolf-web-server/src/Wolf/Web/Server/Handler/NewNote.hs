@@ -16,6 +16,7 @@ import Yesod
 import Wolf.Web.Server.Foundation
 
 import Wolf.Data
+import Wolf.Data.Git
 
 getNewNoteR :: Handler Html
 getNewNoteR = do
@@ -52,12 +53,20 @@ postNewNoteR :: Handler Html
 postNewNoteR = do
     NewNote {..} <- runInputPost newNoteForm
     now <- liftIO getCurrentTime
-    void $
-        runData $
-        createNewNote
-            Note
-            { noteContents = newNoteContents
-            , noteTimestamp = now
-            , noteRelevantPeople = S.singleton newNotePerson
-            }
+    runData $ do
+        noteUuid <-
+            createNewNote
+                Note
+                { noteContents = newNoteContents
+                , noteTimestamp = now
+                , noteRelevantPeople = S.singleton newNotePerson
+                }
+        makeGitCommit $
+            unwords
+                [ "Added note on person with uuid"
+                , personUuidString newNotePerson
+                , "with uuid"
+                , noteUuidString noteUuid
+                , "via wolf-web-server."
+                ]
     redirect HomeR

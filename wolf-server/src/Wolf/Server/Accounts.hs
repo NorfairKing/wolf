@@ -56,6 +56,24 @@ registerAccount Register {..} = do
                     runGitIn
                         add
                         ["config", "receive.denyCurrentBranch", "updateInstead"]
+                    runGitIn
+                        add
+                        [ "config", "user.name"
+                        , show $
+                          unwords
+                              [ usernameString registerUsername
+                              , "via wolf-web-server"
+                              ]
+                        ]
+                    runGitIn
+                        add
+                        ["config", "user.email"
+                        , show $
+                          unwords
+                              [ usernameString registerUsername
+                              , "via wolf-web-server"
+                              ]
+                        ]
                     pure $ Right uuid
 
 -- | Retrieve global accounts data

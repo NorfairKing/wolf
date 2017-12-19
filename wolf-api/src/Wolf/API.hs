@@ -18,6 +18,7 @@ module Wolf.API
     , validUsernameChar
     , username
     , usernameText
+    , usernameString
     , PasswordHash
     , hashPassword
     , validatePassword
@@ -102,6 +103,9 @@ instance Validity Username where
 validUsernameChar :: Char -> Bool
 validUsernameChar c =
     not (Char.isControl c) && Char.isAlphaNum c && Char.isLatin1 c
+
+usernameString :: Username -> String
+usernameString = T.unpack . usernameText
 
 instance FromJSONKey Username where
     fromJSONKey = FromJSONKeyTextParser parseUsername
