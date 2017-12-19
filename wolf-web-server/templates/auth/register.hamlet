@@ -5,7 +5,7 @@
   action="@{AuthR registerR}">
 
   <label for="login-email">
-    Email
+    Username
   <input
     id="login-email"
     name="username"

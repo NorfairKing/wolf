@@ -62,6 +62,7 @@ mkYesodData "App" $(parseRoutesFile "routes")
 
 instance Yesod App where
     defaultLayout widget = do
+        msgs <- getMessages
         pc <- widgetToPageContent $(widgetFile "default-body")
         withUrlRenderer $(hamletFile "templates/default-page.hamlet")
     yesodMiddleware = defaultCsrfMiddleware . defaultYesodMiddleware
