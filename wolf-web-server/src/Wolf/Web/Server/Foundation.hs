@@ -23,6 +23,8 @@ import Control.Monad.Reader
 import Control.Monad.Trans.Maybe
 
 import qualified Network.HTTP.Client as Http
+import Network.Wai (isSecure, requestHeaderHost)
+
 import Text.Hamlet
 import Yesod
 import Yesod.Auth
@@ -59,6 +61,16 @@ data App = App
 mkYesodData "App" $(parseRoutesFile "routes")
 
 instance Yesod App where
+    approot =
+        ApprootRequest $ \_ r ->
+            maybe
+                ""
+                (mappend
+                     (if isSecure r
+                          then "https://"
+                          else "http://") .
+                 TE.decodeUtf8)
+                (requestHeaderHost r)
     defaultLayout widget = do
         pc <- widgetToPageContent $(widgetFile "default-body")
         withUrlRenderer $(hamletFile "templates/default-page.hamlet")

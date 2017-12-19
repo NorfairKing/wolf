@@ -28,7 +28,7 @@ getHomeR = do
         do ar <- getApprootText approot <$> getYesod <*> waiRequest
            pure $
                case ar of
-                   "" -> "wolf.example.com"
+                   "" -> "http://wolf.example.com"
                    _ -> ar
     defaultLayout $ do
         setTitle "Wolf"
