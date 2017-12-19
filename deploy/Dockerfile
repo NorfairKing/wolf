@@ -3,6 +3,9 @@ FROM fpco/ubuntu-with-libgmp:14.04
 ARG PORT=80
 
 run apt-get -y update
+run apt-get -y install software-properties-common python-software-properties
+run add-apt-repository -y ppa:git-core/ppa
+run apt-get -y update
 run apt-get -y install git
 
 RUN mkdir -p /www/bin /www/wolf-data
