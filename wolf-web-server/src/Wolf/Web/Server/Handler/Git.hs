@@ -39,7 +39,6 @@ import Wolf.Web.Server.Foundation
 
 gitApplication :: ServerDataSettings -> Wai.Application
 gitApplication sds req respond = do
-    installHandler sigCHLD Ignore Nothing
     dd <-
         case sds of
             PersonalServer ds -> pure $ dataSetWolfDir ds
@@ -49,7 +48,7 @@ gitApplication sds req respond = do
                         parseAccountUUID "379cf27b-84c1-44bd-a73f-1f4315f5be9c"
                 runReaderT (accountDataDir aid) wse
     let gitPath = toFilePath $ dd </> dotGit
-    print gitPath
+    -- print gitPath
     rewriteMiddleware (cgiGitBackend gitPath) req respond
 
 dotGit :: Path Rel Dir
@@ -57,4 +56,9 @@ dotGit = $(mkRelDir ".git")
 
 -- We want to rewrite `/git` to `/`.
 rewriteMiddleware :: Middleware
-rewriteMiddleware = rewritePureWithQueries $ \(ps, q) _ -> (drop 1 ps, q)
+rewriteMiddleware =
+    rewritePureWithQueries $ \(ps, q) _ ->
+        ( case ps of
+              ("git":rest) -> rest
+              _ -> ps
+        , q)

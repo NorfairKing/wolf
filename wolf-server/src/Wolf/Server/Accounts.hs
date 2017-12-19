@@ -52,6 +52,10 @@ registerAccount Register {..} = do
                     add <- accountDataDir $ accountUUID acc
                     ensureDir add
                     runGitIn add ["init"]
+                    runGitIn add ["config", "http.receivepack", "true"]
+                    runGitIn
+                        add
+                        ["config", "receive.denyCurrentBranch", "updateInstead"]
                     pure $ Right uuid
 
 -- | Retrieve global accounts data
