@@ -24,4 +24,4 @@ $if multiUser
 
 To clone the data locally, run:
 <pre>
-  git clone #{ar}/git ~/.wolf
+  git clone wolf.cs-syd.eu/git ~/.wolf

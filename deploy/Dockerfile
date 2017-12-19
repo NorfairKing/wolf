@@ -10,12 +10,12 @@ run apt-get -y install git
 
 RUN mkdir -p /www/bin /www/wolf-data
 WORKDIR /www
-ADD dist/wolf-web-server /www/bin/wolf-web-server
-RUN chmod +x /www/bin/wolf-web-server
 
 EXPOSE ${PORT}
-
 ENV PORT ${PORT}
 ENV SHARED_DATA_DIR /www/wolf-data
+
+ADD dist/wolf-web-server /www/bin/wolf-web-server
+RUN chmod +x /www/bin/wolf-web-server
 
 CMD /www/bin/wolf-web-server serve
