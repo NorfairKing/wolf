@@ -24,6 +24,12 @@ getHomeR = do
             sortOn snd $ M.toList $ reverseIndexSingleAlias ix :: [( PersonUuid
                                                                    , Alias)]
     mauth <- maybeAuthId
+    ar <-
+        do ar <- getApprootText approot <$> getYesod <*> waiRequest
+           pure $
+               case ar of
+                   "" -> "wolf.example.com"
+                   _ -> ar
     defaultLayout $ do
         setTitle "Wolf"
         $(widgetFile "home")

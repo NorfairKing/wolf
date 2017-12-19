@@ -22,6 +22,6 @@ $if multiUser
       <a href=@{PersonR uuid}>
         #{aliasText alias}
 
-$maybe i <- mauth
-  <pre>
-    /git/#{accountUUIDText i}.git
+To clone the data locally, run:
+<pre>
+  git clone #{ar}/git ~/.wolf
