@@ -7,8 +7,6 @@ module Wolf.Server.Serve where
 
 import Import
 
-import qualified Data.Text.Encoding as TE
-
 import Control.Monad.Except
 
 import Servant
@@ -19,7 +17,6 @@ import qualified Network.Wai.Handler.Warp as Warp
 import Wolf.API
 
 import Wolf.Server.AccountServer
-import Wolf.Server.Accounts
 import Wolf.Server.Auth
 import Wolf.Server.OptParse
 import Wolf.Server.PersonServer

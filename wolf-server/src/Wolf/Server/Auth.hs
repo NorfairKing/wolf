@@ -14,19 +14,11 @@ import Import
 
 import qualified Data.Text.Encoding as TE
 
-import Control.Monad.Except
-
 import Servant
-
-import qualified Network.Wai as Wai
-import qualified Network.Wai.Handler.Warp as Warp
 
 import Wolf.API
 
-import Wolf.Server.AccountServer
 import Wolf.Server.Accounts
-import Wolf.Server.OptParse
-import Wolf.Server.PersonServer
 import Wolf.Server.Types
 
 authContext :: WolfServerEnv -> Context (BasicAuthCheck Account ': '[])

@@ -58,7 +58,8 @@ registerAccount Register {..} = do
                         ["config", "receive.denyCurrentBranch", "updateInstead"]
                     runGitIn
                         add
-                        [ "config", "user.name"
+                        [ "config"
+                        , "user.name"
                         , show $
                           unwords
                               [ usernameString registerUsername
@@ -67,7 +68,8 @@ registerAccount Register {..} = do
                         ]
                     runGitIn
                         add
-                        ["config", "user.email"
+                        [ "config"
+                        , "user.email"
                         , show $
                           unwords
                               [ usernameString registerUsername

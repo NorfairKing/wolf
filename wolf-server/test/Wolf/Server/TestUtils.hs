@@ -25,6 +25,8 @@ import Network.Wai.Handler.Warp (withApplication)
 
 import Wolf.API
 import Wolf.Client
+
+import Wolf.Server.Auth
 import Wolf.Server.Serve
 import Wolf.Server.Types
 
