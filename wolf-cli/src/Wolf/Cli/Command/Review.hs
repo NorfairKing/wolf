@@ -43,10 +43,10 @@ reviewReport pd now ix ns =
             flip map (filter (inPeriod now pd . noteTimestamp) ns) $ \n@Note {..} ->
                 let as =
                         flip map (S.toList noteRelevantPeople) $ \uuid ->
-                            fromMaybe
+                            maybe
                                 (personUuidText uuid)
-                                (aliasText <$>
-                                 reverseIndexLookupSingleAlias uuid ix)
+                                aliasText
+                                (reverseIndexLookupSingleAlias uuid ix)
                 in (n, as)
     in ReviewReport {reviewReportTimestamp = now, reviewReportNotes = noteTups}
 

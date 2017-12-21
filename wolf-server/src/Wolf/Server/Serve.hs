@@ -1,13 +1,10 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeOperators #-}
 
 module Wolf.Server.Serve where
 
 import Import
-
-import Control.Monad.Except
 
 import Servant
 
@@ -34,8 +31,8 @@ wolfApp se =
 makeWolfServer :: WolfServerEnv -> Server WolfAPI
 makeWolfServer cfg = enter (readerToEither cfg) wolfServer
   where
-    readerToEither :: WolfServerEnv -> WolfHandler :~> ExceptT ServantErr IO
-    readerToEither env = Nat $ \x -> runReaderT x env
+    readerToEither :: WolfServerEnv -> (WolfHandler :~> Handler)
+    readerToEither = runReaderTNat
 
 wolfServer :: ServerT WolfAPI WolfHandler
 wolfServer = accountServer :<|> personServer

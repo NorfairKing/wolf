@@ -24,7 +24,7 @@ getPersonUuids :: (MonadIO m, MonadReader DataSettings m) => m [PersonUuid]
 getPersonUuids = do
     pd <- peopleDir
     dirs <- liftIO $ fmap (fromMaybe []) $ forgivingAbsence $ fst <$> listDir pd
-    let relDirs = mapMaybe (stripDir pd) dirs
+    let relDirs = mapMaybe (stripProperPrefix pd) dirs
     pure $
         mapMaybe
             (parsePersonUuidString . FP.dropTrailingPathSeparator . toFilePath)

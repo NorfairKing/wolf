@@ -25,8 +25,8 @@ instance FromJSON NoteIndex where
     parseJSON ob =
         (withObject "NoteIndex" $ \o -> NoteIndex <$> o .: "noteIndexList") ob -- TODO remove old JSON parsing
          <|>
-        (withArray "NoteIndex" $ \a ->
-             (NoteIndex . S.fromList . toList) <$> traverse parseJSON a)
+        (withArray "NoteIndex" $
+         fmap (NoteIndex . S.fromList . toList) . traverse parseJSON)
             ob
 
 instance ToJSON NoteIndex where

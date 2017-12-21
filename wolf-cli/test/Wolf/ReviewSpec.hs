@@ -18,6 +18,7 @@ spec =
     describe "review" $
     withSandbox $
     it "fails if no wolf repo has been initialised" $ \sb ->
+        once $
         forAll genValid $ \pd ->
             runReaderT
                 (review pd)

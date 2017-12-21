@@ -12,6 +12,8 @@ import Wolf.Data
 
 import Wolf.Google.Suggest.Types
 
+{-# ANN module ("HLint: ignore Use lambda-case" :: Text) #-}
+
 findSimilar :: PersonEntry -> [PersonContext] -> Maybe (PersonContext, Double)
 findSimilar pe =
     find ((>= 1) . snd) . sortOn (Down . snd) . map (\c -> (c, sim c))

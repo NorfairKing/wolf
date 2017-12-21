@@ -17,6 +17,7 @@ spec =
     describe "git" $
     withSandbox $
     it "fails if no wolf repo has been initialised" $ \sb ->
+        once $
         forAllValid $ \args ->
             runReaderT
                 (git args)

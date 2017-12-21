@@ -17,6 +17,7 @@ spec = do
     describe "summary" $
         withSandbox $
         it "fails if no wolf repo has been initialised" $ \sb ->
+            once $
             forAllValid $ \person ->
                 runReaderT
                     (summary person)

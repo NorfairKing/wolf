@@ -333,13 +333,13 @@ makeSelection ac =
         AKC kc -> mskc kc
         AMKVC kvc -> mskvc kvc
   where
-    mspc (ValC vc) = fromMaybe [] $ msparc <$> valCursorParent vc
+    mspc (ValC vc) = maybe [] msparc $ valCursorParent vc
     mspc (ListC lc) = mslc lc
     mspc (MapC mc) = msmc mc
     msparc (ListElPC lec) = 0 : mslec lec
     msparc (KeyValPC kvc) = 1 : mskvc kvc
-    mslc lc = fromMaybe [] $ msparc <$> listCursorParent lc
-    msmc mc = fromMaybe [] $ msparc <$> mapCursorParent mc
+    mslc = maybe [] msparc . listCursorParent
+    msmc = maybe [] msparc . mapCursorParent
     mslec lec = listElCursorIx lec : mslc (listElCursorParent lec)
     mskc kc = 0 : mskvc (keyCursorParent kc)
     mskvc kvc = keyValCursorIx kvc : msmc (keyValCursorParent kvc)

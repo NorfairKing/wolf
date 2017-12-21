@@ -17,6 +17,7 @@ spec =
     describe "note" $
     withSandbox $
     it "fails if no wolf repo has been initialised" $ \sb ->
+        once $
         forAllValid $ \person ->
             runReaderT
                 (note person)

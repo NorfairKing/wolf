@@ -33,7 +33,7 @@ import Wolf.Server.Types
 import Wolf.API.Gen ()
 
 testSandbox :: MonadIO m => m (Path Abs Dir)
-testSandbox = liftIO $ resolveDir' "test-sandbox"
+testSandbox = liftIO $ resolveDir' "/tmp/test-sandbox"
 
 withEnv :: WolfServerEnv -> ReaderT WolfServerEnv IO a -> IO a
 withEnv = flip runReaderT

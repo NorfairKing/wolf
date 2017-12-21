@@ -10,31 +10,8 @@ packages:
 - wolf-test-utils
 
 extra-deps:
-- brick-0.24.2
-- data-clist-0.1.2.0
-- genvalidity-0.4.0.0
-- genvalidity-bytestring-0.1.0.0
-- genvalidity-containers-0.3.0.0
-- genvalidity-hspec-0.5.0.0
-- genvalidity-hspec-aeson-0.1.0.0
-- genvalidity-path-0.2.0.0
-- genvalidity-property-0.1.0.0
-- genvalidity-text-0.4.0.0
-- genvalidity-time-0.1.0.0
-- genvalidity-uuid-0.0.0.0
-- gogol-0.3.0
-- gogol-core-0.3.0
-- gogol-people-0.3.0
 - servant-quickcheck-0.0.2.4
 - sockaddr-0.0.0
-- validity-0.4.0.0
-- validity-bytestring-0.2.0.0
-- validity-containers-0.2.0.0
-- validity-path-0.2.0.0
-- validity-text-0.2.0.0
-- validity-time-0.1.0.0
-- validity-uuid-0.0.0.0
 - wai-git-http-0.0.0
-- word-wrap-0.4.1
 
-resolver: lts-8.17
+resolver: lts-10.0
