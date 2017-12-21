@@ -23,7 +23,8 @@ spec :: Spec
 spec =
     withWolfServer $
     describe "postRegister" $ do
-        it "does not crash" $ \cenv -> once $
+        it "does not crash" $ \cenv ->
+            once $
             forAllValid $ \register -> do
                 errOrUuid <- runClient cenv $ clientPostRegister register
                 case errOrUuid of
