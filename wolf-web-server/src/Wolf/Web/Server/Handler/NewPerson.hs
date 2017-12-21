@@ -7,10 +7,6 @@ module Wolf.Web.Server.Handler.NewPerson where
 
 import Import
 
-import qualified Data.Map as M
-import qualified Data.Set as S
-import Data.Time
-
 import Yesod
 
 import Wolf.Web.Server.Foundation
@@ -20,8 +16,6 @@ import Wolf.Data.Git
 
 getNewPersonR :: Handler Html
 getNewPersonR = do
-    ix <- runData getIndexWithDefault
-    let il = sortOn snd $ M.toList $ reverseIndexSingleAlias ix
     token <- genToken
     defaultLayout $ withNavBar $(widgetFile "new-person")
 
@@ -35,7 +29,6 @@ newPersonForm = NewPerson <$> ireq aliasField "alias"
 postNewPersonR :: Handler Html
 postNewPersonR = do
     NewPerson {..} <- runInputPost newPersonForm
-    now <- liftIO getCurrentTime
     puuid <-
         runData $ do
             ix <- getIndexWithDefault

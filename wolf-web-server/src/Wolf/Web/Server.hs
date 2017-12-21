@@ -18,7 +18,7 @@ import Wolf.Web.Server.OptParse
 
 wolfWebServer :: IO ()
 wolfWebServer = do
-    (DispatchServe ss@ServeSettings {..}, Settings) <- getInstructions
+    (DispatchServe ServeSettings {..}, Settings) <- getInstructions
     man <- Http.newManager Http.defaultManagerSettings
     let sds =
             case serveSetDataSets of

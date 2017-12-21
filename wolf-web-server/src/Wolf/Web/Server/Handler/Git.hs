@@ -7,30 +7,13 @@ module Wolf.Web.Server.Handler.Git
 
 import Import
 
-import qualified Data.ByteString as SB
-import Data.ByteString (ByteString)
-import qualified Data.ByteString.Char8 as SB8
-import qualified Data.ByteString.Lazy as LB
-import qualified Data.ByteString.Lazy.Char8 as LB8
-import qualified Data.Text as T
-
 import Control.Monad.Reader
 
-import System.Environment
-import System.Posix.Signals
-import System.Process
-
-import Data.Conduit.Binary (sourceHandle)
 import Network.HTTP.Types as Http
 import Network.Wai as Wai
 import Network.Wai.Application.CGI.Git
-import Network.Wai.Internal
 import Network.Wai.Middleware.HttpAuth
 import Network.Wai.Middleware.Rewrite
-
-import Yesod hiding (AuthResult(..))
-import Yesod.Auth
-import Yesod.Core.Handler
 
 import Wolf.API
 import Wolf.Data
@@ -41,7 +24,7 @@ import Wolf.Server.Path
 import Wolf.Web.Server.Foundation
 
 gitApplication :: ServerDataSettings -> Wai.Application
-gitApplication sds req respond = do
+gitApplication sds req resp = do
     let authSets = "git"
     mdd <-
         case sds of
@@ -61,10 +44,10 @@ gitApplication sds req respond = do
                                 dd <- runReaderT (accountDataDir aid) wse
                                 pure $ Just dd
     case mdd of
-        Nothing -> authOnNoAuth authSets "git" req respond
+        Nothing -> authOnNoAuth authSets "git" req resp
         Just dd -> do
             let gitPath = toFilePath $ dd </> dotGit
-            rewriteMiddleware (cgiGitBackend gitPath) req respond
+            rewriteMiddleware (cgiGitBackend gitPath) req resp
 
 dotGit :: Path Rel Dir
 dotGit = $(mkRelDir ".git")

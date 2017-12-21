@@ -23,7 +23,6 @@ import Control.Monad.Reader
 import Control.Monad.Trans.Maybe
 
 import qualified Network.HTTP.Client as Http
-import Network.Wai (isSecure, requestHeaderHost)
 
 import Text.Hamlet
 import Yesod
