@@ -13,7 +13,8 @@ import Wolf.Data.People.Types.Gen ()
 
 instance GenUnchecked NoteIndex
 
-instance GenValid NoteIndex
+instance GenValid NoteIndex where
+    genValid = NoteIndex <$> genValid
 
 instance GenUnchecked NoteUuid
 

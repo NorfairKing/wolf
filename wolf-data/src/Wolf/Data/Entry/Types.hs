@@ -3,7 +3,7 @@
 {-# LANGUAGE RecordWildCards #-}
 
 module Wolf.Data.Entry.Types
-    ( PersonEntry
+    ( PersonEntry(..)
     , personEntry
     , personEntryProperties
     , sameProperties

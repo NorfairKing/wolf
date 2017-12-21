@@ -18,7 +18,7 @@ spec :: Spec
 spec =
     withWolfServer $ do
         describe "getPersonEntry" $
-            it "gets the same person that was just posted" $ \cenv ->
+            it "gets the same person that was just posted" $ \cenv -> once $
                 forAllValid $ \pe ->
                     withValidNewUser cenv $ \ad -> do
                         pe' <-
@@ -27,7 +27,7 @@ spec =
                                 clientGetPersonEntry ad uuid
                         pe' `shouldBe` pe
         describe "getPersonByAlias" $
-            it "gets the person that just had its alias set" $ \cenv ->
+            it "gets the person that just had its alias set" $ \cenv -> once $
                 forAllValid $ \pe ->
                     forAllValid $ \alias ->
                         withValidNewUser cenv $ \ad -> do

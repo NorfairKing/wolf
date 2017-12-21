@@ -32,15 +32,18 @@ instance GenValid PasswordHash
 
 instance GenUnchecked Account
 
-instance GenValid Account
+instance GenValid Account where
+    genValid = Account <$> genValid <*> genValid <*> genValid
 
 instance GenUnchecked Register
 
-instance GenValid Register
+instance GenValid Register where
+    genValid = Register <$> genValid <*> genValid
 
 instance GenUnchecked SetPersonAlias
 
-instance GenValid SetPersonAlias
+instance GenValid SetPersonAlias where
+    genValid = SetPersonAlias <$> genValid <*> genValid
 
 instance GenUnchecked PersonQuery
 

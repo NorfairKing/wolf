@@ -8,12 +8,20 @@ import Wolf.Data.Entry.Types
 
 instance GenUnchecked PersonEntry
 
-instance GenValid PersonEntry
+instance GenValid PersonEntry where
+    genValid = PersonEntry <$> genValid
 
 instance GenUnchecked PersonProperty
 
-instance GenValid PersonProperty
+instance GenValid PersonProperty where
+    genValid =
+        oneof
+            [ PVal <$> genValid
+            , PList <$> genValid
+            , (PMap <$> genValid) `suchThat` isValid
+            ]
 
 instance GenUnchecked PersonPropertyValue
 
-instance GenValid PersonPropertyValue
+instance GenValid PersonPropertyValue where
+    genValid = PersonPropertyValue <$> genValid <*> genValid

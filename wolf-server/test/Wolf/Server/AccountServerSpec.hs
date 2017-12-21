@@ -23,7 +23,7 @@ spec :: Spec
 spec =
     withWolfServer $
     describe "postRegister" $ do
-        it "does not crash" $ \cenv ->
+        it "does not crash" $ \cenv -> once $
             forAllValid $ \register -> do
                 errOrUuid <- runClient cenv $ clientPostRegister register
                 case errOrUuid of
@@ -39,6 +39,7 @@ spec =
                                _ -> snf
                     Right uuid -> uuid `shouldSatisfy` isValid
         it "returns a 409 error if the username already exists" $ \cenv ->
+            once $
             forAllValid $ \register ->
                 forAllValid $ \secondPassword -> do
                     void $ runClientOrError cenv $ clientPostRegister register
