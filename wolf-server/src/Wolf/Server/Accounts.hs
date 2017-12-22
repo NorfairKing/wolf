@@ -4,6 +4,7 @@
 module Wolf.Server.Accounts
     ( RegisterError(..)
     , registerAccount
+    , setupWolfGit
     , getAccounts
     , storeAccounts
     , lookupAccountUUID
@@ -51,32 +52,20 @@ registerAccount Register {..} = do
                     storeAccount acc
                     add <- accountDataDir $ accountUUID acc
                     ensureDir add
-                    runGitIn add ["init"]
-                    runGitIn add ["config", "http.receivepack", "true"]
-                    runGitIn
-                        add
-                        ["config", "receive.denyCurrentBranch", "updateInstead"]
-                    runGitIn
-                        add
-                        [ "config"
-                        , "user.name"
-                        , show $
-                          unwords
-                              [ usernameString registerUsername
-                              , "via wolf-web-server"
-                              ]
-                        ]
-                    runGitIn
-                        add
-                        [ "config"
-                        , "user.email"
-                        , show $
-                          unwords
-                              [ usernameString registerUsername
-                              , "via wolf-web-server"
-                              ]
-                        ]
+                    setupWolfGit (usernameString registerUsername) add
                     pure $ Right uuid
+
+setupWolfGit :: MonadIO m => String -> Path Abs Dir -> m ()
+setupWolfGit name add = do
+    runGitIn add ["init"]
+    runGitIn add ["config", "http.receivepack", "true"]
+    runGitIn add ["config", "receive.denyCurrentBranch", "updateInstead"]
+    runGitIn
+        add
+        ["config", "user.name", show $ unwords [name, "via wolf-web-server"]]
+    runGitIn
+        add
+        ["config", "user.email", show $ unwords [name, "via wolf-web-server"]]
 
 -- | Retrieve global accounts data
 getAccounts ::

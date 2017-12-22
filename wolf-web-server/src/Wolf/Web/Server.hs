@@ -1,6 +1,9 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module Wolf.Web.Server where
+module Wolf.Web.Server
+    ( wolfWebServer
+    , makeWolfApp
+    ) where
 
 import Import
 
@@ -19,14 +22,18 @@ import Wolf.Web.Server.OptParse
 wolfWebServer :: IO ()
 wolfWebServer = do
     (DispatchServe ServeSettings {..}, Settings) <- getInstructions
-    man <- Http.newManager Http.defaultManagerSettings
     let sds =
             case serveSetDataSets of
                 PersonalSets dd ->
                     PersonalServer DataSettings {dataSetWolfDir = dd}
                 SharedSets dd -> SharedServer WolfServerEnv {wseDataDir = dd}
-    warp
-        serveSetPort
+    app <- makeWolfApp sds
+    warp serveSetPort app
+
+makeWolfApp :: ServerDataSettings -> IO App
+makeWolfApp sds = do
+    man <- Http.newManager Http.defaultManagerSettings
+    pure
         App
         { appDataSettings = sds
         , appHttpManager = man

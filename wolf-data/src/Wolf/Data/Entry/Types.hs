@@ -5,7 +5,6 @@
 module Wolf.Data.Entry.Types
     ( PersonEntry(..)
     , personEntry
-    , personEntryProperties
     , sameProperties
     , newPersonEntry
     , PersonProperty(..)

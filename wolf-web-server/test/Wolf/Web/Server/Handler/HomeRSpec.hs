@@ -9,7 +9,7 @@ import Wolf.Web.Server.TestUtils
 
 spec :: Spec
 spec =
-    wolfWebServerSpec $
+    wolfWebServerPersonalSpec $
     ydescribe "HomeR" $
     yit "returns a 200" $ do
         get HomeR

@@ -66,7 +66,9 @@ tests:
     - mtl
     - path
     - path-io
+    - wolf-api
     - wolf-data
+    - wolf-server
     - wolf-web-server
     - wolf-test-utils
     - yesod-test

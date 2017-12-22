@@ -1,4 +1,6 @@
-module Wolf.Server where
+module Wolf.Server
+    ( runWolfServer
+    ) where
 
 import Import
 

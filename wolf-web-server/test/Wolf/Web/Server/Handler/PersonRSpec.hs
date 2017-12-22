@@ -13,11 +13,11 @@ import Wolf.Web.Server.TestUtils
 
 spec :: Spec
 spec =
-    wolfWebServerSpec $
+    wolfWebServerPersonalSpec $
     ydescribe "PersonRSpec" $
     yit "returns a 200 for each person" $ do
         uuid <-
-            runTestData $ do
+            runTestDataPersonal $ do
                 ix <- getIndexWithDefault
                 let al = alias "alias"
                 (uuid, ix') <- lookupOrCreateNewPerson al ix
