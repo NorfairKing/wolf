@@ -18,31 +18,29 @@ import Network.Wai.Middleware.Rewrite
 import Wolf.API
 import Wolf.Data
 
+import Wolf.Server
 import Wolf.Server.Auth
 import Wolf.Server.Path
+import Wolf.Server.Types
 
 import Wolf.Web.Server.Foundation
 
-gitApplication :: ServerDataSettings -> Wai.Application
-gitApplication sds req resp = do
+gitApplication :: WolfServerEnv -> Wai.Application
+gitApplication wse req resp = do
     let authSets = "git"
     mdd <-
-        case sds of
-            PersonalServer ds -> pure $ Just $ dataSetWolfDir ds
-            SharedServer wse ->
-                case lookup hAuthorization (requestHeaders req) >>=
-                     extractBasicAuth of
-                    Nothing -> pure Nothing
-                    Just (key, pass) -> do
-                        maid <- basicAuthCheck wse key pass
-                        case maid of
-                            Unauthorized -> pure Nothing
-                            BadPassword -> pure Nothing
-                            NoSuchUser -> pure Nothing
-                            Authorized acc -> do
-                                let aid = accountUUID acc
-                                dd <- runReaderT (accountDataDir aid) wse
-                                pure $ Just dd
+        case lookup hAuthorization (requestHeaders req) >>= extractBasicAuth of
+            Nothing -> pure Nothing
+            Just (key, pass) -> do
+                maid <- basicAuthCheck wse key pass
+                case maid of
+                    Unauthorized -> pure Nothing
+                    BadPassword -> pure Nothing
+                    NoSuchUser -> pure Nothing
+                    Authorized acc -> do
+                        let aid = accountUUID acc
+                        dd <- runReaderT (accountDataDir aid) wse
+                        pure $ Just dd
     case mdd of
         Nothing -> authOnNoAuth authSets "git" req resp
         Just dd -> do

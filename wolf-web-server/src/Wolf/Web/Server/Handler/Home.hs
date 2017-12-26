@@ -18,7 +18,6 @@ import Wolf.Web.Server.Foundation
 getHomeR :: Handler Html
 getHomeR = do
     ix <- runData getIndexWithDefault
-    multiUser <- isMultiUser
     let il =
             sortOn snd $ M.toList $ reverseIndexSingleAlias ix :: [( PersonUuid
                                                                    , Alias)]

@@ -3,4 +3,4 @@
 set -e
 set -x
 
-stack install :wolf-web-server --file-watch --exec='./scripts/restart-wolf-web-server.sh' --fast
+stack install :wolf-web-server --file-watch --exec='./scripts/restart-wolf-web-server.sh' --fast --ghc-options=-freverse-errors

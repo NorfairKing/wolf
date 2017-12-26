@@ -1,15 +1,14 @@
 <h1>
   Wolf
 
-$if multiUser
-  $maybe _ <- mauth
-    <a href=@{AuthR LogoutR}>
-      Logout
-  $nothing
-    <a href=@{AuthR loginR}>
-      Login
-    <a href=@{AuthR registerR}>
-      Register
+$maybe _ <- mauth
+  <a href=@{AuthR LogoutR}>
+    Logout
+$nothing
+  <a href=@{AuthR loginR}>
+    Login
+  <a href=@{AuthR registerR}>
+    Register
 
 <a href=@{NewPersonR}>
   New person

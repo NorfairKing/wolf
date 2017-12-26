@@ -12,13 +12,8 @@ newtype Command =
 
 data ServeFlags = ServeFlags
     { serveFlagPort :: Maybe Int
-    , serveFlagDataFlags :: Maybe DataFlags
+    , serveFlagDataDir :: Maybe FilePath
     } deriving (Show, Eq)
-
-data DataFlags
-    = PersonalFlags FilePath
-    | SharedFlags FilePath
-    deriving (Show, Eq)
 
 data Flags =
     Flags
@@ -30,7 +25,7 @@ data Configuration =
 
 data Environment = Environment
     { envPort :: Maybe Int
-    , envDataFlags :: Maybe DataFlags
+    , envDataDir :: Maybe FilePath
     } deriving (Show, Eq)
 
 newtype Dispatch =
@@ -39,13 +34,8 @@ newtype Dispatch =
 
 data ServeSettings = ServeSettings
     { serveSetPort :: Int
-    , serveSetDataSets :: DataSettings
+    , serveSetDataDir :: Path Abs Dir
     } deriving (Show, Eq)
-
-data DataSettings
-    = PersonalSets (Path Abs Dir)
-    | SharedSets (Path Abs Dir)
-    deriving (Show, Eq)
 
 data Settings =
     Settings

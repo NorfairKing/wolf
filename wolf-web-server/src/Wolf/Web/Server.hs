@@ -22,20 +22,16 @@ import Wolf.Web.Server.OptParse
 wolfWebServer :: IO ()
 wolfWebServer = do
     (DispatchServe ServeSettings {..}, Settings) <- getInstructions
-    let sds =
-            case serveSetDataSets of
-                PersonalSets dd ->
-                    PersonalServer DataSettings {dataSetWolfDir = dd}
-                SharedSets dd -> SharedServer WolfServerEnv {wseDataDir = dd}
-    app <- makeWolfApp sds
+    let wse = WolfServerEnv {wseDataDir = serveSetDataDir}
+    app <- makeWolfApp wse
     warp serveSetPort app
 
-makeWolfApp :: ServerDataSettings -> IO App
-makeWolfApp sds = do
+makeWolfApp :: WolfServerEnv -> IO App
+makeWolfApp wse = do
     man <- Http.newManager Http.defaultManagerSettings
     pure
         App
-        { appDataSettings = sds
+        { appDataSettings = wse
         , appHttpManager = man
-        , appGit = WaiSubsite {runWaiSubsite = gitApplication sds} -- TODO find a better way to not duplicate this sds?
+        , appGit = WaiSubsite {runWaiSubsite = gitApplication wse} -- TODO find a better way to not duplicate this sds?
         }

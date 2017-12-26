@@ -13,7 +13,7 @@ WORKDIR /www
 
 EXPOSE ${PORT}
 ENV PORT ${PORT}
-ENV SHARED_DATA_DIR /www/wolf-data
+ENV DATA_DIR /www/wolf-data
 
 ADD dist/wolf-web-server /www/bin/wolf-web-server
 RUN chmod +x /www/bin/wolf-web-server

@@ -47,12 +47,8 @@ type WolfHandler = HandlerT App IO
 
 type WolfAuthHandler = HandlerT Auth WolfHandler
 
-data ServerDataSettings
-    = PersonalServer DataSettings
-    | SharedServer WolfServerEnv
-
 data App = App
-    { appDataSettings :: ServerDataSettings
+    { appDataSettings :: WolfServerEnv
     , appHttpManager :: Http.Manager
     , appGit :: WaiSubsite
     }
@@ -73,30 +69,21 @@ instance YesodAuth App where
     logoutDest _ = HomeR
     authHttpManager = appHttpManager
     authenticate creds = do
-        ds <- asks appDataSettings
-        case ds of
-            PersonalServer _ -> pure $ Authenticated undefined
-            SharedServer senv ->
-                if credsPlugin creds == wolfAuthPluginName
-                    then case username $ credsIdent creds of
-                             Nothing ->
-                                 pure $ UserError Msg.NoIdentifierProvided
-                             Just un -> do
-                                 mec <-
-                                     flip runReaderT senv $ lookupAccountUUID un
-                                 pure $
-                                     case mec of
-                                         Nothing ->
-                                             UserError $
-                                             Msg.IdentifierNotFound $
-                                             usernameText un
-                                         Just uuid -> Authenticated uuid
-                    else pure $
-                         ServerError $
-                         T.unwords
-                             [ "Unknown authentication plugin:"
-                             , credsPlugin creds
-                             ]
+        senv <- asks appDataSettings
+        if credsPlugin creds == wolfAuthPluginName
+            then case username $ credsIdent creds of
+                     Nothing -> pure $ UserError Msg.NoIdentifierProvided
+                     Just un -> do
+                         mec <- flip runReaderT senv $ lookupAccountUUID un
+                         pure $
+                             case mec of
+                                 Nothing ->
+                                     UserError $
+                                     Msg.IdentifierNotFound $ usernameText un
+                                 Just uuid -> Authenticated uuid
+            else pure $
+                 ServerError $
+                 T.unwords ["Unknown authentication plugin:", credsPlugin creds]
     authPlugins _ = [wolfAuthPlugin]
     maybeAuthId =
         runMaybeT $ do
@@ -131,52 +118,40 @@ loginFormPostTargetR = PluginR wolfAuthPluginName ["login"]
 
 postLoginR :: WolfAuthHandler TypedContent
 postLoginR = do
-    ds <- lift $ asks appDataSettings
-    case ds of
-        PersonalServer _ -> notFound
-        SharedServer senv -> do
-            let loginInputForm =
-                    LoginData <$> ireq textField "userkey" <*>
-                    ireq passwordField "passphrase"
-            result <- lift $ runInputPostResult loginInputForm
-            muser <-
-                case result of
-                    FormMissing -> invalidArgs ["Form is missing"]
-                    FormFailure _ -> return $ Left Msg.InvalidLogin
-                    FormSuccess (LoginData ukey pwd) ->
-                        case username ukey of
-                            Nothing -> pure $ Left Msg.InvalidUsernamePass
-                            Just un -> do
-                                mu <-
-                                    flip runReaderT senv $ lookupAccountUUID un
-                                case mu of
+    senv <- lift $ asks appDataSettings
+    let loginInputForm =
+            LoginData <$> ireq textField "userkey" <*>
+            ireq passwordField "passphrase"
+    result <- lift $ runInputPostResult loginInputForm
+    muser <-
+        case result of
+            FormMissing -> invalidArgs ["Form is missing"]
+            FormFailure _ -> return $ Left Msg.InvalidLogin
+            FormSuccess (LoginData ukey pwd) ->
+                case username ukey of
+                    Nothing -> pure $ Left Msg.InvalidUsernamePass
+                    Just un -> do
+                        mu <- flip runReaderT senv $ lookupAccountUUID un
+                        case mu of
+                            Nothing -> return $ Left Msg.InvalidUsernamePass
+                            Just uuid -> do
+                                macc <- flip runReaderT senv $ getAccount uuid
+                                case macc of
                                     Nothing ->
                                         return $ Left Msg.InvalidUsernamePass
-                                    Just uuid -> do
-                                        macc <-
-                                            flip runReaderT senv $
-                                            getAccount uuid
-                                        case macc of
-                                            Nothing ->
-                                                return $
-                                                Left Msg.InvalidUsernamePass
-                                            Just acc ->
-                                                return $
-                                                if validatePassword
-                                                       (accountPasswordHash acc)
-                                                       (TE.encodeUtf8 pwd)
-                                                    then Right acc
-                                                    else Left
-                                                             Msg.InvalidUsernamePass
-            case muser of
-                Left err -> loginErrorMessageI LoginR err
-                Right acc ->
-                    lift $
-                    setCredsRedirect $
-                    Creds
-                        wolfAuthPluginName
-                        (usernameText $ accountUsername acc)
-                        []
+                                    Just acc ->
+                                        return $
+                                        if validatePassword
+                                               (accountPasswordHash acc)
+                                               (TE.encodeUtf8 pwd)
+                                            then Right acc
+                                            else Left Msg.InvalidUsernamePass
+    case muser of
+        Left err -> loginErrorMessageI LoginR err
+        Right acc ->
+            lift $
+            setCredsRedirect $
+            Creds wolfAuthPluginName (usernameText $ accountUsername acc) []
 
 registerR :: AuthRoute
 registerR = PluginR wolfAuthPluginName ["register"]
@@ -194,60 +169,53 @@ data NewAccount = NewAccount
 
 postNewAccountR :: WolfAuthHandler Html
 postNewAccountR = do
-    ds <- lift $ asks appDataSettings
-    case ds of
-        PersonalServer _ -> notFound
-        SharedServer senv -> do
-            let newAccountInputForm =
-                    NewAccount <$>
-                    ireq
-                        (checkMMap
-                             (\t ->
-                                  pure $
-                                  case username t of
-                                      Nothing ->
-                                          Left ("Invalid username" :: Text)
-                                      Just un -> Right un)
-                             usernameText
-                             textField)
-                        "username" <*>
-                    ireq passwordField "passphrase" <*>
-                    ireq passwordField "passphrase-confirm"
-            mr <- lift getMessageRender
-            result <- lift $ runInputPostResult newAccountInputForm
-            mdata <-
-                case result of
-                    FormMissing -> invalidArgs ["Form is missing"]
-                    FormFailure msg -> return $ Left msg
-                    FormSuccess d ->
-                        return $
-                        if newAccountPassword1 d == newAccountPassword2 d
-                            then Right
-                                     Register
-                                     { registerUsername = newAccountUsername d
-                                     , registerPassword = newAccountPassword1 d
-                                     }
-                            else Left [mr Msg.PassMismatch]
-            case mdata of
-                Left errs -> do
-                    setMessage $ toHtml $ T.concat errs
-                    redirect registerR
-                Right reg -> do
-                    errOrUuid <- flip runReaderT senv $ registerAccount reg
-                    case errOrUuid of
-                        Left _ -> redirect registerR
-                        Right _ -> redirect LoginR
+    senv <- lift $ asks appDataSettings
+    let newAccountInputForm =
+            NewAccount <$>
+            ireq
+                (checkMMap
+                     (\t ->
+                          pure $
+                          case username t of
+                              Nothing -> Left ("Invalid username" :: Text)
+                              Just un -> Right un)
+                     usernameText
+                     textField)
+                "username" <*>
+            ireq passwordField "passphrase" <*>
+            ireq passwordField "passphrase-confirm"
+    mr <- lift getMessageRender
+    result <- lift $ runInputPostResult newAccountInputForm
+    mdata <-
+        case result of
+            FormMissing -> invalidArgs ["Form is missing"]
+            FormFailure msg -> return $ Left msg
+            FormSuccess d ->
+                return $
+                if newAccountPassword1 d == newAccountPassword2 d
+                    then Right
+                             Register
+                             { registerUsername = newAccountUsername d
+                             , registerPassword = newAccountPassword1 d
+                             }
+                    else Left [mr Msg.PassMismatch]
+    case mdata of
+        Left errs -> do
+            setMessage $ toHtml $ T.concat errs
+            redirect registerR
+        Right reg -> do
+            errOrUuid <- flip runReaderT senv $ registerAccount reg
+            case errOrUuid of
+                Left _ -> redirect registerR
+                Right _ -> redirect LoginR
 
 runDataApp :: App -> ReaderT DataSettings IO a -> Handler a
 runDataApp app func = do
-    let sds = appDataSettings app
-    case sds of
-        PersonalServer ds -> liftIO $ runReaderT func ds
-        SharedServer wse -> do
-            uuid <- requireAuthId
-            dd <- runReaderT (accountDataDir uuid) wse
-            let ds = DataSettings {dataSetWolfDir = dd}
-            liftIO $ runReaderT func ds
+    let wse = appDataSettings app
+    uuid <- requireAuthId
+    dd <- runReaderT (accountDataDir uuid) wse
+    let ds = DataSettings {dataSetWolfDir = dd}
+    liftIO $ runReaderT func ds
 
 runData :: ReaderT DataSettings IO a -> Handler a
 runData func = do
@@ -276,14 +244,6 @@ genToken = do
         case reqToken req of
             Nothing -> mempty
             Just n -> [shamlet|<input type=hidden name=#{tokenKey} value=#{n}>|]
-
-isMultiUser :: Handler Bool
-isMultiUser = do
-    sds <- asks appDataSettings
-    pure $
-        case sds of
-            PersonalServer _ -> False
-            SharedServer _ -> True
 
 aliasField :: Field Handler Alias
 aliasField =

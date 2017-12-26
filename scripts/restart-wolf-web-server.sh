@@ -5,4 +5,8 @@ set -x
 cd $HOME
 
 killall wolf-web-server || true
-wolf-web-server serve --personal-data-dir="$HOME/.wolf" --port 8000 &
+
+export PORT=8000
+export DATA_DIR=/tmp/shared-wolf
+
+wolf-web-server serve &

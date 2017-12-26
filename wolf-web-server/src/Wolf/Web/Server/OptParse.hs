@@ -6,7 +6,6 @@ module Wolf.Web.Server.OptParse
     , Dispatch(..)
     , Settings(..)
     , ServeSettings(..)
-    , DataSettings(..)
     ) where
 
 import Import
@@ -28,17 +27,13 @@ getInstructions = do
 combineToInstructions ::
        Command -> Flags -> Configuration -> Environment -> IO Instructions
 combineToInstructions (CommandServe ServeFlags {..}) Flags Configuration Environment {..} = do
-    ds <-
-        case fromMaybe (SharedFlags ".") $
-             serveFlagDataFlags `mplus` envDataFlags of
-            PersonalFlags fp -> PersonalSets <$> resolveDir' fp
-            SharedFlags fp -> SharedSets <$> resolveDir' fp
+    dd <- resolveDir' $ fromMaybe "." $ serveFlagDataDir `mplus` envDataDir
     pure
         ( DispatchServe
               ServeSettings
               { serveSetPort =
                     fromMaybe defaultPort $ serveFlagPort `mplus` envPort
-              , serveSetDataSets = ds
+              , serveSetDataDir = dd
               }
         , Settings)
 
@@ -54,11 +49,7 @@ getEnv = do
     let mv k = lookup k env
     pure
         Environment
-        { envPort = mv "PORT" >>= readMaybe
-        , envDataFlags =
-              (SharedFlags <$> mv "SHARED_DATA_DIR") `mplus`
-              (PersonalFlags <$> mv "PERSONAL_DATA_DIR")
-        }
+        {envPort = mv "PORT" >>= readMaybe, envDataDir = mv "DATA_DIR"}
 
 getArguments :: IO Arguments
 getArguments = do
@@ -108,23 +99,15 @@ parseCommandServe = info parser modifier
          parseDataFlags)
     modifier = fullDesc <> progDesc "Serve."
 
-parseDataFlags :: Parser (Maybe DataFlags)
+parseDataFlags :: Parser (Maybe FilePath)
 parseDataFlags =
     option
-        ((Just . PersonalFlags) <$> str)
+        (Just <$> str)
         (mconcat
-             [ long "personal-data-dir"
+             [ long "data-dir"
              , metavar "DIR"
              , value Nothing
-             , help "The directory to serve from, for a personal server"
-             ]) <|>
-    option
-        ((Just . SharedFlags) <$> str)
-        (mconcat
-             [ long "shared-data-dir"
-             , metavar "DIR"
-             , value Nothing
-             , help "The directory to serve from, for a shared server"
+             , help "The directory to serve from"
              ])
 
 parseFlags :: Parser Flags
