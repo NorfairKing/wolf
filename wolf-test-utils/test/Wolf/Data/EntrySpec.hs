@@ -23,7 +23,7 @@ spec = do
         producesValidsOnValids entryContents
     describe "entryContentsBS" $ do
         it "produces valid bytestring for any entry" $
-            producesValid entryContentsBS
+            producesValidsOnValids entryContentsBS
         it "always produces bytestrings in UTF8 encoding" $
             forAllValid $ \pe ->
                 case TE.decodeUtf8' $ entryContentsBS pe of

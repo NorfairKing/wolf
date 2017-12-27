@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Wolf.Data.Export.Types.Gen where
 
@@ -22,14 +23,14 @@ instance GenUnchecked Repo
 
 instance GenValid Repo where
     genValid = do
-        eid <- genValid
+        repoInitData <- genValid
         -- Any list of persons
         eps <- genValid
         -- The person index consists of (some) people from the global index
         -- and some occur multiple times.
-        epi <-
+        repoPersonIndex <-
             let go ix puuid = do
-                    b <- genValid
+                    b <- frequency [(3, pure False), (1, pure True)]
                     if b
                         then pure ix
                         else do
@@ -37,7 +38,7 @@ instance GenValid Repo where
                             go (addIndexEntry a puuid ix) puuid
             in foldM go newIndex eps
         -- For some people, make a person entry.
-        epes <-
+        repoPersonEntries <-
             fmap (M.fromList . catMaybes) $
             forM eps $ \p -> do
                 b <- genValid
@@ -45,29 +46,20 @@ instance GenValid Repo where
                     then (Just . (,) p) <$> genValid
                     else pure Nothing
         -- Any global note index.
-        eni <- genValid
-        let noteUuids = S.toList $ noteIndexSet eni
+        repoNoteIndex <- genValid
+        let noteUuids = S.toList $ noteIndexSet repoNoteIndex
         -- For some people, make a note index with a sub note index of the global note index.
-        enis <-
+        repoNoteIndices <-
             fmap (M.fromList . catMaybes) $
             forM eps $ \p -> do
                 b <- genValid
                 if b
-                    then (Just . (,) p) <$> subNoteIndex eni
+                    then (Just . (,) p) <$> subNoteIndex repoNoteIndex
                     else pure Nothing
         -- For each noteuuid, make a note.
-        ens <- fmap M.fromList $ forM noteUuids $ \uuid -> (,) uuid <$> genValid
+        repoNotes <-
+            fmap M.fromList $ forM noteUuids $ \uuid -> (,) uuid <$> genValid
         -- Two distinct lists of suggestions
-        ees <- genValid
-        eues <- genListOf $ genValid `suchThat` (`notElem` ees)
-        pure
-            Repo
-            { repoInitData = eid
-            , repoPersonIndex = epi
-            , repoPersonEntries = epes
-            , repoNoteIndex = eni
-            , repoNoteIndices = enis
-            , repoNotes = ens
-            , repoEntrySuggestions = ees
-            , repoUsedEntrySuggestions = eues
-            }
+        repoEntrySuggestions <- genValid
+        repoUsedEntrySuggestions <- (\\ repoEntrySuggestions) <$> genValid
+        pure Repo {..}
