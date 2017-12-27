@@ -1,16 +1,16 @@
 <div .ui .secondary .pointing .menu>
   <a .item href=@{HomeR}>
     Home
-  <a .item>
+  <a .item href=@{AccountR}>
     Account
-  <a .item>
-    Git
+  <a .item href=@{PeopleR}>
+    People
   <div .right .menu>
     $maybe _ <- mauth
       <a .ui .item href=@{AuthR LogoutR}>
         Logout
     $nothing
-      <a .ui .item href=@{AuthR loginR}>
+      <a .ui .item href=@{AuthR LoginR}>
         Login
       <a .ui .item href=@{AuthR registerR}>
         Register

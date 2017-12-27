@@ -1,0 +1,4 @@
+<a .ui .button href=@{NewPersonR}>
+  New person
+<a .ui .button href=@{NewNoteR}>
+  New note

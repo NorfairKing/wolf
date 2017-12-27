@@ -17,12 +17,10 @@ import Wolf.Web.Server.Foundation
 
 getHomeR :: Handler Html
 getHomeR = do
-    ix <- runData getIndexWithDefault
-    let il =
-            sortOn snd $ M.toList $ reverseIndexSingleAlias ix :: [( PersonUuid
-                                                                   , Alias)]
     mauth <- maybeAuthId
-    -- FIXME: make the example independent of where this is run.
-    withNavBar $ do
-        setTitle "Wolf"
-        $(widgetFile "home")
+    case mauth of
+        Nothing -> redirect $ AuthR LoginR
+        Just _ ->
+            withNavBar $ do
+                setTitle "Wolf"
+                $(widgetFile "home/logged-in")

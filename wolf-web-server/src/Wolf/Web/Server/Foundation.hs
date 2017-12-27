@@ -60,6 +60,9 @@ mkEmbeddedStatic
     "myStatic"
     [ embedFile "static/semantic/dist/semantic.min.css"
     , embedFile "static/semantic/dist/semantic.min.js"
+    , embedDirAt
+          "static/semantic/dist/themes/default/assets/fonts"
+          "static/semantic/dist/themes/default/assets/fonts"
     ]
 
 mkYesodData "App" $(parseRoutesFile "routes")
@@ -113,9 +116,6 @@ wolfAuthPlugin = AuthPlugin wolfAuthPluginName dispatch loginWidget
         token <- genToken
         msgs <- getMessages
         $(widgetFile "auth/login")
-
-loginR :: AuthRoute
-loginR = PluginR wolfAuthPluginName ["login"]
 
 data LoginData = LoginData
     { loginUserkey :: Text

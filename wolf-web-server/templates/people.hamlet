@@ -1,15 +1,6 @@
-<a .ui .button href=@{NewPersonR}>
-  New person
-<a .ui .button href=@{NewNoteR}>
-  New note
-
 <div .ui .middle .aligned .divided .list>
   $forall (uuid, alias) <- il
     <div .item>
       <div .content>
         <a .header href=@{PersonR uuid}>
           #{aliasText alias}
-
-To clone the data locally, run:
-<pre>
-  git clone wolf.cs-syd.eu/git ~/.wolf

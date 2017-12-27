@@ -9,7 +9,7 @@
       <div .ui .stacked .segment>
         <div .field>
           <div .ui .left .icon .input>
-            <i .user .icon>
+            <i .user .icon></i>
             <input
               name="userkey"
               placeholder="Username or Email"
@@ -18,7 +18,7 @@
               type="text">
         <div .field>
           <div .ui .left .icon .input>
-            <i .lock .icon>
+            <i .lock .icon></i>
             <input
               name="passphrase"
               placeholder="Passphrase"
