@@ -28,6 +28,7 @@ import Text.Hamlet
 import Yesod
 import Yesod.Auth
 import qualified Yesod.Auth.Message as Msg
+import Yesod.EmbeddedStatic
 
 import Wolf.API
 import Wolf.Data
@@ -50,14 +51,21 @@ type WolfAuthHandler = HandlerT Auth WolfHandler
 data App = App
     { appDataSettings :: WolfServerEnv
     , appHttpManager :: Http.Manager
+    , appStatic :: EmbeddedStatic
     , appGit :: WaiSubsite
     }
+
+mkEmbeddedStatic
+    False
+    "myStatic"
+    [ embedFile "static/semantic/dist/semantic.min.css"
+    , embedFile "static/semantic/dist/semantic.min.js"
+    ]
 
 mkYesodData "App" $(parseRoutesFile "routes")
 
 instance Yesod App where
     defaultLayout widget = do
-        msgs <- getMessages
         pc <- widgetToPageContent $(widgetFile "default-body")
         withUrlRenderer $(hamletFile "templates/default-page.hamlet")
     yesodMiddleware = defaultCsrfMiddleware . defaultYesodMiddleware
@@ -103,6 +111,7 @@ wolfAuthPlugin = AuthPlugin wolfAuthPluginName dispatch loginWidget
     loginWidget :: (Route Auth -> Route App) -> WolfWidget
     loginWidget _ = do
         token <- genToken
+        msgs <- getMessages
         $(widgetFile "auth/login")
 
 loginR :: AuthRoute
@@ -123,6 +132,7 @@ postLoginR = do
             LoginData <$> ireq textField "userkey" <*>
             ireq passwordField "passphrase"
     result <- lift $ runInputPostResult loginInputForm
+    msgs <- getMessages
     muser <-
         case result of
             FormMissing -> invalidArgs ["Form is missing"]
@@ -233,8 +243,11 @@ instance PathPiece PersonUuid where
     fromPathPiece = parsePersonUuid
     toPathPiece = personUuidText
 
-withNavBar :: WidgetT App IO () -> WidgetT App IO ()
-withNavBar widget = $(widgetFile "with-nav-bar")
+withNavBar :: WidgetT App IO () -> HandlerT App IO Html
+withNavBar widget = do
+    mauth <- maybeAuthId
+    msgs <- getMessages
+    defaultLayout $(widgetFile "with-nav-bar")
 
 genToken :: MonadHandler m => m Html
 genToken = do

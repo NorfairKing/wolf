@@ -23,6 +23,6 @@ getHomeR = do
                                                                    , Alias)]
     mauth <- maybeAuthId
     -- FIXME: make the example independent of where this is run.
-    defaultLayout $ do
+    withNavBar $ do
         setTitle "Wolf"
         $(widgetFile "home")

@@ -4,5 +4,6 @@
 /new-person                     NewPersonR      GET POST
 
 -- Subsites
-/auth                           AuthR Auth getAuth
-/git                            GitR WaiSubsite appGit
+/auth                           AuthR   Auth            getAuth
+/static                         StaticR EmbeddedStatic  appStatic
+/git                            GitR    WaiSubsite      appGit

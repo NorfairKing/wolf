@@ -1,4 +1,1 @@
-$forall (_, msg) <- msgs
-  <p>
-    #{msg}
 ^{widget}

@@ -1,25 +1,14 @@
-<h1>
-  Wolf
-
-$maybe _ <- mauth
-  <a href=@{AuthR LogoutR}>
-    Logout
-$nothing
-  <a href=@{AuthR loginR}>
-    Login
-  <a href=@{AuthR registerR}>
-    Register
-
-<a href=@{NewPersonR}>
+<a .ui .button href=@{NewPersonR}>
   New person
-<a href=@{NewNoteR}>
+<a .ui .button href=@{NewNoteR}>
   New note
 
-<ul>
+<div .ui .middle .aligned .divided .list>
   $forall (uuid, alias) <- il
-    <li> 
-      <a href=@{PersonR uuid}>
-        #{aliasText alias}
+    <div .item>
+      <div .content>
+        <a .header href=@{PersonR uuid}>
+          #{aliasText alias}
 
 To clone the data locally, run:
 <pre>

@@ -36,6 +36,7 @@ library:
   - yesod-auth
   - yesod-core
   - yesod-form
+  - yesod-static
   source-dirs: src
   default-extensions: NoImplicitPrelude
 

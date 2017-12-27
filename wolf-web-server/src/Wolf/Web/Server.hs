@@ -33,5 +33,6 @@ makeWolfApp wse = do
         App
         { appDataSettings = wse
         , appHttpManager = man
+        , appStatic = myStatic
         , appGit = WaiSubsite {runWaiSubsite = gitApplication wse} -- TODO find a better way to not duplicate this sds?
         }

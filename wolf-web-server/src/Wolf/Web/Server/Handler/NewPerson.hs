@@ -17,7 +17,7 @@ import Wolf.Data.Git
 getNewPersonR :: Handler Html
 getNewPersonR = do
     token <- genToken
-    defaultLayout $ withNavBar $(widgetFile "new-person")
+    withNavBar $(widgetFile "new-person")
 
 newtype NewPerson = NewPerson
     { newPersonAlias :: Alias
