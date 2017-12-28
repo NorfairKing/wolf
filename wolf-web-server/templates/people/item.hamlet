@@ -1,0 +1,14 @@
+<div .item>
+  <div .content>
+    <div .header>
+      <a href=@{PersonR uuid}>
+        #{displayName}
+    <div .meta>
+      $maybe met <- mmet
+        #{met}
+      $maybe gender <- mgender
+        $case gender
+          $of Male
+            <i .man .icon></i>
+          $of Female
+            <i .woman .icon></i>

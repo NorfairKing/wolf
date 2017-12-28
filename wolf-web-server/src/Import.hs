@@ -13,5 +13,9 @@ import Data.Text as X (Text)
 import Control.Applicative as X
 import Control.Monad as X
 
+import GHC.Generics as X
+
 import Path as X
 import Path.IO as X
+
+import Debug.Trace as X

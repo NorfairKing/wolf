@@ -1,6 +1,1 @@
-<div .ui .middle .aligned .divided .list>
-  $forall (uuid, alias) <- il
-    <div .item>
-      <div .content>
-        <a .header href=@{PersonR uuid}>
-          #{aliasText alias}
+^{pcs}

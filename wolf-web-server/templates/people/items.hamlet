@@ -1,0 +1,4 @@
+<div .ui .items>
+  $forall pc <- pcs
+    ^{pc}
+

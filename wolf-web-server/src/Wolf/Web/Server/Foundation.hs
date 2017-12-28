@@ -132,7 +132,6 @@ postLoginR = do
             LoginData <$> ireq textField "userkey" <*>
             ireq passwordField "passphrase"
     result <- lift $ runInputPostResult loginInputForm
-    msgs <- getMessages
     muser <-
         case result of
             FormMissing -> invalidArgs ["Form is missing"]
