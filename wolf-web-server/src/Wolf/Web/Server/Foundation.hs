@@ -168,6 +168,7 @@ registerR = PluginR wolfAuthPluginName ["register"]
 getNewAccountR :: WolfAuthHandler Html
 getNewAccountR = do
     token <- genToken
+    msgs <- getMessages
     lift $ defaultLayout $(widgetFile "auth/register")
 
 data NewAccount = NewAccount

@@ -46,13 +46,12 @@ peopleCards trips = do
 
 personCard :: PersonUuid -> (Set Alias, Maybe PersonEntry) -> (Text, WolfWidget)
 personCard uuid (aliases, mpe) =
-    let alias =
+    let a =
             case S.toList aliases of
                 [] -> "Unaliased person"
-                (a:_) -> a
+                (a_:_) -> a_
         displayName =
-            fromMaybe (aliasText alias) $
-            mpe >>= fromEntry >>= renderDisplayName
+            fromMaybe (aliasText a) $ mpe >>= fromEntry >>= renderDisplayName
         mmet = metText <$> (mpe >>= fromEntry)
         mgender = mpe >>= fromEntry
     in (displayName, $(widgetFile "people/item"))

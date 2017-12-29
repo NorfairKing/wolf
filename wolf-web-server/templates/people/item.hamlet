@@ -12,3 +12,5 @@
             <i .man .icon></i>
           $of Female
             <i .woman .icon></i>
+          $of Other _
+            <i .other .gender .icon></i>

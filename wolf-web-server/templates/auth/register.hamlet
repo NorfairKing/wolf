@@ -1,43 +1,46 @@
-<h1> 
-  Wolf Registration
-<form
-  method="post"
-  action="@{AuthR registerR}">
+<div .ui .middle .aligned .center .aligned .grid>
+  <div .column>
+    <h2 .ui teal .image .header>
+      <div .content>
+        Wolf Registration
+    <form .ui .large .form
+      method="post"
+      action=@{AuthR registerR}>
+      <div .ui .stacked .segment>
+        <div .field>
+          <div .ui .left .icon .input>
+            <i .user .icon></i>
+            <input
+              id="login-email"
+              name="username"
+              placeholder="Username"
+              required=""
+              value=""
+              type="text">
+        <div .field>
+          <div .ui .left .icon .input>
+            <i .lock .icon></i>
+            <input
+              id="login-passphrase1"
+              name="passphrase"
+              placeholder="Passphrase"
+              required=""
+              value=""
+              type="password">
+        <div .field>
+          <div .ui .left .icon .input>
+            <i .lock .icon></i>
+            <input
+              id="login-passphrase2"
+              name="passphrase-confirm"
+              placeholder="Passphrase"
+              required=""
+              value=""
+              type="password">
+        ^{token}
+        <button .ui .fluid .large .teal .submit .button>
+          Register
 
-  <label for="login-email">
-    Username
-  <input
-    id="login-email"
-    name="username"
-    placeholder="Username"
-    required=""
-    value=""
-    type="text">
-
-  <label for="login-passphrase1">
-    Passphrase
-  <input
-    id="login-passphrase1"
-    name="passphrase"
-    placeholder="Passphrase"
-    required=""
-    value=""
-    type="password">
-
-  <label for="login-passphrase2">
-    Confirm Passphrase
-  <input
-    id="login-passphrase2"
-    name="passphrase-confirm"
-    placeholder="Confirm Passphrase"
-    required=""
-    value=""
-    type="password">
-
-  ^{token}
-
-  <button
-    id="login-submit"
-    type="submit">
-    Register
-
+    $forall (_, msg) <- msgs
+      <div .ui .error .message>
+        #{msg}
