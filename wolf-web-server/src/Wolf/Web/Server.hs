@@ -10,8 +10,6 @@ import Import
 import qualified Network.HTTP.Client as Http
 import Yesod
 
-import Wolf.Data
-
 import Wolf.Server.Types
 
 import Wolf.Web.Server.Application ()

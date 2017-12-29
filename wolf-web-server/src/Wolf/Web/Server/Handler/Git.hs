@@ -16,14 +16,10 @@ import Network.Wai.Middleware.HttpAuth
 import Network.Wai.Middleware.Rewrite
 
 import Wolf.API
-import Wolf.Data
 
-import Wolf.Server
 import Wolf.Server.Auth
 import Wolf.Server.Path
 import Wolf.Server.Types
-
-import Wolf.Web.Server.Foundation
 
 gitApplication :: WolfServerEnv -> Wai.Application
 gitApplication wse req resp = do

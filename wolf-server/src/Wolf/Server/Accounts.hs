@@ -62,10 +62,10 @@ setupWolfGit name add = do
     runGitIn add ["config", "receive.denyCurrentBranch", "updateInstead"]
     runGitIn
         add
-        ["config", "user.name", show $ unwords [name, "via wolf-web-server"]]
+        ["config", "user.name", show $ unwords [name, "via wolf-server"]]
     runGitIn
         add
-        ["config", "user.email", show $ unwords [name, "via wolf-web-server"]]
+        ["config", "user.email", show $ unwords [name, "via wolf-server"]]
 
 -- | Retrieve global accounts data
 getAccounts ::
