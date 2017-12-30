@@ -1,9 +1,30 @@
-<form method=post action=@{NewNoteR}>
-  <textarea name="contents" placeholder="I met ... today at ...">
-  <select name="uuid">
-    $forall (uuid, alias) <- il
-      <option value=#{personUuidText uuid}>
-        #{aliasText alias}
+<h1>
+  New note
+
+<p>
+  Create a new note on a person.
+
+<form 
+  .ui .form
+  method=post
+  action=@{NewNoteR}>
+  
+  <div .field>
+    <label>
+      Relevant people
+    <select
+      name="uuid">
+      $forall (uuid, alias) <- il
+        <option value=#{personUuidText uuid}>
+          #{aliasText alias}
+
+  <div .field>
+    <label>
+      Note contents
+    <textarea 
+      name="contents" 
+      placeholder="I met ... today at ...">
+
   ^{token}
 
   <button type="submit">
