@@ -28,6 +28,7 @@ import Text.Hamlet
 import Yesod
 import Yesod.Auth
 import qualified Yesod.Auth.Message as Msg
+import Yesod.EmbeddedStatic
 
 import Wolf.API
 import Wolf.Data
@@ -50,14 +51,24 @@ type WolfAuthHandler = HandlerT Auth WolfHandler
 data App = App
     { appDataSettings :: WolfServerEnv
     , appHttpManager :: Http.Manager
+    , appStatic :: EmbeddedStatic
     , appGit :: WaiSubsite
     }
+
+mkEmbeddedStatic
+    False
+    "myStatic"
+    [ embedFile "static/semantic/dist/semantic.min.css"
+    , embedFile "static/semantic/dist/semantic.min.js"
+    , embedDirAt
+          "static/semantic/dist/themes/default/assets/fonts"
+          "static/semantic/dist/themes/default/assets/fonts"
+    ]
 
 mkYesodData "App" $(parseRoutesFile "routes")
 
 instance Yesod App where
     defaultLayout widget = do
-        msgs <- getMessages
         pc <- widgetToPageContent $(widgetFile "default-body")
         withUrlRenderer $(hamletFile "templates/default-page.hamlet")
     yesodMiddleware = defaultCsrfMiddleware . defaultYesodMiddleware
@@ -103,10 +114,8 @@ wolfAuthPlugin = AuthPlugin wolfAuthPluginName dispatch loginWidget
     loginWidget :: (Route Auth -> Route App) -> WolfWidget
     loginWidget _ = do
         token <- genToken
+        msgs <- getMessages
         $(widgetFile "auth/login")
-
-loginR :: AuthRoute
-loginR = PluginR wolfAuthPluginName ["login"]
 
 data LoginData = LoginData
     { loginUserkey :: Text
@@ -159,6 +168,7 @@ registerR = PluginR wolfAuthPluginName ["register"]
 getNewAccountR :: WolfAuthHandler Html
 getNewAccountR = do
     token <- genToken
+    msgs <- getMessages
     lift $ defaultLayout $(widgetFile "auth/register")
 
 data NewAccount = NewAccount
@@ -233,8 +243,11 @@ instance PathPiece PersonUuid where
     fromPathPiece = parsePersonUuid
     toPathPiece = personUuidText
 
-withNavBar :: WidgetT App IO () -> WidgetT App IO ()
-withNavBar widget = $(widgetFile "with-nav-bar")
+withNavBar :: WidgetT App IO () -> HandlerT App IO Html
+withNavBar widget = do
+    mauth <- maybeAuthId
+    msgs <- getMessages
+    defaultLayout $(widgetFile "with-nav-bar")
 
 genToken :: MonadHandler m => m Html
 genToken = do

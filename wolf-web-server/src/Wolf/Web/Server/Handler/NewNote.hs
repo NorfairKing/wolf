@@ -23,7 +23,7 @@ getNewNoteR = do
     ix <- runData getIndexWithDefault
     let il = sortOn snd $ M.toList $ reverseIndexSingleAlias ix
     token <- genToken
-    defaultLayout $ withNavBar $(widgetFile "new-note")
+    withNavBar $(widgetFile "new-note")
 
 data NewNote = NewNote
     { newNotePerson :: PersonUuid

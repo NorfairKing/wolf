@@ -10,8 +10,6 @@ import Import
 import qualified Network.HTTP.Client as Http
 import Yesod
 
-import Wolf.Data
-
 import Wolf.Server.Types
 
 import Wolf.Web.Server.Application ()
@@ -33,5 +31,6 @@ makeWolfApp wse = do
         App
         { appDataSettings = wse
         , appHttpManager = man
+        , appStatic = myStatic
         , appGit = WaiSubsite {runWaiSubsite = gitApplication wse} -- TODO find a better way to not duplicate this sds?
         }

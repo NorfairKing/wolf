@@ -4,6 +4,9 @@ $doctype 5
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <link rel="stylesheet" href=@{StaticR static_semantic_dist_semantic_min_css}>
+
+    <script src=@{StaticR static_semantic_dist_semantic_min_js}>
     <title>#{pageTitle pc}
 
     ^{pageHead pc}

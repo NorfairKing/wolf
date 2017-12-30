@@ -8,6 +8,7 @@ module Wolf.Web.Server.Handler.NewPerson where
 import Import
 
 import Yesod
+import Yesod.Auth
 
 import Wolf.Web.Server.Foundation
 
@@ -16,8 +17,9 @@ import Wolf.Data.Git
 
 getNewPersonR :: Handler Html
 getNewPersonR = do
+    void requireAuthId
     token <- genToken
-    defaultLayout $ withNavBar $(widgetFile "new-person")
+    withNavBar $(widgetFile "new-person")
 
 newtype NewPerson = NewPerson
     { newPersonAlias :: Alias

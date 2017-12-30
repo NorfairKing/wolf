@@ -1,9 +1,26 @@
-<h1> New Person
-<form method=post action=@{NewPersonR}>
-  <input type="text" name="alias" placeholder="John Smith">
+<h1>
+  New Person
+
+<p>
+  Create a new person: start by giving them an alias.
+
+<form 
+  .ui .form
+  method=post 
+  action=@{NewPersonR}>
+
+  <div .field>
+    <label>
+      Alias
+    <input 
+      type="text" 
+      name="alias" 
+      placeholder="John from accross the street">
 
   ^{token}
 
-  <button type="submit">
-    Submit
+  <button 
+    .ui .button
+    type="submit">
+    Create new person
 

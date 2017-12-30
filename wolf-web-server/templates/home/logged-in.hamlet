@@ -1,0 +1,7 @@
+<div .ui .vertical .menu>
+  <a .item 
+    href=@{NewPersonR}>
+      New person
+  <a .item
+    href=@{NewNoteR}>
+      New note

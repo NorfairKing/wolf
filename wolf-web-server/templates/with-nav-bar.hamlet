@@ -1,3 +1,22 @@
-<a href=@{HomeR}>
-  Wolf
-^{widget}
+<div .ui .secondary .pointing .menu>
+  <a .item href=@{HomeR}>
+    Home
+  <a .item href=@{AccountR}>
+    Account
+  <a .item href=@{PeopleR}>
+    People
+  <div .right .menu>
+    $maybe _ <- mauth
+      <a .ui .item href=@{AuthR LogoutR}>
+        Logout
+    $nothing
+      <a .ui .item href=@{AuthR LoginR}>
+        Login
+      <a .ui .item href=@{AuthR registerR}>
+        Register
+
+$forall (_, msg) <- msgs
+  <div .ui .bottom .attached .message>
+    #{msg}
+<div .ui .main .container>
+  ^{widget}
