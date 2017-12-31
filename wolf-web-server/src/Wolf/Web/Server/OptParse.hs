@@ -11,6 +11,7 @@ module Wolf.Web.Server.OptParse
 import Import
 
 import System.Environment (getArgs, getEnvironment)
+import System.Exit
 import Text.Read
 
 import Options.Applicative
@@ -28,12 +29,16 @@ combineToInstructions ::
        Command -> Flags -> Configuration -> Environment -> IO Instructions
 combineToInstructions (CommandServe ServeFlags {..}) Flags Configuration Environment {..} = do
     dd <- resolveDir' $ fromMaybe "." $ serveFlagDataDir `mplus` envDataDir
+    let port = fromMaybe defaultPort $ serveFlagPort `mplus` envPort
+    let apiPort = serveFlagAPIPort `mplus` envAPIPort
+    when (apiPort == Just port) $
+        die "Web server port and API port must not be the same."
     pure
         ( DispatchServe
               ServeSettings
-              { serveSetPort =
-                    fromMaybe defaultPort $ serveFlagPort `mplus` envPort
+              { serveSetPort = port
               , serveSetDataDir = dd
+              , serveSetAPIPort = apiPort
               }
         , Settings)
 
@@ -49,7 +54,10 @@ getEnv = do
     let mv k = lookup k env
     pure
         Environment
-        {envPort = mv "PORT" >>= readMaybe, envDataDir = mv "DATA_DIR"}
+        { envPort = mv "PORT" >>= readMaybe
+        , envDataDir = mv "DATA_DIR"
+        , envAPIPort = mv "API_PORT" >>= readMaybe
+        }
 
 getArguments :: IO Arguments
 getArguments = do
@@ -96,7 +104,14 @@ parseCommandServe = info parser modifier
                   , value Nothing
                   , help "the port to serve on"
                   ]) <*>
-         parseDataFlags)
+         parseDataFlags <*>
+         option
+             (Just <$> auto)
+             (mconcat
+                  [ long "api-port"
+                  , value Nothing
+                  , help "the port to serve the API on"
+                  ]))
     modifier = fullDesc <> progDesc "Serve."
 
 parseDataFlags :: Parser (Maybe FilePath)

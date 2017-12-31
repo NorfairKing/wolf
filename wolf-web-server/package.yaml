@@ -7,6 +7,7 @@ dependencies:
 
 library:
   dependencies:
+  - async
   - bytestring
   - case-insensitive
   - conduit-extra
@@ -29,6 +30,7 @@ library:
   - wai
   - wai-extra
   - wai-git-http
+  - warp
   - wolf-api
   - wolf-data
   - wolf-server

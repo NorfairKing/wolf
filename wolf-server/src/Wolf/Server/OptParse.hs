@@ -21,14 +21,9 @@ getInstructions = do
 
 combineToInstructions :: Command -> Flags -> Configuration -> IO Instructions
 combineToInstructions (CommandServe ServeFlags {..}) Flags Configuration = do
-    dd <- resolveDir' $ fromMaybe "." serveFlagDataDir
-    pure
-        ( DispatchServe
-              ServeSettings
-              { serveSetPort = fromMaybe defaultPort serveFlagPort
-              , serveSetDataDir = dd
-              }
-        , Settings)
+    serveSetDataDir <- resolveDir' $ fromMaybe "." serveFlagDataDir
+    let serveSetPort = fromMaybe defaultPort serveFlagPort
+    pure (DispatchServe ServeSettings {..}, Settings)
 
 defaultPort :: Int
 defaultPort = 8000
