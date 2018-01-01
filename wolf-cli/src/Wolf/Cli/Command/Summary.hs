@@ -85,4 +85,5 @@ summaryReportReport SummaryReport {..} =
         , case summaryReportPersonEntry of
               Nothing -> "No person entry."
               Just pe -> textReport $ entryContents pe
+        , "\n"
         ]

@@ -80,4 +80,5 @@ reviewReportReport ReviewReport {..} =
                      , formatMomentNicely reviewReportTimestamp noteTimestamp
                      ]
                , textReport noteContents
+               , mempty
                ]
