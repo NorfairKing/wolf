@@ -16,6 +16,12 @@ import Zifter.Hindent
 import Zifter.Hlint
 import Zifter.Stack
 
+import Control.Monad
+import Control.Monad.IO.Class
+import Path
+import Path.IO
+import System.Process
+
 main :: IO ()
 main =
     ziftWith $ do
@@ -23,5 +29,13 @@ main =
         preprocessor hindentZift
         prechecker gitAddAllZift
         checker $ do
+            rd <- getRootDir
+            liftIO $ do
+                sd <- resolveDir rd "wolf-web-server/static"
+                (_, _, _, ph) <-
+                    createProcess
+                        (shell "./set-up-semantic.sh")
+                        {cwd = Just $ toFilePath sd}
+                void $ waitForProcess ph
             hlintZift
             stackBuildZift

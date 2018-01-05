@@ -66,12 +66,14 @@ tests:
     - genvalidity
     - genvalidity-hspec
     - hspec
+    - http-types
     - mtl
     - path
     - path-io
+    - text
     - wolf-api
     - wolf-data
     - wolf-server
-    - wolf-web-server
     - wolf-test-utils
+    - wolf-web-server
     - yesod-test

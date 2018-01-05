@@ -11,6 +11,7 @@ spec :: Spec
 spec =
     wolfWebServerPersonalSpec $
     ydescribe "HomeR" $
-    yit "returns a 200" $ do
-        get HomeR
-        statusIs 200
+    yit "gets a 200 for an example user" $ do
+        withExampleAccount $ do
+            get HomeR
+            statusIs 303

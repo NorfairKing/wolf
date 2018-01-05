@@ -15,7 +15,8 @@ spec :: Spec
 spec =
     wolfWebServerPersonalSpec $
     ydescribe "PersonRSpec" $
-    yit "returns a 200 for each person" $ do
+    yit "returns a 200 for each person" $
+    withExampleAccount $ do
         uuid <-
             runTestDataPersonal $ do
                 ix <- getIndexWithDefault

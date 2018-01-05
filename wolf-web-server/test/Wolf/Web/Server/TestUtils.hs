@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Wolf.Web.Server.TestUtils where
 
@@ -7,6 +8,10 @@ import TestImport
 import Yesod.Test
 
 import Control.Monad.Reader
+import qualified Data.Text as T
+import Data.Text (Text)
+
+import Network.HTTP.Types
 
 import Wolf.API
 import Wolf.Data
@@ -27,11 +32,10 @@ wolfWebServerPersonalSpec =
             ignoringAbsence $ removeDirRecur sb) .
     yesodSpecWithSiteGenerator
         (do dd <- testSandbox
-            let ds = DataSettings {dataSetWolfDir = dd}
-            runReaderT setupTestData ds
-            setupWolfGit "test" dd
-            let sds = PersonalServer ds
-            makeWolfApp sds)
+            let clear = ignoringAbsence $ removeDirRecur dd
+            clear
+            let env = WolfServerEnv dd
+            makeWolfApp env)
 
 setupTestData :: ReaderT DataSettings IO ()
 setupTestData = do
@@ -54,3 +58,22 @@ runTestDataShared uuid func = do
 
 testSandbox :: IO (Path Abs Dir)
 testSandbox = resolveDir' "/tmp/wolf-web-server-test"
+
+withFreshAccount :: Text -> Text -> YesodExample App a -> YesodExample App a
+withFreshAccount exampleEmail examplePassphrase func = do
+    get $ AuthR registerR
+    statusIs 200
+    request $ do
+        setMethod methodPost
+        setUrl $ AuthR registerR
+        addTokenFromCookie
+        addPostParam "username" exampleEmail
+        addPostParam "passphrase" examplePassphrase
+        addPostParam "passphrase-confirm" examplePassphrase
+    statusIs 303
+    loc <- followRedirect
+    liftIO $ loc `shouldBe` Right "/"
+    func
+
+withExampleAccount :: YesodExample App a -> YesodExample App a
+withExampleAccount = withFreshAccount "example" "pass"

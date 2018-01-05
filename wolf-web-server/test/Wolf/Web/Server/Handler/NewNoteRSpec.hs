@@ -17,10 +17,11 @@ spec :: Spec
 spec =
     wolfWebServerPersonalSpec $
     ydescribe "NewNoteR" $ do
-        yit "returns a 200" $ do
+        yit "returns a 200" $
+            withExampleAccount $ do
             get NewNoteR
             statusIs 200
-        yit "it allows submitting of the form" $ do
+        yit "it allows submitting of the form" $ withExampleAccount $ do
             let newPersonAlias = "test-alias"
             uuid <-
                 runTestDataPersonal $ do
