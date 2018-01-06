@@ -23,7 +23,6 @@ install:
   - stack build --only-snapshot
   - stack install hindent
   - npm install -g gulp-cli
-  - cd ./wolf-web-server/static && ./set-up-semantic.sh && cd -
 
 script:
   - git --version
