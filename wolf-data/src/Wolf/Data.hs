@@ -8,10 +8,6 @@ module Wolf.Data
     , withInitCheck_
     -- * Global index
     , PersonUuid
-    , personUuidLBs
-    , personUuidText
-    , personUuidString
-    , nextRandomPersonUuid
     , getPersonUuids
     , Alias
     , alias
@@ -57,11 +53,6 @@ module Wolf.Data
     , NoteIndex
     , noteIndexSet
     , newNoteIndex
-    , nextRandomNoteUuid
-    , parsePersonUuid
-    , parsePersonUuidString
-    , noteUuidText
-    , noteUuidString
     , addToNoteIndex
     , containsNoteUuid
     , isSubNoteIndexOf

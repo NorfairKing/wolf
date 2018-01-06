@@ -10,10 +10,6 @@ module Wolf.API
     , PostRegister
     , Register(..)
     , AccountUUID
-    , newAccountUUID
-    , parseAccountUUID
-    , accountUUIDString
-    , accountUUIDText
     , Username
     , validUsernameChar
     , username
@@ -41,8 +37,6 @@ import qualified Data.ByteString.Base16 as Base16
 import Data.Char as Char
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
-import Data.UUID as UUID
-import Data.UUID.V4 as UUID
 import Text.Read
 
 import qualified Crypto.BCrypt as BCrypt
@@ -58,40 +52,7 @@ type WolfAPI = AccountAPI :<|> PersonAPI
 
 type AccountAPI = PostRegister
 
-newtype AccountUUID = AccountUUID
-    { unAccountUUID :: UUID
-    } deriving (Eq, Ord, Generic)
-
-instance Validity AccountUUID where
-    isValid = const True
-
-instance Show AccountUUID where
-    show (AccountUUID u) = show u
-
-instance Read AccountUUID where
-    readPrec = AccountUUID <$> readPrec
-
-instance FromJSON AccountUUID where
-    parseJSON =
-        withText "AccountUUID" $ \t ->
-            case UUID.fromText t of
-                Nothing -> fail "Invalid Text when parsing UUID"
-                Just u -> pure $ AccountUUID u
-
-instance ToJSON AccountUUID where
-    toJSON (AccountUUID u) = JSON.String $ UUID.toText u
-
-newAccountUUID :: IO AccountUUID
-newAccountUUID = AccountUUID <$> UUID.nextRandom
-
-parseAccountUUID :: Text -> Maybe AccountUUID
-parseAccountUUID = fmap AccountUUID . UUID.fromText
-
-accountUUIDString :: AccountUUID -> String
-accountUUIDString = UUID.toString . unAccountUUID
-
-accountUUIDText :: AccountUUID -> Text
-accountUUIDText = UUID.toText . unAccountUUID
+type AccountUUID = UUID Account
 
 newtype Username = Username
     { usernameText :: Text

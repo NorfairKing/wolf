@@ -31,7 +31,7 @@ accountDir ::
     -> m (Path Abs Dir)
 accountDir uuid = do
     ad <- accountsDir
-    liftIO $ resolveDir ad $ accountUUIDString uuid
+    liftIO $ resolveDir ad $ uuidString uuid
 
 accountDataDir ::
        (MonadIO m, MonadReader WolfServerEnv m)

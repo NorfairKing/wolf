@@ -36,15 +36,14 @@ serveGetPersonEntry acc personUuid = do
             throwError $
             err404
             { errBody =
-                  "Person entry for person with uuid " <>
-                  personUuidLBs personUuid <>
+                  "Person entry for person with uuid " <> uuidLBs personUuid <>
                   " not found."
             }
         Just pe -> pure pe
 
 servePostNewPerson :: Account -> PersonEntry -> WolfHandler PersonUuid
 servePostNewPerson acc pe = do
-    personUuid <- liftIO nextRandomPersonUuid
+    personUuid <- liftIO nextRandomUUID
     runDataForAccount acc $ putPersonEntry personUuid pe
     pure personUuid
 

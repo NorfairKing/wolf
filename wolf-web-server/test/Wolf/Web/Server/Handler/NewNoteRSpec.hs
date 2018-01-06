@@ -45,7 +45,7 @@ spec =
                     setUrl NewNoteR
                     addTokenFromCookie
                     addPostParam "contents" "test contents"
-                    addPostParam "uuid" $ personUuidText uuid
+                    addPostParam "uuid" $ uuidText uuid
                 statusIs 303
                 loc <- getLocation
                 lift $ loc `shouldBe` Right HomeR

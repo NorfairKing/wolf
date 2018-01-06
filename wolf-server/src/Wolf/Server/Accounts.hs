@@ -105,7 +105,7 @@ tryToAddNewAccount un = do
     case M.lookup un as of
         Just _ -> pure Nothing
         Nothing -> do
-            uuid <- liftIO newAccountUUID
+            uuid <- liftIO nextRandomUUID
             storeAccounts $ M.insert un uuid as
             pure $ Just uuid
 

@@ -13,5 +13,10 @@ extra-deps:
 - servant-quickcheck-0.0.2.4
 - sockaddr-0.0.0
 - wai-git-http-0.0.0
+- git: git@github.com:NorfairKing/typed-uuid.git
+  commit: a7baf4999c901ccdeb66dba0221431de692963f1
+  subdirs:
+    - typed-uuid
+    - genvalidity-typed-uuid
 
 resolver: lts-10.0

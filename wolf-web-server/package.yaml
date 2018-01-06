@@ -25,6 +25,7 @@ library:
   - template-haskell
   - text
   - time
+  - typed-uuid
   - transformers
   - unix
   - wai
@@ -71,6 +72,7 @@ tests:
     - path
     - path-io
     - text
+    - typed-uuid
     - wolf-api
     - wolf-data
     - wolf-server

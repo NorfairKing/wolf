@@ -24,7 +24,7 @@ finaliseSuggestion es =
             Just (uuid, score) ->
                 T.concat
                     [ "This data was exported and suggested to be related to the person with UUID "
-                    , personUuidText uuid
+                    , uuidText uuid
                     , " and score "
                     , T.pack $ show score
                     , "."

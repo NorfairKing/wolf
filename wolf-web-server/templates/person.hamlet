@@ -2,7 +2,7 @@
   $maybe alias <-  malias
     #{aliasText alias}
   $nothing
-    #{personUuidText uuid}
+    #{uuidText uuid}
 
 $maybe pe <- mpe
   <pre>

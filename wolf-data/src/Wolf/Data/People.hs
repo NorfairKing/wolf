@@ -2,13 +2,6 @@
 
 module Wolf.Data.People
     ( PersonUuid
-    , personUuidBs
-    , personUuidLBs
-    , personUuidString
-    , personUuidText
-    , nextRandomPersonUuid
-    , parsePersonUuid
-    , parsePersonUuidString
     , getPersonUuids
     ) where
 
@@ -27,5 +20,5 @@ getPersonUuids = do
     let relDirs = mapMaybe (stripProperPrefix pd) dirs
     pure $
         mapMaybe
-            (parsePersonUuidString . FP.dropTrailingPathSeparator . toFilePath)
+            (parseUUIDString . FP.dropTrailingPathSeparator . toFilePath)
             relDirs

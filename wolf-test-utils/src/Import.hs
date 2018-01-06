@@ -36,3 +36,4 @@ import Data.GenValidity.Path as X ()
 import Data.GenValidity.Text as X
 import Data.GenValidity.Time as X ()
 import Data.GenValidity.UUID as X ()
+import Data.GenValidity.UUID.Typed as X ()

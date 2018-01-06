@@ -40,6 +40,7 @@ library:
   - genvalidity-time
   - genvalidity-path
   - genvalidity-uuid
+  - genvalidity-typed-uuid
   - quickcheck-text
   - hspec >=2.4 && <2.5
   - mtl >=2.2 && <2.3

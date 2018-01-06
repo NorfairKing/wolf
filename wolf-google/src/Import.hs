@@ -15,5 +15,6 @@ import Data.Maybe as X
 import Data.Monoid as X
 import Data.Ord as X
 import Data.Text as X (Text)
+import Data.UUID.Typed as X
 
 import Control.Monad as X

@@ -50,7 +50,7 @@ note people =
                         [ "Added note on"
                         , intercalate ", " $ map aliasString people
                         , "with uuid"
-                        , noteUuidString noteUuid
+                        , uuidString noteUuid
                         ]
 
 getRelevantPeopleUuidsAndNewIndex ::
@@ -67,4 +67,4 @@ getRelevantPeopleUuidsAndNewIndex (t:ts) origIndex = do
 tmpNoteFile :: MonadIO m => [PersonUuid] -> m (Path Abs File)
 tmpNoteFile uuids = do
     tmpDir <- liftIO getTempDir
-    liftIO $ resolveFile tmpDir $ concatMap personUuidString uuids ++ ".txt"
+    liftIO $ resolveFile tmpDir $ concatMap uuidString uuids ++ ".txt"
