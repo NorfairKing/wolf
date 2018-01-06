@@ -37,7 +37,6 @@ import qualified Data.ByteString.Base16 as Base16
 import Data.Char as Char
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
-import Text.Read
 
 import qualified Crypto.BCrypt as BCrypt
 

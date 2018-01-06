@@ -16,5 +16,5 @@ listSuggestions :: (MonadIO m, MonadReader Settings m) => m ()
 listSuggestions =
     runData $
     withInitCheck_ $ do
-        sugs <- readPersonEntrySuggestions
+        sugs <- readSuggestions entrySuggestionType
         liftIO $ mapM_ (putReport . renderSuggestion renderEntrySuggestion) sugs

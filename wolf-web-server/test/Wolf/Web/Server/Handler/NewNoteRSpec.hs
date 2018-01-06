@@ -26,7 +26,7 @@ spec =
         yit "it allows submitting of the form" $
             withExampleAccount $ \uuid -> do
                 let newPersonAlias = "test-alias"
-                uuid <-
+                puuid <-
                     runTestDataShared uuid $ do
                         ix <- getIndexWithDefault
                         (puuid, ix') <-
@@ -45,7 +45,7 @@ spec =
                     setUrl NewNoteR
                     addTokenFromCookie
                     addPostParam "contents" "test contents"
-                    addPostParam "uuid" $ uuidText uuid
+                    addPostParam "uuid" $ uuidText puuid
                 statusIs 303
                 loc <- getLocation
                 lift $ loc `shouldBe` Right HomeR

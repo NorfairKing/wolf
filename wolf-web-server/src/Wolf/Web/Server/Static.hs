@@ -11,11 +11,6 @@ module Wolf.Web.Server.Static where
 
 import Import
 
-import System.Exit
-import System.Process
-
-import Language.Haskell.TH
-
 import Yesod.EmbeddedStatic
 
 mkEmbeddedStatic

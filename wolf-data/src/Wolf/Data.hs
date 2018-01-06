@@ -74,13 +74,16 @@ module Wolf.Data
     , writeNote
     -- * Suggestions
     , Suggestion(..)
+    , aliasSuggestionType
+    , AliasSuggestion(..)
+    , entrySuggestionType
     , EntrySuggestion(..)
     , sameEntrySuggestionData
     , sameEntrySuggestion
-    , readPersonEntrySuggestions
-    , addPersonEntrySuggestions
-    , readUsedPersonEntrySuggestions
-    , recordUsedPersonEntrySuggestions
+    , readSuggestions
+    , addSuggestions
+    , readUsedSuggestions
+    , recordUsedSuggestions
     -- * Import and Export
     , Repo
     , repoInitData

@@ -35,6 +35,9 @@ import Wolf.API.Gen ()
 testSandbox :: MonadIO m => m (Path Abs Dir)
 testSandbox = liftIO $ resolveDir' "/tmp/test-sandbox"
 
+testServerEnv :: MonadIO m => m WolfServerEnv
+testServerEnv = WolfServerEnv <$> testSandbox
+
 withEnv :: WolfServerEnv -> ReaderT WolfServerEnv IO a -> IO a
 withEnv = flip runReaderT
 
@@ -43,12 +46,9 @@ withTestSandbox = around withSandbox
   where
     withSandbox :: ActionWith WolfServerEnv -> IO ()
     withSandbox func = do
-        sb <- testSandbox
-        let clear = ignoringAbsence $ removeDirRecur sb
-        clear
-        let env = WolfServerEnv sb
+        env <- testServerEnv
+        ignoringAbsence $ removeDirRecur $ wseDataDir env
         func env
-        clear
 
 withWolfServer :: SpecWith ClientEnv -> Spec
 withWolfServer specFunc = do
@@ -56,15 +56,11 @@ withWolfServer specFunc = do
         setupMan = HTTP.newManager HTTP.defaultManagerSettings
     let withApp :: (ClientEnv -> IO ()) -> HTTP.Manager -> IO ()
         withApp func man = do
-            dd <- testSandbox
-            let clear = ignoringAbsence $ removeDirRecur dd
-            clear
-            let wolfEnv = WolfServerEnv {wseDataDir = dd}
-            let getServer = pure $ makeWolfServer wolfEnv
-            withServantServerAndContext wolfAPI (authContext wolfEnv) getServer $ \burl ->
-                let cenv = ClientEnv man burl
-                in func cenv
-            clear
+            env <- testServerEnv
+            ignoringAbsence $ removeDirRecur $ wseDataDir env
+            let getServer = pure $ makeWolfServer env
+            withServantServerAndContext wolfAPI (authContext env) getServer $ \burl ->
+                func $ ClientEnv man burl
     beforeAll setupMan $ aroundWith withApp specFunc
 
 -- | Like 'withServantServer', but allows passing in a 'Context' to the

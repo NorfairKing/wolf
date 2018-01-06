@@ -8,7 +8,6 @@ import TestImport
 import Yesod.Test
 
 import Control.Monad.Reader
-import qualified Data.Text as T
 import Data.Text (Text)
 
 import Network.HTTP.Types
