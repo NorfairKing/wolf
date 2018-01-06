@@ -18,18 +18,20 @@ import Wolf.Web.Server.Foundation
 
 getPersonR :: PersonUuid -> Handler Html
 getPersonR uuid = do
-    (mpe, ix, ns) <-
+    (ix, mpe, ns) <-
         runData $ do
-            mpe <- getPersonEntry uuid
             ix <- getIndexWithDefault
+            mpe <- getPersonEntry uuid
             ns <- sortOn (Down . noteTimestamp) <$> getPersonNotes uuid
-            pure (mpe, ix, ns)
-    now <- liftIO getCurrentTime
-    let malias = reverseIndexLookupSingleAlias uuid ix
-    token <- genToken
-    let titleAlias = maybe (uuidText uuid) aliasText malias
-    let placeholderAlias = maybe "..." aliasText malias
-    withNavBar $(widgetFile "person")
+            pure (ix, mpe, ns)
+    case (reverseIndexLookupSingleAlias uuid ix , mpe, ns) of
+        (Nothing, Nothing, []) -> notFound
+        (malias, _, _) -> do
+            now <- liftIO getCurrentTime
+            token <- genToken
+            let titleAlias = maybe (uuidText uuid) aliasText malias
+            let placeholderAlias = maybe "..." aliasText malias
+            withNavBar $(widgetFile "person")
 
 noteWidget :: UTCTime -> Index -> PersonUuid -> Note -> Widget
 noteWidget now ix uuid n = $(widgetFile "note")
