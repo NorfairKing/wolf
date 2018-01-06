@@ -3,7 +3,10 @@
 {-# LANGUAGE RecordWildCards #-}
 
 module Wolf.Data.Suggestion.Types
-    ( Suggestion(..)
+    ( SuggestionUuid
+    , SuggestionType(..)
+    , Suggestion(..)
+    , AliasSuggestion(..)
     , EntrySuggestion(..)
     , sameEntrySuggestionData
     , sameEntrySuggestion
@@ -16,6 +19,14 @@ import Data.Aeson
 import Wolf.Data.Entry.Types
 import Wolf.Data.Index.Types
 import Wolf.Data.People.Types
+
+type SuggestionUuid = UUID Sugg
+
+data Sugg
+
+newtype SuggestionType a =
+    SuggestionType (Path Rel Dir)
+    deriving (Show, Eq, Generic)
 
 data Suggestion a = Suggestion
     { suggestionSuggestor :: Text
@@ -39,6 +50,25 @@ instance ToJSON a => ToJSON (Suggestion a) where
             , "reason" .= suggestionReason
             , "data" .= suggestionData
             ]
+
+data AliasSuggestion = AliasSuggestion
+    { aliasSuggestionPerson :: PersonUuid
+    , aliasSuggestionAlias :: Alias
+    } deriving (Show, Eq, Generic)
+
+instance Validity AliasSuggestion
+
+instance NFData AliasSuggestion
+
+instance FromJSON AliasSuggestion where
+    parseJSON =
+        withObject "AliasSuggestion" $ \o ->
+            AliasSuggestion <$> o .: "person" <*> o .: "alias"
+
+instance ToJSON AliasSuggestion where
+    toJSON AliasSuggestion {..} =
+        object
+            ["person" .= aliasSuggestionPerson, "alias" .= aliasSuggestionAlias]
 
 data EntrySuggestion = EntrySuggestion
     { entrySuggestionEntry :: PersonEntry

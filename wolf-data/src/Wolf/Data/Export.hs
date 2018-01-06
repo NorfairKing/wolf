@@ -41,8 +41,8 @@ exportRepo = do
             noteIxs <- mKeyed getPersonNoteIndex people
             noteUuids <- getNoteUuids
             notes <- mKeyed readNote noteUuids
-            entrySuggestions <- readPersonEntrySuggestions
-            usedEntrySuggestions <- readUsedPersonEntrySuggestions
+            entrySuggestions <- readSuggestions entrySuggestionType
+            usedEntrySuggestions <- readUsedSuggestions entrySuggestionType
             pure $
                 Just
                     Repo

@@ -3,15 +3,19 @@
 
 module Wolf.Data.Suggestion
     ( Suggestion(..)
+    , SuggestionType
+    , aliasSuggestionType
+    , AliasSuggestion(..)
+    , entrySuggestionType
     , EntrySuggestion(..)
     , sameEntrySuggestionData
     , sameEntrySuggestion
-    , readPersonEntrySuggestions
-    , writePersonEntrySuggestions
-    , addPersonEntrySuggestions
-    , readUsedPersonEntrySuggestions
-    , writeUsedPersonEntrySuggestions
-    , recordUsedPersonEntrySuggestions
+    , readSuggestions
+    , writeSuggestions
+    , addSuggestions
+    , readUsedSuggestions
+    , writeUsedSuggestions
+    , recordUsedSuggestions
     ) where
 
 import Import
@@ -25,57 +29,71 @@ import Wolf.Data.Suggestion.Types
 suggestionsDir :: MonadReader DataSettings m => m (Path Abs Dir)
 suggestionsDir = (</> $(mkRelDir "suggestions")) <$> wolfDir
 
-entrySuggestionsFile :: MonadReader DataSettings m => m (Path Abs File)
-entrySuggestionsFile = (</> $(mkRelFile "entry.json")) <$> suggestionsDir
+aliasSuggestionType :: SuggestionType AliasSuggestion
+aliasSuggestionType = SuggestionType $(mkRelDir "alias")
 
-usedEntrySuggestionFile :: MonadReader DataSettings m => m (Path Abs File)
-usedEntrySuggestionFile =
-    (</> $(mkRelFile "entry-used.json")) <$> suggestionsDir
+entrySuggestionType :: SuggestionType EntrySuggestion
+entrySuggestionType = SuggestionType $(mkRelDir "entry")
 
-readPersonEntrySuggestions ::
-       (MonadIO m, MonadReader DataSettings m) => m [Suggestion EntrySuggestion]
-readPersonEntrySuggestions = entrySuggestionsFile >>= readJSONWithDefault []
+entrySuggestionsFile ::
+       MonadReader DataSettings m => SuggestionType a -> m (Path Abs File)
+entrySuggestionsFile (SuggestionType rf) =
+    (</> rf </> $(mkRelFile "unused.json")) <$> suggestionsDir
 
-writePersonEntrySuggestions ::
-       (MonadIO m, MonadReader DataSettings m)
-    => [Suggestion EntrySuggestion]
+usedSuggestionFile ::
+       MonadReader DataSettings m => SuggestionType a -> m (Path Abs File)
+usedSuggestionFile (SuggestionType rf) =
+    (</> rf </> $(mkRelFile "used.json")) <$> suggestionsDir
+
+readSuggestions ::
+       (MonadIO m, MonadReader DataSettings m, FromJSON a)
+    => SuggestionType a
+    -> m [Suggestion a]
+readSuggestions typ = entrySuggestionsFile typ >>= readJSONWithDefault []
+
+writeSuggestions ::
+       (MonadIO m, MonadReader DataSettings m, ToJSON a)
+    => SuggestionType a
+    -> [Suggestion a]
     -> m ()
-writePersonEntrySuggestions ess = do
-    f <- entrySuggestionsFile
+writeSuggestions typ ess = do
+    f <- entrySuggestionsFile typ
     writeJSON f ess
 
-addPersonEntrySuggestions ::
-       (MonadIO m, MonadReader DataSettings m)
-    => [Suggestion EntrySuggestion]
+addSuggestions ::
+       (MonadIO m, MonadReader DataSettings m, Eq a, FromJSON a, ToJSON a)
+    => SuggestionType a
+    -> [Suggestion a]
     -> m ()
-addPersonEntrySuggestions newSugs = do
-    usedSugs <- readUsedPersonEntrySuggestions
-    sugs <- readPersonEntrySuggestions
-    let sugs' =
-            nubBy sameEntrySuggestionData $
-            sugs ++ deleteFirstsBy sameEntrySuggestionData newSugs usedSugs
-    writePersonEntrySuggestions sugs'
+addSuggestions typ newSugs = do
+    usedSugs <- readSuggestions typ
+    sugs <- readSuggestions typ
+    let sugs' = nub $ sugs ++ (newSugs \\ usedSugs)
+    writeSuggestions typ sugs'
 
-readUsedPersonEntrySuggestions ::
-       (MonadIO m, MonadReader DataSettings m) => m [Suggestion EntrySuggestion]
-readUsedPersonEntrySuggestions =
-    usedEntrySuggestionFile >>= readJSONWithDefault []
+readUsedSuggestions ::
+       (MonadIO m, MonadReader DataSettings m, FromJSON a)
+    => SuggestionType a
+    -> m [Suggestion a]
+readUsedSuggestions typ = usedSuggestionFile typ >>= readJSONWithDefault []
 
-writeUsedPersonEntrySuggestions ::
-       (MonadIO m, MonadReader DataSettings m)
-    => [Suggestion EntrySuggestion]
+writeUsedSuggestions ::
+       (MonadIO m, MonadReader DataSettings m, ToJSON a)
+    => SuggestionType a
+    -> [Suggestion a]
     -> m ()
-writeUsedPersonEntrySuggestions ess = do
-    f <- usedEntrySuggestionFile
+writeUsedSuggestions typ ess = do
+    f <- usedSuggestionFile typ
     writeJSON f ess
 
-recordUsedPersonEntrySuggestions ::
-       (MonadIO m, MonadReader DataSettings m)
-    => [Suggestion EntrySuggestion]
+recordUsedSuggestions ::
+       (MonadIO m, MonadReader DataSettings m, Eq a, ToJSON a, FromJSON a)
+    => SuggestionType a
+    -> [Suggestion a]
     -> m ()
-recordUsedPersonEntrySuggestions usedSugs = do
-    psugs <- readPersonEntrySuggestions
-    writePersonEntrySuggestions $ psugs \\ usedSugs
-    sugs <- readUsedPersonEntrySuggestions
-    let sugs' = nubBy sameEntrySuggestionData $ sugs ++ usedSugs
-    writeUsedPersonEntrySuggestions sugs'
+recordUsedSuggestions typ usedSugs = do
+    psugs <- readSuggestions typ
+    writeSuggestions typ $ psugs \\ usedSugs
+    sugs <- readUsedSuggestions typ
+    let sugs' = nub $ sugs ++ usedSugs
+    writeUsedSuggestions typ sugs'

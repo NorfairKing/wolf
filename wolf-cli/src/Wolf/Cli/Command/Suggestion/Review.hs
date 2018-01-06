@@ -30,7 +30,7 @@ reviewSuggestion :: (MonadIO m, MonadReader Settings m) => m ()
 reviewSuggestion =
     runData $
     withInitCheck_ $ do
-        sugs <- readPersonEntrySuggestions
+        sugs <- readSuggestions entrySuggestionType
         case sugs of
             [] -> liftIO $ putStrLn "No suggestions to review."
             (sug:_) -> reviewSingle sug
@@ -54,7 +54,7 @@ reviewSingle s = do
                 pure $ reverseIndexLookup uuid index
     case yn of
         No -> do
-            recordUsedPersonEntrySuggestions [s]
+            recordUsedSuggestions entrySuggestionType [s]
             let message =
                     unwords
                         [ "Threw away a suggestion"
@@ -123,7 +123,7 @@ reviewSingle s = do
                                         , "via a suggestion from"
                                         , T.unpack $ suggestionSuggestor s
                                         ]
-            do recordUsedPersonEntrySuggestions [s]
+            do recordUsedSuggestions entrySuggestionType [s]
                makeGitCommit commitMessage
 
 showData ::

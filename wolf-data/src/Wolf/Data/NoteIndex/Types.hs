@@ -6,7 +6,6 @@ module Wolf.Data.NoteIndex.Types where
 import Import
 
 import Data.Aeson as JSON
-import Data.Aeson.Types as JSON
 import qualified Data.Set as S
 
 {-# ANN module ("HLint: ignore Use &&" :: Text) #-}

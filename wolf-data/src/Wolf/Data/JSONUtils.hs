@@ -2,6 +2,8 @@ module Wolf.Data.JSONUtils
     ( readJSONWithDefault
     , readJSONWithMaybe
     , writeJSON
+    , FromJSON
+    , ToJSON
     ) where
 
 import Import

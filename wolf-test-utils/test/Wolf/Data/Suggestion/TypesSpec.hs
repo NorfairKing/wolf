@@ -15,6 +15,9 @@ spec = do
     eqSpec @(Suggestion Double)
     genValidSpec @(Suggestion Double)
     jsonSpecOnValid @(Suggestion Double)
+    eqSpec @AliasSuggestion
+    genValidSpec @AliasSuggestion
+    jsonSpecOnValid @AliasSuggestion
     eqSpec @EntrySuggestion
     genValidSpec @EntrySuggestion
     jsonSpecOnValid @EntrySuggestion

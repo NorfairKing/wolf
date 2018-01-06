@@ -18,8 +18,8 @@ spec =
                     forAllValid $ \sugs -> do
                         sugs' <-
                             flip runReaderT sets $ do
-                                writePersonEntrySuggestions sugs
-                                readPersonEntrySuggestions
+                                writeSuggestions entrySuggestionType sugs
+                                readSuggestions entrySuggestionType
                         sugs' `shouldBe` sugs
         describe "readUsedPersonEntrySuggestions" $
             it "reads the suggestions that were just written" $ \gen ->
@@ -27,6 +27,6 @@ spec =
                     forAllValid $ \sugs -> do
                         sugs' <-
                             flip runReaderT sets $ do
-                                writeUsedPersonEntrySuggestions sugs
-                                readUsedPersonEntrySuggestions
+                                writeUsedSuggestions entrySuggestionType sugs
+                                readUsedSuggestions entrySuggestionType
                         sugs' `shouldBe` sugs

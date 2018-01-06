@@ -50,7 +50,7 @@ suggest = do
                                   Just (personContextUuid pc, score)
                             }
     let finalisedSugs = map finaliseSuggestion sugs
-    addPersonEntrySuggestions finalisedSugs
+    addSuggestions entrySuggestionType finalisedSugs
 
 getPeopleContexts ::
        (MonadIO m, MonadReader DataSettings m) => m [PersonContext]

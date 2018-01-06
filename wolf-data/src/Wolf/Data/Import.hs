@@ -25,5 +25,5 @@ importRepo Repo {..} = do
     putNoteIndex repoNoteIndex
     void $ M.traverseWithKey putPersonNoteIndex repoNoteIndices
     void $ M.traverseWithKey writeNote repoNotes
-    writePersonEntrySuggestions repoEntrySuggestions
-    writeUsedPersonEntrySuggestions repoUsedEntrySuggestions
+    writeSuggestions entrySuggestionType repoEntrySuggestions
+    writeUsedSuggestions entrySuggestionType repoUsedEntrySuggestions
