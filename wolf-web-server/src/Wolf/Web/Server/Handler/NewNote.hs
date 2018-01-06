@@ -42,8 +42,7 @@ newNoteForm =
     ireq
         (checkMMap
              (\t ->
-                  pure . maybe (Left $ InvalidPersonUuid t) Right $
-                  parseUUID t)
+                  pure . maybe (Left $ InvalidPersonUuid t) Right $ parseUUID t)
              uuidText
              textField)
         "uuid" <*>

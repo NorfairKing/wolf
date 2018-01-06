@@ -16,7 +16,6 @@ instance GenUnchecked NoteIndex
 instance GenValid NoteIndex where
     genValid = NoteIndex <$> genValid
 
-
 subNoteIndex :: NoteIndex -> Gen NoteIndex
 subNoteIndex (NoteIndex nis) =
     (NoteIndex . S.fromList) <$> sublistOf (S.toList nis)

@@ -25,5 +25,4 @@ tmpPersonEntryFile ::
     -> m (Path Abs File)
 tmpPersonEntryFile personUuid = do
     td <- liftIO getTempDir
-    liftIO $
-        resolveFile td $ T.unpack (uuidText personUuid) ++ "-entry.yaml"
+    liftIO $ resolveFile td $ T.unpack (uuidText personUuid) ++ "-entry.yaml"
