@@ -17,12 +17,12 @@ spec =
     ydescribe "PersonRSpec" $
     yit "returns a 200 for each person" $
     withExampleAccount $ \uuid -> do
-        uuid <-
+        puuid <-
             runTestDataShared uuid $ do
                 ix <- getIndexWithDefault
                 let al = alias "alias"
-                (uuid, ix') <- lookupOrCreateNewPerson al ix
+                (puuid, ix') <- lookupOrCreateNewPerson al ix
                 putIndex ix'
-                pure uuid
-        get $ PersonR uuid
+                pure puuid
+        get $ PersonR puuid
         statusIs 200
