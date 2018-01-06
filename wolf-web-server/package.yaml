@@ -34,6 +34,7 @@ library:
   - warp
   - wolf-api
   - wolf-data
+  - wolf-data-baked
   - wolf-server
   - yesod
   - yesod-auth

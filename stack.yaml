@@ -4,6 +4,7 @@ packages:
 - wolf-client
 - wolf-cub
 - wolf-data
+- wolf-data-baked
 - wolf-google
 - wolf-server
 - wolf-web-server
@@ -19,4 +20,4 @@ extra-deps:
     - typed-uuid
     - genvalidity-typed-uuid
 
-resolver: lts-10.0
+resolver: lts-10.2

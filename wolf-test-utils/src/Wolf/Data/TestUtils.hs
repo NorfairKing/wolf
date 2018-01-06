@@ -19,7 +19,7 @@ runData = flip runReaderT
 withDataSetsGen :: SpecWith (Gen DataSettings) -> Spec
 withDataSetsGen = beforeAll mkGen . afterAll_ cleanup
   where
-    resolveTestSandbox = resolveDir' "test-sandbox"
+    resolveTestSandbox = resolveDir' "/tmp/test-sandbox"
     mkGen = do
         sbd <- resolveTestSandbox
         pure $ do

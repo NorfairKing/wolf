@@ -20,6 +20,7 @@ import Yesod
 import Yesod.Auth
 
 import Wolf.Data
+import Wolf.Data.Baked
 
 import Wolf.Web.Server.Foundation
 
@@ -51,69 +52,18 @@ personCard uuid (aliases, mpe) =
                 [] -> "Unaliased person"
                 (a_:_) -> a_
         displayName =
-            fromMaybe (aliasText a) $ mpe >>= fromEntry >>= renderDisplayName
+            fromMaybe (aliasText a) $ (fromEntry <$> mpe) >>= renderDisplayName
         mmet = metText <$> (mpe >>= fromEntry)
         mgender = mpe >>= fromEntry
     in (displayName, $(widgetFile "people/item"))
 
-class FromProperty a where
-    fromProperty :: PersonProperty -> Maybe a
-
-instance FromProperty Text where
-    fromProperty (PVal ppv) = Just $ personPropertyValueContents ppv
-    fromProperty _ = Nothing
-
-atKey :: FromProperty a => PersonProperty -> Text -> Maybe a
-atKey (PMap tups) key = lookup key tups >>= fromProperty
-atKey _ _ = Nothing
-
-fromEntry :: FromProperty a => PersonEntry -> Maybe a
-fromEntry = fromProperty . personEntryProperties
-
-data DisplayName = DisplayName
-    { displayNameFirstName :: Maybe Text
-    , displayNameMiddleName :: Maybe Text
-    , displayNameLastName :: Maybe Text
-    } deriving (Show, Eq, Generic)
-
-instance FromProperty DisplayName where
-    fromProperty pp =
-        Just
-            DisplayName
-            { displayNameFirstName = pp `atKey` "first name"
-            , displayNameMiddleName = pp `atKey` "middle name"
-            , displayNameLastName = pp `atKey` "last name"
-            }
-
-renderDisplayName :: DisplayName -> Maybe Text
-renderDisplayName DisplayName {..} =
-    case (displayNameFirstName, displayNameLastName) of
+renderDisplayName :: Name -> Maybe Text
+renderDisplayName Name {..} =
+    case (nameFirst, nameLast) of
         (Nothing, Nothing) -> Nothing
         (Just fn, Nothing) ->
             Just $
-            T.unwords $
-            fn : maybeToList ((("(" <>) . (<> ")")) <$> displayNameMiddleName)
-        (Nothing, Just ln) -> Just $ "Mr or Ms. " <> ln
+            T.unwords $ fn : maybeToList ((("(" <>) . (<> ")")) <$> nameMiddle)
+        (Nothing, Just ln) -> Just $ "Mr or Ms " <> ln
         (Just fn, Just ln) ->
-            Just $ T.unwords $ [fn] ++ maybeToList displayNameMiddleName ++ [ln]
-
-newtype Met = Met
-    { metText :: Text
-    } deriving (Show, Eq, Generic)
-
-instance FromProperty Met where
-    fromProperty pp = Met <$> pp `atKey` "met"
-
-data Gender
-    = Male
-    | Female
-    | Other Text
-    deriving (Show, Eq, Generic)
-
-instance FromProperty Gender where
-    fromProperty pp =
-        flip fmap (pp `atKey` "gender") $ \gt ->
-            case gt of
-                "male" -> Male
-                "female" -> Female
-                _ -> Other gt
+            Just $ T.unwords $ [fn] ++ maybeToList nameMiddle ++ [ln]
