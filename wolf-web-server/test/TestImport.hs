@@ -12,6 +12,7 @@ import System.Exit as X
 import Data.Function as X
 import Data.List as X hiding (head, init, last, tail)
 import Data.Maybe as X
+import Data.UUID.Typed as X
 import Data.Monoid as X
 import Data.String as X
 

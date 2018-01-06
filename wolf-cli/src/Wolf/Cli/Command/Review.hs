@@ -44,7 +44,7 @@ reviewReport pd now ix ns =
                 let as =
                         flip map (S.toList noteRelevantPeople) $ \uuid ->
                             maybe
-                                (personUuidText uuid)
+                                (uuidText uuid)
                                 aliasText
                                 (reverseIndexLookupSingleAlias uuid ix)
                 in (n, as)

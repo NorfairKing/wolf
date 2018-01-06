@@ -15,7 +15,7 @@
     <select
       name="uuid">
       $forall (uuid, alias) <- il
-        <option value=#{personUuidText uuid}>
+        <option value=#{uuidText uuid}>
           #{aliasText alias}
 
   <div .field>

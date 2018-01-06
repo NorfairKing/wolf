@@ -63,7 +63,7 @@ instance Validity Repo where
                   noteIndex `isSubNoteIndexOf` repoNoteIndex <?@>
                   unlines
                       [ "The person note index for person"
-                      , personUuidString personUuid
+                      , uuidString personUuid
                       , "is a sub-noteindex of the global note index."
                       , "Person note index: " ++ show noteIndex
                       , "Global note index: " ++ show repoNoteIndex

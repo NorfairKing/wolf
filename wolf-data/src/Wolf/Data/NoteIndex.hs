@@ -5,9 +5,6 @@ module Wolf.Data.NoteIndex
     , noteIndexSet
     , newNoteIndex
     , NoteUuid
-    , nextRandomNoteUuid
-    , noteUuidText
-    , noteUuidString
     -- * Manipulating indices purely
     , addToNoteIndex
     , containsNoteUuid
@@ -141,7 +138,7 @@ createNewNoteUuid ::
     => NoteIndex -- ^ The global note index
     -> m (NoteUuid, NoteIndex)
 createNewNoteUuid noteIndex = do
-    noteUuid <- nextRandomNoteUuid
+    noteUuid <- nextRandomUUID
     case addToNoteIndex noteIndex noteUuid of
         Nothing -> createNewNoteUuid noteIndex
         Just newIndex -> pure (noteUuid, newIndex)

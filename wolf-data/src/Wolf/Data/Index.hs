@@ -86,7 +86,7 @@ createNewPerson ::
     -> Index
     -> m (Maybe (PersonUuid, Index))
 createNewPerson aliases origIndex = do
-    uuid <- nextRandomPersonUuid
+    uuid <- nextRandomUUID
     let index = addAliases aliases uuid origIndex
     pure $ (,) uuid <$> index
 
@@ -112,11 +112,11 @@ lookupOrCreateNewPerson person origIndex =
     case lookupInIndex person origIndex of
         Just i -> pure (i, origIndex)
         Nothing ->
-            case find ((== aliasText person) . personUuidText) $
+            case find ((== aliasText person) . uuidText) $
                  M.elems (indexMap origIndex) of
                 Just puuid -> pure (puuid, origIndex)
                 Nothing -> do
-                    uuid <- nextRandomPersonUuid
+                    uuid <- nextRandomUUID
                     pure (uuid, addIndexEntry person uuid origIndex)
 
 -- | Get the index if it is there

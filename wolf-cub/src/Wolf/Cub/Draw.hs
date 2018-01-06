@@ -50,7 +50,7 @@ drawPerson :: UTCTime -> PersonState -> [Widget ResourceName]
 drawPerson now PersonState {..} = [helpUI | personStateShowHelp] ++ [personUI]
   where
     personUI =
-        borderWithLabel (str $ "[" ++ personUuidString personStateUuid ++ "]") $
+        borderWithLabel (str $ "[" ++ uuidString personStateUuid ++ "]") $
         personEntryPart <=> hBorder <=> personNotesPart
     helpUI =
         centerLayer $

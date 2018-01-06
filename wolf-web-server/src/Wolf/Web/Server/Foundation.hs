@@ -242,13 +242,9 @@ runData func = do
 instance RenderMessage App FormMessage where
     renderMessage _ _ = defaultFormMessage
 
-instance PathPiece AccountUUID where
-    fromPathPiece = parseAccountUUID
-    toPathPiece = accountUUIDText
-
-instance PathPiece PersonUuid where
-    fromPathPiece = parsePersonUuid
-    toPathPiece = personUuidText
+instance PathPiece (UUID a) where
+    fromPathPiece = parseUUID
+    toPathPiece = uuidText
 
 withNavBar :: WidgetT App IO () -> HandlerT App IO Html
 withNavBar widget = do

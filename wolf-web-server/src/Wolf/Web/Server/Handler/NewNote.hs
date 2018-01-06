@@ -43,8 +43,8 @@ newNoteForm =
         (checkMMap
              (\t ->
                   pure . maybe (Left $ InvalidPersonUuid t) Right $
-                  parsePersonUuid t)
-             personUuidText
+                  parseUUID t)
+             uuidText
              textField)
         "uuid" <*>
     ireq textField "contents"
@@ -64,9 +64,9 @@ postNewNoteR = do
         makeGitCommit $
             unwords
                 [ "Added note on person with uuid"
-                , personUuidString newNotePerson
+                , uuidString newNotePerson
                 , "with uuid"
-                , noteUuidString noteUuid
+                , uuidString noteUuid
                 , "via wolf-web-server."
                 ]
     redirect HomeR

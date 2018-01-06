@@ -48,7 +48,7 @@ personDir ::
        (MonadReader DataSettings m, MonadIO m) => PersonUuid -> m (Path Abs Dir)
 personDir personUuid = do
     pd <- peopleDir
-    liftIO $ resolveDir pd $ T.unpack $ personUuidText personUuid
+    liftIO $ resolveDir pd $ T.unpack $ uuidText personUuid
 
 personEntryFile ::
        (MonadReader DataSettings m, MonadIO m)
@@ -70,7 +70,7 @@ noteFile ::
        (MonadReader DataSettings m, MonadIO m) => NoteUuid -> m (Path Abs File)
 noteFile noteUuid = do
     nd <- notesDir
-    liftIO $ resolveFile nd $ T.unpack $ noteUuidText noteUuid
+    liftIO $ resolveFile nd $ T.unpack $ uuidText noteUuid
 
 personNotesDir ::
        (MonadReader DataSettings m, MonadIO m) => PersonUuid -> m (Path Abs Dir)
@@ -93,4 +93,4 @@ personNoteFile ::
     -> m (Path Abs File)
 personNoteFile personUuid noteUuid = do
     pnd <- personNotesDir personUuid
-    liftIO $ resolveFile pnd $ T.unpack $ noteUuidText noteUuid
+    liftIO $ resolveFile pnd $ T.unpack $ uuidText noteUuid

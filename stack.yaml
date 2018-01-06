@@ -13,5 +13,7 @@ extra-deps:
 - servant-quickcheck-0.0.2.4
 - sockaddr-0.0.0
 - wai-git-http-0.0.0
+- /home/syd/typed-uuid/typed-uuid
+- /home/syd/typed-uuid/genvalidity-typed-uuid
 
 resolver: lts-10.0

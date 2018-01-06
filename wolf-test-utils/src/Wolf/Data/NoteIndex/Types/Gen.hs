@@ -16,10 +16,6 @@ instance GenUnchecked NoteIndex
 instance GenValid NoteIndex where
     genValid = NoteIndex <$> genValid
 
-instance GenUnchecked NoteUuid
-
-instance GenValid NoteUuid where
-    genValid = NoteUuid <$> genValid
 
 subNoteIndex :: NoteIndex -> Gen NoteIndex
 subNoteIndex (NoteIndex nis) =

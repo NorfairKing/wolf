@@ -16,6 +16,7 @@ import Data.Maybe as X
 import Data.Monoid as X
 import Data.Set as X (Set)
 import Data.String as X
+import Data.UUID.Typed as X
 
 import Control.Applicative as X
 import Control.Arrow as X

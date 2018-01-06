@@ -10,10 +10,6 @@ import Wolf.API
 
 import Wolf.Data.Gen ()
 
-instance GenUnchecked AccountUUID
-
-instance GenValid AccountUUID
-
 instance GenUnchecked Username
 
 instance GenValid Username where
