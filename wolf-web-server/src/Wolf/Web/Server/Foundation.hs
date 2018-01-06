@@ -217,7 +217,14 @@ postNewAccountR = do
             errOrUuid <- flip runReaderT senv $ registerAccount reg
             case errOrUuid of
                 Left _ -> redirect registerR
-                Right _ -> redirect LoginR
+                Right _ -> do
+                    lift $
+                        setCreds True $
+                        Creds
+                            wolfAuthPluginName
+                            (usernameText $ registerUsername reg)
+                            []
+                    redirect LoginR
 
 runDataApp :: App -> ReaderT DataSettings IO a -> Handler a
 runDataApp app func = do
