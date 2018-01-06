@@ -1,0 +1,3 @@
+[submodule "wolf-web-server/static/semantic"]
+	path = wolf-web-server/static/semantic
+	url = https://github.com/Semantic-Org/Semantic-UI

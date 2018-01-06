@@ -24,7 +24,7 @@ getPersonR uuid = do
             mpe <- getPersonEntry uuid
             ns <- sortOn (Down . noteTimestamp) <$> getPersonNotes uuid
             pure (ix, mpe, ns)
-    case (reverseIndexLookupSingleAlias uuid ix , mpe, ns) of
+    case (reverseIndexLookupSingleAlias uuid ix, mpe, ns) of
         (Nothing, Nothing, []) -> notFound
         (malias, _, _) -> do
             now <- liftIO getCurrentTime
