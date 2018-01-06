@@ -1,10 +1,12 @@
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Wolf.Web.Server.Handler.Person where
 
 import Import
 
 import Data.Ord
+import qualified Data.Set as S
 import Data.Time
 
 import Yesod
@@ -24,4 +26,12 @@ getPersonR uuid = do
             pure (mpe, ix, ns)
     now <- liftIO getCurrentTime
     let malias = reverseIndexLookupSingleAlias uuid ix
+    token <- genToken
+    let titleAlias = maybe (uuidText uuid) aliasText malias
+    let placeholderAlias = maybe "..." aliasText malias
     withNavBar $(widgetFile "person")
+
+noteWidget :: UTCTime -> Index -> PersonUuid -> Note -> Widget
+noteWidget now ix uuid n = $(widgetFile "note")
+  where
+    otherRelevantPeople = filter (/= uuid) $ S.toList $ noteRelevantPeople n

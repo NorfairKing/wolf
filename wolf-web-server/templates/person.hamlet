@@ -1,16 +1,30 @@
 <h1>
-  $maybe alias <-  malias
-    #{aliasText alias}
-  $nothing
-    #{uuidText uuid}
+  #{titleAlias}
 
 $maybe pe <- mpe
   <pre>
     #{entryContents pe}
 
 $forall n <- ns
-  <p> #{formatMomentNicely now (noteTimestamp n)}
-  <p> #{noteContents n}
+  ^{noteWidget now ix uuid n}
 
 
+<h2>
+ New note for #{titleAlias}
+<form
+  .ui .form
+  method=post
+  action=@{NewNoteR}>
 
+  <div .field>
+    <label>
+      Note contents
+    <textarea
+      name="contents"
+      placeholder="I met #{placeholderAlias} today at ...">
+
+  <input type="hidden" name="uuid" value=#{uuidText uuid}>
+  ^{token}
+
+  <button type="submit">
+    Submit

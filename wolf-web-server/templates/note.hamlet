@@ -1,0 +1,14 @@
+<p> #{formatMomentNicely now (noteTimestamp n)}
+<p> #{noteContents n}
+$if not (null otherRelevantPeople)
+  <p>
+    Other relevant people:
+    <ul>
+      $forall rp <- otherRelevantPeople
+        <li>
+          <a href=@{PersonR rp}>
+            $maybe a <- reverseIndexLookupSingleAlias rp ix
+              #{aliasText a}
+            $nothing
+              #{uuidText rp}
+
