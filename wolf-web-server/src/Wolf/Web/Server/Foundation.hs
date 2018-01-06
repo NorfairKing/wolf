@@ -10,6 +10,7 @@
 module Wolf.Web.Server.Foundation
     ( module Wolf.Web.Server.Foundation
     , module Wolf.Web.Server.Widget
+    , module Wolf.Web.Server.Static
     , module Wolf.Web.Server.Constants
     ) where
 
@@ -38,6 +39,7 @@ import Wolf.Server.Path
 import Wolf.Server.Types hiding (WolfHandler)
 
 import Wolf.Web.Server.Constants
+import Wolf.Web.Server.Static
 import Wolf.Web.Server.Widget
 
 type WolfWidget = WolfWidget' ()
@@ -54,16 +56,6 @@ data App = App
     , appStatic :: EmbeddedStatic
     , appGit :: WaiSubsite
     }
-
-mkEmbeddedStatic
-    False
-    "myStatic"
-    [ embedFile "static/semantic/dist/semantic.min.css"
-    , embedFile "static/semantic/dist/semantic.min.js"
-    , embedDirAt
-          "static/semantic/dist/themes/default/assets/fonts"
-          "static/semantic/dist/themes/default/assets/fonts"
-    ]
 
 mkYesodData "App" $(parseRoutesFile "routes")
 
