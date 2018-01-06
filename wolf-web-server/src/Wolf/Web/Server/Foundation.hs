@@ -218,7 +218,8 @@ postNewAccountR = do
             case errOrUuid of
                 Left _ -> redirect registerR
                 Right _ -> do
-                    lift $ setCreds True $
+                    lift $
+                        setCreds True $
                         Creds
                             wolfAuthPluginName
                             (usernameText $ registerUsername reg)

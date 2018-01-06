@@ -25,16 +25,21 @@ import Wolf.Web.Server.Foundation
 
 import Wolf.Data.Gen ()
 
+testSandbox :: IO (Path Abs Dir)
+testSandbox = resolveDir' "/tmp/wolf-web-server-test"
+
+wolfTestServerEnv :: IO WolfServerEnv
+wolfTestServerEnv = WolfServerEnv <$> testSandbox
+
 wolfWebServerPersonalSpec :: YesodSpec App -> Spec
 wolfWebServerPersonalSpec =
     before_
-        (do sb <- testSandbox
+        (do sb <- wseDataDir <$> wolfTestServerEnv
             ignoringAbsence $ removeDirRecur sb) .
     yesodSpecWithSiteGenerator
-        (do dd <- testSandbox
-            let clear = ignoringAbsence $ removeDirRecur dd
+        (do env <- wolfTestServerEnv
+            let clear = ignoringAbsence $ removeDirRecur $ wseDataDir env
             clear
-            let env = WolfServerEnv dd
             makeWolfApp env)
 
 setupTestData :: ReaderT DataSettings IO ()
@@ -42,38 +47,46 @@ setupTestData = do
     repo <- liftIO $ generate genValid
     importRepo repo
 
-runTestDataPersonal :: ReaderT DataSettings IO a -> YesodExample App a
-runTestDataPersonal func = do
-    dd <- liftIO testSandbox
-    liftIO $ runReaderT func DataSettings {dataSetWolfDir = dd}
+runTestServer :: ReaderT WolfServerEnv IO a -> YesodExample App a
+runTestServer func = liftIO $ wolfTestServerEnv >>= runReaderT func
 
 runTestDataShared ::
        AccountUUID -> ReaderT DataSettings IO a -> YesodExample App a
 runTestDataShared uuid func = do
-    dd <- liftIO testSandbox
-    let wse = WolfServerEnv {wseDataDir = dd}
+    wse <- liftIO wolfTestServerEnv
     ad <- runReaderT (accountDataDir uuid) wse
     let ds = DataSettings {dataSetWolfDir = ad}
     liftIO $ runReaderT func ds
 
-testSandbox :: IO (Path Abs Dir)
-testSandbox = resolveDir' "/tmp/wolf-web-server-test"
-
-withFreshAccount :: Text -> Text -> YesodExample App a -> YesodExample App a
-withFreshAccount exampleEmail examplePassphrase func = do
+withFreshAccount ::
+       Username
+    -> Text
+    -> (AccountUUID -> YesodExample App a)
+    -> YesodExample App a
+withFreshAccount exampleUsername examplePassphrase func = do
     get $ AuthR registerR
     statusIs 200
     request $ do
         setMethod methodPost
         setUrl $ AuthR registerR
         addTokenFromCookie
-        addPostParam "username" exampleEmail
+        addPostParam "username" $ usernameText exampleUsername
         addPostParam "passphrase" examplePassphrase
         addPostParam "passphrase-confirm" examplePassphrase
     statusIs 303
     loc <- followRedirect
     liftIO $ loc `shouldBe` Right "/"
-    func
+    muuid <- runTestServer $ lookupAccountUUID exampleUsername
+    case muuid of
+        Nothing -> do
+            liftIO $
+                expectationFailure
+                    "expected to have a user with the example username."
+            undefined -- Fine, won't get here anyway
+        Just uuid -> func uuid
 
-withExampleAccount :: YesodExample App a -> YesodExample App a
-withExampleAccount = withFreshAccount "example" "pass"
+withExampleAccount :: (AccountUUID -> YesodExample App a) -> YesodExample App a
+withExampleAccount = withFreshAccount (fromJust $ username "example") "pass"
+
+withExampleAccount_ :: YesodExample App a -> YesodExample App a
+withExampleAccount_ = withExampleAccount . const

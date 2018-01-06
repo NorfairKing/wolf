@@ -31,5 +31,5 @@ spec =
                 addPostParam "passphrase" examplePassphrase
                 addPostParam "passphrase-confirm" examplePassphrase
             statusIs 303
-            loc <- followRedirect
-            liftIO $ loc `shouldBe` Right "/"
+            loc <- getLocation
+            liftIO $ loc `shouldBe` Right HomeR
