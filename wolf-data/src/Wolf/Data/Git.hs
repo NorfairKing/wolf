@@ -37,6 +37,7 @@ runGitIn wd args = do
             , std_in = Inherit
             , std_out = Inherit
             , std_err = Inherit
+            , env = Just []
             }
     ec <-
         liftIO $ do
