@@ -24,6 +24,7 @@ newtype Alias = Alias
     { aliasText :: Text
     } deriving ( Show
                , Eq
+               , Hashable
                , Ord
                , Generic
                , FromJSONKey

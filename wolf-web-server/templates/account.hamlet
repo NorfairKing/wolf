@@ -1,3 +1,19 @@
-To clone the data locally, run:
-<pre>
-  git clone https://wolf.cs-syd.eu/git ~/.wolf
+<h1>
+  Account
+<h2>
+  Git integration
+<p>
+  To clone the data locally, run:
+  <pre>
+    git clone https://wolf.cs-syd.eu/git ~/.wolf
+
+<h2>
+  Suggestions
+<p>
+  <form
+    method=post
+    action=@{SuggestionsRunAliasR}>
+    ^{token}
+    <button .ui .button
+      type=submit>
+      Propose Alias Suggestions

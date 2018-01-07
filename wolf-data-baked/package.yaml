@@ -31,6 +31,7 @@ library:
   ghc-options: -Wall
   exposed-modules:
   - Wolf.Data.Baked
+  - Wolf.Data.Baked.Suggestion.Alias
 tests:
   wolf-data-baked-test:
     main: Spec.hs

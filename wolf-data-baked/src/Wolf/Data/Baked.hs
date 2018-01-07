@@ -3,25 +3,18 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Wolf.Data.Baked where
+module Wolf.Data.Baked
+    ( module Wolf.Data.Baked
+    , module Wolf.Data.Baked.Name
+    , module Wolf.Data.Baked.FromProperty
+    , module Wolf.Data.Baked.Suggestion.Alias
+    ) where
 
 import Import
 
-import Wolf.Data
-
-class FromProperty a where
-    fromProperty :: PersonProperty -> a
-
-atKey :: FromProperty (Maybe a) => PersonProperty -> Text -> Maybe a
-atKey (PMap tups) key = lookup key tups >>= fromProperty
-atKey _ _ = Nothing
-
-fromEntry :: FromProperty a => PersonEntry -> a
-fromEntry = fromProperty . personEntryProperties
-
-instance FromProperty (Maybe Text) where
-    fromProperty (PVal ppv) = Just $ personPropertyValueContents ppv
-    fromProperty _ = Nothing
+import Wolf.Data.Baked.FromProperty
+import Wolf.Data.Baked.Name
+import Wolf.Data.Baked.Suggestion.Alias
 
 newtype Met = Met
     { metText :: Text
@@ -47,25 +40,3 @@ instance FromProperty (Maybe Gender) where
                 "male" -> Male
                 "female" -> Female
                 _ -> Other gt
-
-data Name = Name
-    { namePrefix :: Maybe Text -- Mr
-    , nameFirst :: Maybe Text -- John
-    , nameMiddle :: Maybe Text -- Jonas
-    , nameLast :: Maybe Text -- Smith
-    , nameSuffix :: Maybe Text -- Jr
-    , nameNick :: Maybe Text -- Joe
-    } deriving (Show, Eq, Generic)
-
-instance Validity Name
-
-instance FromProperty Name where
-    fromProperty pp =
-        Name
-        { namePrefix = pp `atKey` "prefix"
-        , nameFirst = pp `atKey` "first name"
-        , nameMiddle = pp `atKey` "middle name"
-        , nameLast = pp `atKey` "last name"
-        , nameSuffix = pp `atKey` "suffix"
-        , nameNick = pp `atKey` "nick name"
-        }

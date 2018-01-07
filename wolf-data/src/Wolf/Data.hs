@@ -80,10 +80,12 @@ module Wolf.Data
     , EntrySuggestion(..)
     , sameEntrySuggestionData
     , sameEntrySuggestion
-    , readSuggestions
-    , addSuggestions
+    , readUnusedSuggestions
+    , addUnusedSuggestions
+    , addUnusedSuggestion
     , readUsedSuggestions
     , recordUsedSuggestions
+    , recordUsedSuggestion
     -- * Import and Export
     , Repo
     , repoInitData
