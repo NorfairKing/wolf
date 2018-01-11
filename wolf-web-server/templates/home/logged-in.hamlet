@@ -1,7 +1,22 @@
 <div .ui .vertical .menu>
-  <a .item 
-    href=@{NewPersonR}>
-      New person
-  <a .item
-    href=@{NewNoteR}>
-      New note
+  <div .item>
+    <div .header>
+      New
+    <div .menu>
+      <a .item
+        href=@{NewPersonR}>
+        New Person
+      <a .item
+        href=@{NewNoteR}>
+        New Note
+  <div .item>
+    <div .header>
+      Suggestions
+    <div .menu>
+      <form .item
+        method=post
+        action=@{SuggestionsRunAliasR}>
+        ^{token}
+        <button .ui .button
+          type=submit>
+          Propose Alias Suggestions

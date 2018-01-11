@@ -5,6 +5,8 @@
     Account
   <a .item href=@{PeopleR}>
     People
+  <a .item href=@{SuggestionsR}>
+    Suggestions
   <div .right .menu>
     $maybe _ <- mauth
       <a .ui .item href=@{AuthR LogoutR}>
