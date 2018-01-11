@@ -1,0 +1,16 @@
+image: fpco/stack-build:lts-10.2
+
+cache:
+  paths:
+    - .stack-work/
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+stages:
+  - check
+
+check:
+  stage: check
+  script:
+    - ./zift.hs check
