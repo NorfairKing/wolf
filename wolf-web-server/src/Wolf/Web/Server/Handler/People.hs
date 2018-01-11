@@ -52,18 +52,7 @@ personCard uuid (aliases, mpe) =
                 [] -> "Unaliased person"
                 (a_:_) -> a_
         displayName =
-            fromMaybe (aliasText a) $ (fromEntry <$> mpe) >>= renderDisplayName
+            fromMaybe (aliasText a) $ (fromEntry <$> mpe) >>= renderName
         mmet = metText <$> (mpe >>= fromEntry)
         mgender = mpe >>= fromEntry
     in (displayName, $(widgetFile "people/item"))
-
-renderDisplayName :: Name -> Maybe Text
-renderDisplayName Name {..} =
-    case (nameFirst, nameLast) of
-        (Nothing, Nothing) -> Nothing
-        (Just fn, Nothing) ->
-            Just $
-            T.unwords $ fn : maybeToList ((("(" <>) . (<> ")")) <$> nameMiddle)
-        (Nothing, Just ln) -> Just $ "Mr or Ms " <> ln
-        (Just fn, Just ln) ->
-            Just $ T.unwords $ [fn] ++ maybeToList nameMiddle ++ [ln]

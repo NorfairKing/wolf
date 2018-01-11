@@ -1,0 +1,7 @@
+<ul>
+  $forall sug <- aSugs
+    <li> 
+      <p>
+        <a href=@{PersonR (aliasSuggestionPerson $ suggestionData sug)}>
+          
+          #{show sug}

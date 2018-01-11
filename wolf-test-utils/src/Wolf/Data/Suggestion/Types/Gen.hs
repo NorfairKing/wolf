@@ -10,6 +10,14 @@ import Wolf.Data.Entry.Types.Gen ()
 import Wolf.Data.Index.Types.Gen ()
 import Wolf.Data.People.Types.Gen ()
 
+instance GenUnchecked (SuggestionIndex a)
+
+instance GenValid (SuggestionIndex a)
+
+instance GenUnchecked (SuggestionHash a)
+
+instance GenValid (SuggestionHash a)
+
 instance GenUnchecked a => GenUnchecked (Suggestion a)
 
 instance GenValid a => GenValid (Suggestion a) where

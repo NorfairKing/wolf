@@ -5,6 +5,7 @@ module Wolf.Google.Suggest where
 import Import
 
 import Control.Monad.Reader
+import qualified Data.Set as S
 import Data.Time
 import Lens.Micro
 
@@ -50,7 +51,7 @@ suggest = do
                                   Just (personContextUuid pc, score)
                             }
     let finalisedSugs = map finaliseSuggestion sugs
-    addSuggestions entrySuggestionType finalisedSugs
+    addUnusedSuggestions entrySuggestionType $ S.fromList finalisedSugs
 
 getPeopleContexts ::
        (MonadIO m, MonadReader DataSettings m) => m [PersonContext]

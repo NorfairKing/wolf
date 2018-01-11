@@ -14,6 +14,7 @@ import Wolf.Web.Server.Foundation
 getAccountR :: Handler Html
 getAccountR = do
     void requireAuthId
+    token <- genToken
     -- FIXME: make the example independent of where this is run.
     withNavBar $ do
         setTitle "Wolf Account"

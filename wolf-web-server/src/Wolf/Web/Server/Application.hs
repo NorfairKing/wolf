@@ -15,5 +15,7 @@ import Wolf.Web.Server.Handler.NewNote
 import Wolf.Web.Server.Handler.NewPerson
 import Wolf.Web.Server.Handler.People
 import Wolf.Web.Server.Handler.Person
+import Wolf.Web.Server.Handler.Suggestions
+import Wolf.Web.Server.Handler.Suggestions.Alias
 
 mkYesodDispatch "App" resourcesApp

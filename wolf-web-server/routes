@@ -1,9 +1,12 @@
-/                               HomeR           GET
-/account                        AccountR        GET
-/people                         PeopleR         GET
-/people/#PersonUuid             PersonR         GET
-/new-note                       NewNoteR        GET POST
-/new-person                     NewPersonR      GET POST
+/                               HomeR                GET
+/account                        AccountR             GET
+/people                         PeopleR              GET
+/people/#PersonUuid             PersonR              GET
+/new-note                       NewNoteR             GET POST
+/new-person                     NewPersonR           GET POST
+
+/suggestions                    SuggestionsR         GET
+/suggestions/run/alias          SuggestionsRunAliasR POST
 
 -- Subsites
 /auth                           AuthR   Auth            getAuth

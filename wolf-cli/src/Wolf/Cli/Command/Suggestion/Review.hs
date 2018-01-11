@@ -9,6 +9,7 @@ module Wolf.Cli.Command.Suggestion.Review
 import Import
 
 import qualified Data.ByteString as SB
+import qualified Data.Set as S
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import Data.Time
@@ -30,8 +31,8 @@ reviewSuggestion :: (MonadIO m, MonadReader Settings m) => m ()
 reviewSuggestion =
     runData $
     withInitCheck_ $ do
-        sugs <- readSuggestions entrySuggestionType
-        case sugs of
+        sugs <- readUnusedSuggestions entrySuggestionType
+        case S.toList sugs of
             [] -> liftIO $ putStrLn "No suggestions to review."
             (sug:_) -> reviewSingle sug
 
@@ -54,7 +55,7 @@ reviewSingle s = do
                 pure $ reverseIndexLookup uuid index
     case yn of
         No -> do
-            recordUsedSuggestions entrySuggestionType [s]
+            recordUsedSuggestion entrySuggestionType s
             let message =
                     unwords
                         [ "Threw away a suggestion"
@@ -123,7 +124,7 @@ reviewSingle s = do
                                         , "via a suggestion from"
                                         , T.unpack $ suggestionSuggestor s
                                         ]
-            do recordUsedSuggestions entrySuggestionType [s]
+            do recordUsedSuggestion entrySuggestionType s
                makeGitCommit commitMessage
 
 showData ::

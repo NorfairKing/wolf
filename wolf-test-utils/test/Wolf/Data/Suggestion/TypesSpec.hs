@@ -21,3 +21,9 @@ spec = do
     eqSpec @EntrySuggestion
     genValidSpec @EntrySuggestion
     jsonSpecOnValid @EntrySuggestion
+    eqSpec @(SuggestionIndex Double)
+    genValidSpec @(SuggestionIndex Double)
+    jsonSpecOnValid @(SuggestionIndex Double)
+    eqSpec @(SuggestionHash Double)
+    genValidSpec @(SuggestionHash Double)
+    jsonSpecOnValid @(SuggestionHash Double)

@@ -17,7 +17,6 @@ import Wolf.Data.Init
 import Wolf.Data.Note
 import Wolf.Data.NoteIndex
 import Wolf.Data.People
-import Wolf.Data.Suggestion
 import Wolf.Data.Types
 
 exportRepo :: (MonadIO m, MonadReader DataSettings m) => m (Maybe Repo)
@@ -41,8 +40,6 @@ exportRepo = do
             noteIxs <- mKeyed getPersonNoteIndex people
             noteUuids <- getNoteUuids
             notes <- mKeyed readNote noteUuids
-            entrySuggestions <- readSuggestions entrySuggestionType
-            usedEntrySuggestions <- readUsedSuggestions entrySuggestionType
             pure $
                 Just
                     Repo
@@ -52,6 +49,6 @@ exportRepo = do
                     , repoNoteIndex = noteIndex
                     , repoNoteIndices = noteIxs
                     , repoNotes = notes
-                    , repoEntrySuggestions = entrySuggestions
-                    , repoUsedEntrySuggestions = usedEntrySuggestions
+                    , repoEntrySuggestions = [] -- TODO suggestions
+                    , repoUsedEntrySuggestions = []
                     }
