@@ -14,6 +14,10 @@ instance GenUnchecked (SuggestionIndex a)
 
 instance GenValid (SuggestionIndex a)
 
+instance GenUnchecked SuggestionType
+
+instance GenValid SuggestionType
+
 instance GenUnchecked (SuggestionHash a)
 
 instance GenValid (SuggestionHash a)
@@ -21,7 +25,7 @@ instance GenValid (SuggestionHash a)
 instance GenUnchecked a => GenUnchecked (Suggestion a)
 
 instance GenValid a => GenValid (Suggestion a) where
-    genValid = Suggestion <$> genValid <*> genValid <*> genValid
+    genValid = Suggestion <$> genValid <*> genValid <*> genValid <*> genValid
 
 instance GenUnchecked AliasSuggestion
 

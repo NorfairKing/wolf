@@ -7,6 +7,7 @@
 
 /suggestions                    SuggestionsR         GET
 /suggestions/run/alias          SuggestionsRunAliasR POST
+/suggestion/#FilePath/#SuggestionUuid SuggestionR GET
 
 -- Subsites
 /auth                           AuthR   Auth            getAuth

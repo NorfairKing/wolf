@@ -73,6 +73,9 @@ module Wolf.Data
     , readNote
     , writeNote
     -- * Suggestions
+    , SuggestionType(..)
+    , parseSuggestionType
+    , SuggestionUuid
     , Suggestion(..)
     , aliasSuggestionType
     , AliasSuggestion(..)
@@ -80,6 +83,7 @@ module Wolf.Data
     , EntrySuggestion(..)
     , sameEntrySuggestionData
     , sameEntrySuggestion
+    , readSuggestion
     , readUnusedSuggestions
     , addUnusedSuggestions
     , addUnusedSuggestion

@@ -4,7 +4,9 @@
 
 module Wolf.Data.Suggestion
     ( Suggestion(..)
-    , SuggestionType
+    , SuggestionType(..)
+    , parseSuggestionType
+    , SuggestionUuid
     , aliasSuggestionType
     , AliasSuggestion(..)
     , entrySuggestionType
@@ -14,6 +16,8 @@ module Wolf.Data.Suggestion
     , hashSuggestion
     , SuggestionIndex
     , suggestionIndexMap
+    , readSuggestion
+    , readSuggestionChecked
     , readUnusedSuggestions
     , writeUnusedSuggestions
     , addUnusedSuggestions
@@ -38,23 +42,23 @@ import Wolf.Data.Suggestion.Types
 suggestionsDir :: MonadReader DataSettings m => m (Path Abs Dir)
 suggestionsDir = (</> $(mkRelDir "suggestions")) <$> wolfDir
 
-aliasSuggestionType :: SuggestionType AliasSuggestion
+aliasSuggestionType :: SuggestionType
 aliasSuggestionType = SuggestionType $(mkRelDir "alias")
 
-entrySuggestionType :: SuggestionType EntrySuggestion
+entrySuggestionType :: SuggestionType
 entrySuggestionType = SuggestionType $(mkRelDir "entry")
 
 suggestionTypeDir ::
-       MonadReader DataSettings m => SuggestionType a -> m (Path Abs Dir)
+       MonadReader DataSettings m => SuggestionType -> m (Path Abs Dir)
 suggestionTypeDir (SuggestionType d) = (</> d) <$> suggestionsDir
 
 unusedSuggestionsIndexFile ::
-       MonadReader DataSettings m => SuggestionType a -> m (Path Abs File)
+       MonadReader DataSettings m => SuggestionType -> m (Path Abs File)
 unusedSuggestionsIndexFile typ =
     (</> $(mkRelFile "unused.json")) <$> suggestionTypeDir typ
 
 usedSuggestionsIndexFile ::
-       MonadReader DataSettings m => SuggestionType a -> m (Path Abs File)
+       MonadReader DataSettings m => SuggestionType -> m (Path Abs File)
 usedSuggestionsIndexFile typ =
     (</> $(mkRelFile "used.json")) <$> suggestionTypeDir typ
 
@@ -66,7 +70,7 @@ emptySuggestionIndex = SuggestionIndex {suggestionIndexMap = M.empty}
 
 suggestionFilePath ::
        (MonadIO m, MonadReader DataSettings m)
-    => SuggestionType a
+    => SuggestionType
     -> SuggestionUuid
     -> m (Path Abs File)
 suggestionFilePath typ u = do
@@ -74,14 +78,23 @@ suggestionFilePath typ u = do
     resolveFile d $ uuidString u
 
 readSuggestion ::
+       forall a m.
        (MonadIO m, MonadReader DataSettings m, FromJSON a, Hashable a)
-    => SuggestionType a
+    => SuggestionType
+    -> SuggestionUuid
+    -> m (Maybe (Suggestion a))
+readSuggestion typ u = do
+    f <- suggestionFilePath typ u
+    readJSONWithMaybe f
+
+readSuggestionChecked ::
+       (MonadIO m, MonadReader DataSettings m, FromJSON a, Hashable a)
+    => SuggestionType
     -> SuggestionUuid
     -> SuggestionHash a
     -> m (Maybe (Suggestion a))
-readSuggestion typ u h = do
-    f <- suggestionFilePath typ u
-    ms <- readJSONWithMaybe f
+readSuggestionChecked typ u h = do
+    ms <- readSuggestion typ u
     pure $
         (ms >>=) $ \s ->
             if hashSuggestion s == h
@@ -90,7 +103,7 @@ readSuggestion typ u h = do
 
 writeSuggestion ::
        (MonadIO m, MonadReader DataSettings m, ToJSON a)
-    => SuggestionType a
+    => SuggestionType
     -> SuggestionUuid
     -> Suggestion a
     -> m ()
@@ -100,23 +113,33 @@ writeSuggestion typ u s = do
 
 readUnusedSuggestionIndex ::
        (MonadIO m, MonadReader DataSettings m)
-    => SuggestionType a
+    => SuggestionType
     -> m (SuggestionIndex a)
 readUnusedSuggestionIndex typ =
     unusedSuggestionsIndexFile typ >>= readJSONWithDefault emptySuggestionIndex
 
 readUnusedSuggestions ::
        (MonadIO m, MonadReader DataSettings m, FromJSON a, Ord a, Hashable a)
-    => SuggestionType a
-    -> m (Set (Suggestion a))
-readUnusedSuggestions typ = do
-    (SuggestionIndex ix) <- readUnusedSuggestionIndex typ
-    ix_ <- M.traverseWithKey (flip $ readSuggestion typ) ix
-    pure $ S.fromList . catMaybes . M.elems $ ix_
+    => SuggestionType
+    -> m (Map SuggestionUuid (Suggestion a))
+readUnusedSuggestions = readHelper readUsedSuggestionIndex
+
+readHelper ::
+       (MonadIO m, MonadReader DataSettings m, FromJSON a, Ord a, Hashable a)
+    => (SuggestionType -> m (SuggestionIndex a))
+    -> SuggestionType
+    -> m (Map SuggestionUuid (Suggestion a))
+readHelper rfunc typ = do
+    (SuggestionIndex ix) <- rfunc typ
+    ix_ <-
+        M.traverseWithKey
+            (\h u -> fmap ((,) u) <$> readSuggestionChecked typ u h)
+            ix
+    pure $ M.fromList . catMaybes . M.elems $ ix_
 
 writeUnusedSuggestionIndex ::
        (MonadIO m, MonadReader DataSettings m)
-    => SuggestionType a
+    => SuggestionType
     -> SuggestionIndex a
     -> m ()
 writeUnusedSuggestionIndex typ ix = do
@@ -124,8 +147,8 @@ writeUnusedSuggestionIndex typ ix = do
     writeJSON f ix
 
 writeUnusedSuggestions ::
-       (MonadIO m, MonadReader DataSettings m, ToJSON a, Hashable a)
-    => SuggestionType a
+       forall a m. (MonadIO m, MonadReader DataSettings m, ToJSON a, Hashable a)
+    => SuggestionType
     -> Set (Suggestion a)
     -> m ()
 writeUnusedSuggestions typ ess = do
@@ -145,7 +168,7 @@ addUnusedSuggestions ::
        , ToJSON a
        , Hashable a
        )
-    => SuggestionType a
+    => SuggestionType
     -> Set (Suggestion a)
     -> m ()
 addUnusedSuggestions typ newSugs = do
@@ -174,39 +197,36 @@ addUnusedSuggestion ::
        , ToJSON a
        , Hashable a
        )
-    => SuggestionType a
+    => SuggestionType
     -> Suggestion a
     -> m ()
 addUnusedSuggestion typ s = addUnusedSuggestions typ $ S.singleton s
 
 readUsedSuggestionIndex ::
        (MonadIO m, MonadReader DataSettings m)
-    => SuggestionType a
+    => SuggestionType
     -> m (SuggestionIndex a)
 readUsedSuggestionIndex typ =
     usedSuggestionsIndexFile typ >>= readJSONWithDefault emptySuggestionIndex
 
 readUsedSuggestions ::
        (MonadIO m, MonadReader DataSettings m, FromJSON a, Ord a, Hashable a)
-    => SuggestionType a
-    -> m (Set (Suggestion a))
-readUsedSuggestions typ = do
-    (SuggestionIndex ix) <- readUsedSuggestionIndex typ
-    ix_ <- M.traverseWithKey (flip $ readSuggestion typ) ix
-    pure $ S.fromList . catMaybes . M.elems $ ix_
+    => SuggestionType
+    -> m (Map SuggestionUuid (Suggestion a))
+readUsedSuggestions = readHelper readUnusedSuggestionIndex
 
 writeUsedSuggestionIndex ::
-       (MonadIO m, MonadReader DataSettings m)
-    => SuggestionType a
+       forall a m. (MonadIO m, MonadReader DataSettings m)
+    => SuggestionType
     -> SuggestionIndex a
     -> m ()
 writeUsedSuggestionIndex typ ix = do
     f <- usedSuggestionsIndexFile typ
     writeJSON f ix
 
-writeUsedSuggestions ::
+writeUsedSuggestions :: forall a m.
        (MonadIO m, MonadReader DataSettings m, ToJSON a, Hashable a)
-    => SuggestionType a
+    => SuggestionType
     -> Set (Suggestion a)
     -> m ()
 writeUsedSuggestions typ ess = do
@@ -226,7 +246,7 @@ recordUsedSuggestions ::
        , FromJSON a
        , Hashable a
        )
-    => SuggestionType a
+    => SuggestionType
     -> Set (Suggestion a)
     -> m ()
 recordUsedSuggestions typ usedSugs = do
@@ -264,7 +284,7 @@ recordUsedSuggestion ::
        , FromJSON a
        , Hashable a
        )
-    => SuggestionType a
+    => SuggestionType
     -> Suggestion a
     -> m ()
 recordUsedSuggestion typ s = recordUsedSuggestions typ $ S.singleton s

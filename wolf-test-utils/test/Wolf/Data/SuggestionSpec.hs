@@ -6,6 +6,9 @@ module Wolf.Data.SuggestionSpec
 
 import TestImport
 
+import qualified Data.Map as M
+import qualified Data.Set as S
+
 import Wolf.Data.Suggestion
 import Wolf.Data.TestUtils
 
@@ -20,36 +23,40 @@ spec = do
         describe "readPersonEntrySuggestions" $ do
             it "reads the suggestions that were just written" $ \gen ->
                 forAll gen $ \sets ->
-                    forAllValid $ \sugs -> do
-                        sugs' <-
-                            flip runReaderT sets $ do
-                                writeUnusedSuggestions entrySuggestionType sugs
-                                readUnusedSuggestions entrySuggestionType
-                        sugs' `shouldBe` sugs
+                    forAllValid $ \typ ->
+                        forAllValid $ \sugs -> do
+                            sugs' <-
+                                flip runReaderT sets $ do
+                                    writeUnusedSuggestions @EntrySuggestion typ sugs
+                                    readUnusedSuggestions typ
+                            S.fromList (M.elems sugs') `shouldBe` sugs
             it "reads the suggestions that were just added" $ \gen ->
                 once $
                 forAll gen $ \sets ->
-                    forAllValid $ \sugs -> do
-                        sugs' <-
-                            flip runReaderT sets $ do
-                                addUnusedSuggestions entrySuggestionType sugs
-                                readUnusedSuggestions entrySuggestionType
-                        sugs' `shouldBe` sugs
+                    forAllValid $ \typ ->
+                        forAllValid $ \sugs -> do
+                            sugs' <-
+                                flip runReaderT sets $ do
+                                    addUnusedSuggestions @EntrySuggestion typ sugs
+                                    readUnusedSuggestions typ
+                            S.fromList (M.elems sugs') `shouldBe` sugs
         describe "readUsedPersonEntrySuggestions" $ do
             it "reads the suggestions that were just written" $ \gen ->
                 forAll gen $ \sets ->
-                    forAllValid $ \sugs -> do
-                        sugs' <-
-                            flip runReaderT sets $ do
-                                writeUsedSuggestions entrySuggestionType sugs
-                                readUsedSuggestions entrySuggestionType
-                        sugs' `shouldBe` sugs
+                    forAllValid $ \typ ->
+                        forAllValid $ \sugs -> do
+                            sugs' <-
+                                flip runReaderT sets $ do
+                                    writeUsedSuggestions @EntrySuggestion typ sugs
+                                    readUsedSuggestions typ
+                            S.fromList (M.elems sugs') `shouldBe` sugs
             it "reads the suggestions that were just added" $ \gen ->
                 once $
                 forAll gen $ \sets ->
-                    forAllValid $ \sugs -> do
-                        sugs' <-
-                            flip runReaderT sets $ do
-                                recordUsedSuggestions entrySuggestionType sugs
-                                readUsedSuggestions entrySuggestionType
-                        sugs' `shouldBe` sugs
+                    forAllValid $ \typ ->
+                        forAllValid $ \sugs -> do
+                            sugs' <-
+                                flip runReaderT sets $ do
+                                    recordUsedSuggestions @EntrySuggestion typ sugs
+                                    readUsedSuggestions typ
+                            S.fromList (M.elems sugs') `shouldBe` sugs

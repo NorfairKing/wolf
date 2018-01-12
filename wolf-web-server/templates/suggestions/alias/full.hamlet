@@ -1,0 +1,12 @@
+<h2> 
+  <a href=@{suggestionR aliasSuggestionType uuid}>
+    Alias suggestion
+<p> 
+  Do you want to use the alias #{aliasText $ aliasSuggestionAlias asug}?
+<form>
+  <div .ui .buttons>
+    <button .ui .positive .button>
+        Yes
+    <div .or>
+    <button .ui .button>
+      No

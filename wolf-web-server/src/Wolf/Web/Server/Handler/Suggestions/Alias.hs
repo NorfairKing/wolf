@@ -20,9 +20,14 @@ postSuggestionsRunAliasR = do
     redirect SuggestionsR
 
 instance DisplaySuggestion AliasSuggestion where
+    suggestionPreviewWidget = aliasSuggestionPreviewWidget
     suggestionWidget = aliasSuggestionWidget
 
-aliasSuggestionWidget :: Suggestion AliasSuggestion -> Widget
-aliasSuggestionWidget sug =
+aliasSuggestionPreviewWidget ::
+       SuggestionUuid -> Suggestion AliasSuggestion -> Widget
+aliasSuggestionPreviewWidget uuid sug =
     let d = suggestionData sug
-    in $(widgetFile "suggestions/alias")
+    in $(widgetFile "suggestions/alias/preview")
+
+aliasSuggestionWidget :: SuggestionUuid -> AliasSuggestion -> Widget
+aliasSuggestionWidget uuid asug = $(widgetFile "suggestions/alias/full")

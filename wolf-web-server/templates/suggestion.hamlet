@@ -1,0 +1,10 @@
+<div .ui .fluid .card>
+  <div .content>
+    By #{suggestionSuggestor s}
+    <div .ui .divider>
+    <div .description>
+      ^{w}
+    <div .ui .divider>
+    #{suggestionReason s}
+  <div .extra .content>
+    #{formatMomentNicely now $ suggestionTimestamp s}

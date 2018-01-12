@@ -6,6 +6,7 @@
 module Wolf.Data.Suggestion.Types
     ( SuggestionUuid
     , SuggestionType(..)
+    , parseSuggestionType
     , SuggestionIndex(..)
     , SuggestionHash(..)
     , Suggestion(..)
@@ -21,8 +22,10 @@ import Data.Aeson
 import qualified Data.Aeson as JSON
 import Data.Aeson.Types
 import qualified Data.Text as T
+import Data.Time
 import Data.Word
 import Numeric (showHex)
+import qualified System.FilePath as FP
 import Text.Read
 
 import Wolf.Data.Entry.Types
@@ -33,9 +36,19 @@ type SuggestionUuid = UUID Sugg
 
 data Sugg
 
-newtype SuggestionType a =
-    SuggestionType (Path Rel Dir)
-    deriving (Show, Eq, Generic)
+newtype SuggestionType = SuggestionType
+    { suggestionTypePath :: Path Rel Dir
+    } deriving (Show, Eq, Ord, Generic)
+
+parseSuggestionType :: FilePath -> Maybe SuggestionType
+parseSuggestionType = fmap SuggestionType . parseRelDir
+
+instance Validity SuggestionType where
+    validate (SuggestionType p) =
+        check
+            (length (filter (/= ".") . FP.splitDirectories $ fromRelDir p) == 1)
+            "only contains one path component"
+    isValid = isValidByValidating
 
 newtype SuggestionIndex a = SuggestionIndex
     { suggestionIndexMap :: Map (SuggestionHash a) SuggestionUuid
@@ -73,25 +86,38 @@ toJSONTextHash (SuggestionHash i) = T.pack $ "0x" ++ showHex i ""
 data Suggestion a = Suggestion
     { suggestionSuggestor :: Text
     , suggestionReason :: Text
+    , suggestionTimestamp :: UTCTime
     , suggestionData :: a
-    } deriving (Show, Eq, Ord, Generic)
+    } deriving (Show, Ord, Generic)
 
 instance Validity a => Validity (Suggestion a)
+
+instance Eq a => Eq (Suggestion a) where
+    s1 == s2 =
+        suggestionSuggestor s1 == suggestionSuggestor s2 &&
+        suggestionReason s1 == suggestionReason s2 &&
+        suggestionData s1 == suggestionData s2
 
 instance NFData a => NFData (Suggestion a)
 
 instance FromJSON a => FromJSON (Suggestion a) where
     parseJSON =
         withObject "Suggestion" $ \o ->
-            Suggestion <$> o .: "suggestor" <*> o .: "reason" <*> o .: "data"
+            Suggestion <$> o .: "suggestor" <*> o .: "reason" <*>
+            o .: "timestamp" <*>
+            o .: "data"
 
 instance ToJSON a => ToJSON (Suggestion a) where
     toJSON Suggestion {..} =
         object
             [ "suggestor" .= suggestionSuggestor
             , "reason" .= suggestionReason
+            , "timestamp" .= suggestionTimestamp
             , "data" .= suggestionData
             ]
+
+instance Functor Suggestion where
+    fmap f s = s {suggestionData = f $ suggestionData s}
 
 data AliasSuggestion = AliasSuggestion
     { aliasSuggestionPerson :: PersonUuid

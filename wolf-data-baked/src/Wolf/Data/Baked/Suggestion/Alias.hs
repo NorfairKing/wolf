@@ -7,6 +7,7 @@ import Import
 
 import qualified Data.Map as M
 import qualified Data.Set as S
+import Data.Time
 
 import Wolf.Data
 
@@ -16,6 +17,7 @@ import Wolf.Data.Baked.Name
 makeAliasSuggestions :: (MonadIO m, MonadReader DataSettings m) => m ()
 makeAliasSuggestions = do
     ix <- getIndexWithDefault
+    now <- liftIO getCurrentTime
     sugs <-
         forM (M.toList $ reverseIndex ix) $ \(puuid, as) -> do
             mpe <- getPersonEntry puuid
@@ -34,16 +36,18 @@ makeAliasSuggestions = do
                                             { aliasSuggestionPerson = puuid
                                             , aliasSuggestionAlias = sa
                                             }
-                                    let sas = finaliseAliasSuggestion asug
+                                    let sas = finaliseAliasSuggestion asug now
                                     pure [sas]
     addUnusedSuggestions aliasSuggestionType $ S.fromList $ concat sugs
 
-finaliseAliasSuggestion :: AliasSuggestion -> Suggestion AliasSuggestion
-finaliseAliasSuggestion as =
+finaliseAliasSuggestion ::
+       AliasSuggestion -> UTCTime -> Suggestion AliasSuggestion
+finaliseAliasSuggestion as t =
     Suggestion
     { suggestionSuggestor = "Alias suggestor"
     , suggestionReason =
-          "The entry contained enough information to suggest this alias"
+          "The entry contained enough information to suggest this alias."
+    , suggestionTimestamp = t
     , suggestionData = as
     }
 
