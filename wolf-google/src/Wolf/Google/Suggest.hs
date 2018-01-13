@@ -50,7 +50,7 @@ suggest = do
                             , entrySuggestionLikelyRelevantPerson =
                                   Just (personContextUuid pc, score)
                             }
-    let finalisedSugs = map finaliseSuggestion sugs
+    let finalisedSugs = map (finaliseSuggestion now) sugs
     addUnusedSuggestions entrySuggestionType $ S.fromList finalisedSugs
 
 getPeopleContexts ::

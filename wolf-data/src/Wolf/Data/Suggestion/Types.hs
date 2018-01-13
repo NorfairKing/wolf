@@ -45,7 +45,7 @@ newtype SuggestionType = SuggestionType
     } deriving (Show, Eq, Ord, Generic)
 
 parseSuggestionType :: FilePath -> Maybe SuggestionType
-parseSuggestionType = fmap SuggestionType . parseRelDir
+parseSuggestionType fp = SuggestionType <$> parseRelDir fp >>= constructValid
 
 instance Validity SuggestionType where
     validate (SuggestionType p) =
@@ -57,6 +57,8 @@ instance Validity SuggestionType where
                   "only contains one path component"
             ]
     isValid = isValidByValidating
+
+instance NFData SuggestionType
 
 instance FromJSON SuggestionType where
     parseJSON = withText "SuggestionType" parseSuggestionTypeText
@@ -221,6 +223,8 @@ newtype SuggestionRepo = SuggestionRepo
 
 instance Validity SuggestionRepo
 
+instance NFData SuggestionRepo
+
 data SuggestionTypeRepo a = SuggestionTypeRepo
     { suggestionTypeRepoUnused :: Map SuggestionUuid (Suggestion a)
     , suggestionTypeRepoUsed :: Map SuggestionUuid (Suggestion a)
@@ -247,6 +251,8 @@ instance (Validity a, Hashable a) => Validity (SuggestionTypeRepo a) where
                   "contains no duplicate uuids"
             ]
     isValid = isValidByValidating
+
+instance NFData a => NFData (SuggestionTypeRepo a)
 
 instance FromJSON a => FromJSON (SuggestionTypeRepo a) where
     parseJSON =

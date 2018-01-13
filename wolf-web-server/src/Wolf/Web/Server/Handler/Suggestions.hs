@@ -12,23 +12,20 @@ module Wolf.Web.Server.Handler.Suggestions where
 import Import
 
 import qualified Data.Map as M
-import qualified Data.Set as S
 import Data.Time
 
 import Yesod
-import Yesod.Auth
 
 import Wolf.Data
 import Wolf.Data.Time
 
 import Wolf.Web.Server.Foundation
 
-import Wolf.Web.Server.Handler.Suggestions.Alias
+import Wolf.Web.Server.Handler.Suggestions.Alias ()
 import Wolf.Web.Server.Handler.Suggestions.Class
 
 getSuggestionsR :: Handler Html
 getSuggestionsR = do
-    ix <- runData getIndexWithDefault
     aSugs <-
         runData $ readUnusedSuggestions aliasSuggestionType :: Handler (M.Map SuggestionUuid (Suggestion AliasSuggestion))
     let sws = map (uncurry suggestionPreviewWidget) $ M.toList aSugs

@@ -26,8 +26,7 @@ data Repo = Repo
     , repoNoteIndex :: NoteIndex
     , repoNoteIndices :: Map PersonUuid NoteIndex
     , repoNotes :: Map NoteUuid Note
-    , repoEntrySuggestions :: [Suggestion EntrySuggestion]
-    , repoUsedEntrySuggestions :: [Suggestion EntrySuggestion]
+    , repoSuggestions :: SuggestionRepo
     } deriving (Show, Eq, Generic)
 
 instance Validity Repo where
@@ -39,11 +38,9 @@ instance Validity Repo where
             , isValid repoNoteIndex
             , isValid repoNoteIndices
             , isValid repoNotes
-            , isValid repoEntrySuggestions
-            , isValid repoUsedEntrySuggestions
             , M.keysSet repoNotes == noteIndexSet repoNoteIndex
             , all (`isSubNoteIndexOf` repoNoteIndex) $ M.elems repoNoteIndices
-            , null $ repoEntrySuggestions `intersect` repoUsedEntrySuggestions
+            , isValid repoSuggestions
             ]
     validate Repo {..} =
         mconcat
@@ -53,8 +50,6 @@ instance Validity Repo where
             , repoNoteIndex <?!> "repoNoteIndex"
             , repoNoteIndices <?!> "repoNoteIndices"
             , repoNotes <?!> "repoNotes"
-            , repoEntrySuggestions <?!> "repoEntrySuggestions"
-            , repoUsedEntrySuggestions <?!> "repoUsedEntrySuggestions"
             , M.keysSet repoNotes ==
               noteIndexSet repoNoteIndex <?@>
               "The key set of repoNotes equals the note UUID's in the global note index."
@@ -68,8 +63,7 @@ instance Validity Repo where
                       , "Person note index: " ++ show noteIndex
                       , "Global note index: " ++ show repoNoteIndex
                       ]
-            , null (repoEntrySuggestions `intersect` repoUsedEntrySuggestions) <?@>
-              "The entry suggestions and the used entry suggestions should not share suggestions."
+            , repoSuggestions <?!> "repoSuggestions"
             ]
 
 instance NFData Repo
@@ -82,8 +76,7 @@ instance FromJSON Repo where
             o .: "note-index" <*>
             o .: "note-indices" <*>
             o .: "notes" <*>
-            o .: "entry-suggestions" <*>
-            o .: "used-entry-suggestions"
+            o .: "suggestions"
 
 instance ToJSON Repo where
     toJSON Repo {..} =
@@ -94,6 +87,5 @@ instance ToJSON Repo where
             , "note-index" .= repoNoteIndex
             , "note-indices" .= repoNoteIndices
             , "notes" .= repoNotes
-            , "entry-suggestions" .= repoEntrySuggestions
-            , "used-entry-suggestions" .= repoUsedEntrySuggestions
+            , "suggestions" .= repoSuggestions
             ]

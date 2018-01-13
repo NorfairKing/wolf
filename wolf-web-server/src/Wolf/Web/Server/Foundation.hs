@@ -19,8 +19,6 @@ import Import
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 
-import Control.Monad.Except
-import Control.Monad.Reader
 import Control.Monad.Trans.Maybe
 
 import qualified Network.HTTP.Client as Http

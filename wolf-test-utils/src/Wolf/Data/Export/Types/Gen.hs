@@ -59,7 +59,5 @@ instance GenValid Repo where
         -- For each noteuuid, make a note.
         repoNotes <-
             fmap M.fromList $ forM noteUuids $ \uuid -> (,) uuid <$> genValid
-        -- Two distinct lists of suggestions
-        repoEntrySuggestions <- genValid
-        repoUsedEntrySuggestions <- (\\ repoEntrySuggestions) <$> genValid
+        repoSuggestions <- genValid
         pure Repo {..}

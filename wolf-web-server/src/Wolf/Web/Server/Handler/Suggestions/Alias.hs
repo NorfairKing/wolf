@@ -1,11 +1,9 @@
 {-# LANGUAGE TemplateHaskell #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Wolf.Web.Server.Handler.Suggestions.Alias where
 
-import Import
-
 import Yesod
-import Yesod.Auth
 
 import Wolf.Data
 import Wolf.Data.Baked

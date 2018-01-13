@@ -12,12 +12,8 @@ import qualified Data.Map as M
 import Data.Map (Map)
 import Data.Set (Set)
 import qualified Data.Set as S
-import qualified Data.Text as T
-
-import Control.Monad.Reader
 
 import Yesod
-import Yesod.Auth
 
 import Wolf.Data
 import Wolf.Data.Baked
@@ -26,7 +22,6 @@ import Wolf.Web.Server.Foundation
 
 getPeopleR :: Handler Html
 getPeopleR = do
-    void requireAuthId
     pcs <- runData getAllPeopleCards
     withNavBar $ do
         setTitle "Wolf People"
