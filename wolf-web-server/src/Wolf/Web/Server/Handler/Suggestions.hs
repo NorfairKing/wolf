@@ -28,7 +28,7 @@ getSuggestionsR :: Handler Html
 getSuggestionsR = do
     aSugs <-
         runData $ readUnusedSuggestions aliasSuggestionType :: Handler (M.Map SuggestionUuid (Suggestion AliasSuggestion))
-    let sws = map (uncurry suggestionPreviewWidget) $ M.toList aSugs
+    sws <- mapM (uncurry suggestionPreviewWidget) $ M.toList aSugs
     withNavBar $ do
         setTitle "Wolf Suggestions"
         $(widgetFile "suggestions")
@@ -44,7 +44,8 @@ getSuggestionR fp uuid =
                    | otherwise -> pure Nothing
             case mw of
                 Nothing -> notFound -- TODO better error
-                Just (s, w) -> do
+                Just (s, wFunc) -> do
+                    w <- wFunc
                     now <- liftIO getCurrentTime
                     withNavBar $ do
                         setTitle "Wolf Suggestion"
@@ -60,7 +61,7 @@ readSuggestionWidget ::
        )
     => SuggestionType
     -> SuggestionUuid
-    -> m (Maybe (Suggestion (), WolfWidget))
+    -> m (Maybe (Suggestion (), Handler Widget))
 readSuggestionWidget typ uuid = do
     ms <- readSuggestion @a typ uuid
     case ms of

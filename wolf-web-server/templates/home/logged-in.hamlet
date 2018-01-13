@@ -15,7 +15,7 @@
     <div .menu>
       <form .item
         method=post
-        action=@{SuggestionsRunAliasR}>
+        action=@{SuggestionsAliasRunR}>
         ^{token}
         <button .ui .button
           type=submit>

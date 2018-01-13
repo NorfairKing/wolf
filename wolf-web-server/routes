@@ -6,7 +6,8 @@
 /new-person                     NewPersonR           GET POST
 
 /suggestions                    SuggestionsR         GET
-/suggestions/run/alias          SuggestionsRunAliasR POST
+/suggestions/alias/run          SuggestionsAliasRunR POST
+/suggestions/alias/complete     SuggestionsAliasCompleteR POST
 /suggestion/#FilePath/#SuggestionUuid SuggestionR GET
 
 -- Subsites

@@ -15,5 +15,5 @@ suggestionR (SuggestionType rf) =
     SuggestionR (FP.dropTrailingPathSeparator (fromRelDir rf))
 
 class DisplaySuggestion a where
-    suggestionPreviewWidget :: SuggestionUuid -> Suggestion a -> WolfWidget
-    suggestionWidget :: SuggestionUuid -> a -> WolfWidget
+    suggestionPreviewWidget :: SuggestionUuid -> Suggestion a -> Handler Widget
+    suggestionWidget :: SuggestionUuid -> a -> Handler Widget

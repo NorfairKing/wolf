@@ -3,10 +3,5 @@
     Alias suggestion
 <p> 
   Do you want to use the alias #{aliasText $ aliasSuggestionAlias d}?
-<form>
-  <div .ui .buttons>
-    <button .ui .positive .button>
-        Yes
-    <div .or>
-    <button .ui .button>
-      No
+
+^{cf}
