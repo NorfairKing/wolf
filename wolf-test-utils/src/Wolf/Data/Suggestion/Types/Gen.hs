@@ -4,6 +4,8 @@ module Wolf.Data.Suggestion.Types.Gen where
 
 import Import
 
+import Data.Hashable
+
 import Wolf.Data.Suggestion.Types
 
 import Wolf.Data.Entry.Types.Gen ()
@@ -36,3 +38,12 @@ instance GenUnchecked EntrySuggestion
 
 instance GenValid EntrySuggestion where
     genValid = EntrySuggestion <$> genValid <*> genValid <*> genValid
+
+instance GenUnchecked SuggestionRepo
+
+instance GenValid SuggestionRepo
+
+instance GenUnchecked a => GenUnchecked (SuggestionTypeRepo a)
+
+instance (GenValid a, Hashable a) => GenValid (SuggestionTypeRepo a) where
+    genValid = (SuggestionTypeRepo <$> genValid <*> genValid) `suchThat` isValid

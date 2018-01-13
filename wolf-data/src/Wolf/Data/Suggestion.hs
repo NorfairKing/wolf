@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TemplateHaskell #-}
 
@@ -15,21 +16,30 @@ module Wolf.Data.Suggestion
     , sameEntrySuggestion
     , hashSuggestion
     , SuggestionIndex
+    , emptySuggestionIndex
     , suggestionIndexMap
     , readSuggestion
     , readSuggestionChecked
+    , readUnusedSuggestionIndex
     , readUnusedSuggestions
     , writeUnusedSuggestions
     , addUnusedSuggestions
     , addUnusedSuggestion
+    , readUsedSuggestionIndex
     , readUsedSuggestions
     , writeUsedSuggestions
     , recordUsedSuggestions
     , recordUsedSuggestion
+    , recordUsed
+    , SuggestionRepo
+    , SuggestionTypeRepo
+    , readAllSuggestions
+    , writeAllSuggestions
     ) where
 
 import Import
 
+import Data.Aeson as JSON
 import qualified Data.Map as M
 import qualified Data.Set as S
 
@@ -61,9 +71,6 @@ usedSuggestionsIndexFile ::
        MonadReader DataSettings m => SuggestionType -> m (Path Abs File)
 usedSuggestionsIndexFile typ =
     (</> $(mkRelFile "used.json")) <$> suggestionTypeDir typ
-
-hashSuggestion :: Hashable a => Suggestion a -> SuggestionHash a
-hashSuggestion = SuggestionHash . fromIntegral . hash . suggestionData
 
 emptySuggestionIndex :: SuggestionIndex a
 emptySuggestionIndex = SuggestionIndex {suggestionIndexMap = M.empty}
@@ -112,17 +119,18 @@ writeSuggestion typ u s = do
     writeJSON f s
 
 readUnusedSuggestionIndex ::
-       (MonadIO m, MonadReader DataSettings m)
+       forall a m. (MonadIO m, MonadReader DataSettings m)
     => SuggestionType
     -> m (SuggestionIndex a)
 readUnusedSuggestionIndex typ =
     unusedSuggestionsIndexFile typ >>= readJSONWithDefault emptySuggestionIndex
 
 readUnusedSuggestions ::
+       forall a m.
        (MonadIO m, MonadReader DataSettings m, FromJSON a, Ord a, Hashable a)
     => SuggestionType
     -> m (Map SuggestionUuid (Suggestion a))
-readUnusedSuggestions = readHelper readUsedSuggestionIndex
+readUnusedSuggestions = readHelper readUnusedSuggestionIndex
 
 readHelper ::
        (MonadIO m, MonadReader DataSettings m, FromJSON a, Ord a, Hashable a)
@@ -184,12 +192,12 @@ addUnusedSuggestions typ newSugs = do
         in case M.lookup h m of
                Nothing -> do
                    u <- nextRandomUUID
-                   let m_ = M.insert h u m
                    writeSuggestion typ u s
-                   pure m_
+                   pure $ M.insert h u m
                Just _ -> pure m
 
 addUnusedSuggestion ::
+       forall a m.
        ( MonadIO m
        , MonadReader DataSettings m
        , Eq a
@@ -203,17 +211,18 @@ addUnusedSuggestion ::
 addUnusedSuggestion typ s = addUnusedSuggestions typ $ S.singleton s
 
 readUsedSuggestionIndex ::
-       (MonadIO m, MonadReader DataSettings m)
+       forall a m. (MonadIO m, MonadReader DataSettings m)
     => SuggestionType
     -> m (SuggestionIndex a)
 readUsedSuggestionIndex typ =
     usedSuggestionsIndexFile typ >>= readJSONWithDefault emptySuggestionIndex
 
 readUsedSuggestions ::
+       forall a m.
        (MonadIO m, MonadReader DataSettings m, FromJSON a, Ord a, Hashable a)
     => SuggestionType
     -> m (Map SuggestionUuid (Suggestion a))
-readUsedSuggestions = readHelper readUnusedSuggestionIndex
+readUsedSuggestions = readHelper readUsedSuggestionIndex
 
 writeUsedSuggestionIndex ::
        forall a m. (MonadIO m, MonadReader DataSettings m)
@@ -224,8 +233,8 @@ writeUsedSuggestionIndex typ ix = do
     f <- usedSuggestionsIndexFile typ
     writeJSON f ix
 
-writeUsedSuggestions :: forall a m.
-       (MonadIO m, MonadReader DataSettings m, ToJSON a, Hashable a)
+writeUsedSuggestions ::
+       forall a m. (MonadIO m, MonadReader DataSettings m, ToJSON a, Hashable a)
     => SuggestionType
     -> Set (Suggestion a)
     -> m ()
@@ -252,28 +261,43 @@ recordUsedSuggestions ::
 recordUsedSuggestions typ usedSugs = do
     (SuggestionIndex uusi) <- readUnusedSuggestionIndex typ
     (SuggestionIndex usi) <- readUsedSuggestionIndex typ
-    let (uusi', usi') = foldl' go (uusi, usi) usedSugs
+    (uusi', usi') <- foldM (recordUsed typ) (uusi, usi) usedSugs
     writeUnusedSuggestionIndex typ $ SuggestionIndex uusi'
     writeUsedSuggestionIndex typ $ SuggestionIndex usi'
-  where
-    go :: ( Map (SuggestionHash a) SuggestionUuid
-          , Map (SuggestionHash a) SuggestionUuid)
-       -> Suggestion a
-       -> ( Map (SuggestionHash a) SuggestionUuid
-          , Map (SuggestionHash a) SuggestionUuid)
-    go t@(uusi, usi) s =
-        let h = hashSuggestion s
-        in case M.lookup h uusi of
-               Nothing -> t -- Wasn't unused, can't record that it's being used.
-               Just uuid ->
-                   case M.lookup h usi of
-                       Just uuid' ->
-                           if uuid == uuid'
-                               then (M.delete h uusi, usi) -- Wasn't deleted yet, let's do it now
-                               else ( M.delete h uusi
-                                    , M.insert h uuid usi -- Wasn't deleted yet, AND had the wrong uuid.
-                                     )
-                       Nothing -> (M.delete h uusi, M.insert h uuid usi)
+
+-- TODO split this into a pure and an impure function
+recordUsed ::
+       forall a m.
+       ( MonadIO m
+       , MonadReader DataSettings m
+       , Eq a
+       , ToJSON a
+       , FromJSON a
+       , Hashable a
+       )
+    => SuggestionType
+    -> ( Map (SuggestionHash a) SuggestionUuid
+       , Map (SuggestionHash a) SuggestionUuid)
+    -> Suggestion a
+    -> m ( Map (SuggestionHash a) SuggestionUuid
+         , Map (SuggestionHash a) SuggestionUuid)
+recordUsed typ (uusi, usi) s = do
+    let h = hashSuggestion s
+    case M.lookup h uusi of
+        Nothing -> do
+            uuid <- nextRandomUUID
+            writeSuggestion typ uuid s
+            pure (uusi, M.insert h uuid usi) -- Wasn't unused, will record it as used anyway
+        Just uuid ->
+            pure $
+            case M.lookup h usi of
+                Just uuid' ->
+                    if uuid == uuid'
+                        then (M.delete h uusi, usi) -- Wasn't deleted yet, let's do it now
+                        else ( M.delete h uusi
+                             , M.insert h uuid usi -- Wasn't deleted yet, AND had the wrong uuid.
+                              )
+                Nothing -> (M.delete h uusi, M.insert h uuid usi)
 
 recordUsedSuggestion ::
        forall a m.
@@ -288,3 +312,61 @@ recordUsedSuggestion ::
     -> Suggestion a
     -> m ()
 recordUsedSuggestion typ s = recordUsedSuggestions typ $ S.singleton s
+
+readAllSuggestions ::
+       (MonadIO m, MonadReader DataSettings m) => m SuggestionRepo
+readAllSuggestions = do
+    ssd <- suggestionsDir
+    -- TODO I would prefer to use a type index instead of listing a directory
+    ds <- liftIO $ fromMaybe [] <$> forgivingAbsence (fst <$> listDir ssd)
+    mtups <-
+        forM ds $ \ad ->
+            case stripProperPrefix ssd ad of
+                Nothing -> pure Nothing
+                Just rd -> do
+                    let typ = SuggestionType rd
+                    suggestionTypeRepoUnused <-
+                        readAll readUnusedSuggestionIndex typ
+                    suggestionTypeRepoUsed <-
+                        readAll readUsedSuggestionIndex typ
+                    pure $ Just (typ, SuggestionTypeRepo {..})
+    pure $ SuggestionRepo $ M.fromList $ catMaybes mtups
+  where
+    readAll ::
+           (MonadIO m, MonadReader DataSettings m)
+        => (SuggestionType -> m (SuggestionIndex JSON.Value))
+        -> SuggestionType
+        -> m (Map SuggestionUuid (Suggestion JSON.Value))
+    readAll readFunc typ = do
+        SuggestionIndex ix <- readFunc typ
+        msugs <-
+            forM (M.toList ix) $ \(h, uuid) -> do
+                msug <- readSuggestionChecked typ uuid h
+                pure $ (,) uuid <$> msug
+        pure $ M.fromList $ catMaybes msugs
+
+writeAllSuggestions ::
+       (MonadIO m, MonadReader DataSettings m) => SuggestionRepo -> m ()
+writeAllSuggestions (SuggestionRepo m) = do
+    suggestionsDir >>= ensureDir
+    void $
+        flip M.traverseWithKey m $ \typ SuggestionTypeRepo {..} -> do
+            suggestionTypeDir typ >>= ensureDir
+            writeAll writeUnusedSuggestionIndex typ suggestionTypeRepoUnused
+            writeAll writeUsedSuggestionIndex typ suggestionTypeRepoUsed
+  where
+    writeAll ::
+           (MonadIO m, MonadReader DataSettings m)
+        => (SuggestionType -> SuggestionIndex JSON.Value -> m ())
+        -> SuggestionType
+        -> Map SuggestionUuid (Suggestion JSON.Value)
+        -> m ()
+    writeAll writeFunc typ sm = do
+        writeFunc typ $ makeIndex sm
+        void $ M.traverseWithKey (writeSuggestion typ) sm
+    makeIndex ::
+           Map SuggestionUuid (Suggestion JSON.Value)
+        -> SuggestionIndex JSON.Value
+    makeIndex m_ =
+        SuggestionIndex $
+        M.fromList $ flip map (M.toList m_) $ \(u, s) -> (hashSuggestion s, u)

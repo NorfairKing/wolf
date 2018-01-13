@@ -5,6 +5,7 @@ module Wolf.Data.TestUtils
     , withDataSetsGen
     , ensureClearRepository
     , assertRepoValid
+    , forAllSets
     ) where
 
 import Import
@@ -17,7 +18,7 @@ runData :: Monad m => DataSettings -> ReaderT DataSettings m a -> m a
 runData = flip runReaderT
 
 withDataSetsGen :: SpecWith (Gen DataSettings) -> Spec
-withDataSetsGen = beforeAll mkGen . afterAll_ cleanup
+withDataSetsGen = beforeAll mkGen
   where
     resolveTestSandbox = resolveDir' "/tmp/test-sandbox"
     mkGen = do
@@ -25,9 +26,6 @@ withDataSetsGen = beforeAll mkGen . afterAll_ cleanup
         pure $ do
             rd <- genValid
             pure DataSettings {dataSetWolfDir = sbd </> rd}
-    cleanup = do
-        sbd <- resolveTestSandbox
-        ignoringAbsence $ removeDirRecur sbd
 
 ensureClearRepository :: (MonadIO m, MonadReader DataSettings m) => m ()
 ensureClearRepository = do
@@ -42,3 +40,6 @@ assertRepoValid sets = do
             expectationFailure
                 "Failed to assert that the repo was valid: No repo found."
         Just r -> shouldBeValid r
+
+forAllSets :: Testable t => (DataSettings -> t) -> Gen DataSettings -> Property
+forAllSets func gen = forAll gen func

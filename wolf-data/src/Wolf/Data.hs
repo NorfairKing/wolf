@@ -90,6 +90,8 @@ module Wolf.Data
     , readUsedSuggestions
     , recordUsedSuggestions
     , recordUsedSuggestion
+    , readAllSuggestions
+    , writeAllSuggestions
     -- * Import and Export
     , Repo
     , repoInitData

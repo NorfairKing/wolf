@@ -12,10 +12,6 @@ import Wolf.Data.Gen ()
 
 spec :: Spec
 spec = do
-    eqSpec @(Suggestion Double)
-    genValidSpec @(Suggestion Double)
-    jsonSpecOnValid @(Suggestion Double)
-    functorSpecOnValid @Suggestion
     eqSpec @AliasSuggestion
     genValidSpec @AliasSuggestion
     jsonSpecOnValid @AliasSuggestion
@@ -28,3 +24,14 @@ spec = do
     eqSpec @(SuggestionHash Double)
     genValidSpec @(SuggestionHash Double)
     jsonSpecOnValid @(SuggestionHash Double)
+    eqSpec @(Suggestion Double)
+    genValidSpec @(Suggestion Double)
+    jsonSpecOnValid @(Suggestion Double)
+    hashableSpecOnValid @(Suggestion Double)
+    functorSpecOnValid @Suggestion
+    eqSpec @(SuggestionTypeRepo Int)
+    genValidSpec @(SuggestionTypeRepo Int)
+    jsonSpecOnValid @(SuggestionTypeRepo Int)
+    eqSpec @SuggestionRepo
+    genValidSpec @SuggestionRepo
+    jsonSpecOnValid @SuggestionRepo

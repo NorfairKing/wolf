@@ -9,11 +9,14 @@ module Wolf.Data.Suggestion.Types
     , parseSuggestionType
     , SuggestionIndex(..)
     , SuggestionHash(..)
+    , hashSuggestion
     , Suggestion(..)
     , AliasSuggestion(..)
     , EntrySuggestion(..)
     , sameEntrySuggestionData
     , sameEntrySuggestion
+    , SuggestionRepo(..)
+    , SuggestionTypeRepo(..)
     ) where
 
 import Import
@@ -21,6 +24,7 @@ import Import
 import Data.Aeson
 import qualified Data.Aeson as JSON
 import Data.Aeson.Types
+import qualified Data.Map as M
 import qualified Data.Text as T
 import Data.Time
 import Data.Word
@@ -45,10 +49,36 @@ parseSuggestionType = fmap SuggestionType . parseRelDir
 
 instance Validity SuggestionType where
     validate (SuggestionType p) =
-        check
-            (length (filter (/= ".") . FP.splitDirectories $ fromRelDir p) == 1)
-            "only contains one path component"
+        mconcat
+            [ p <?!> "suggestionTypePath"
+            , check
+                  (length (filter (/= ".") . FP.splitDirectories $ fromRelDir p) ==
+                   1)
+                  "only contains one path component"
+            ]
     isValid = isValidByValidating
+
+instance FromJSON SuggestionType where
+    parseJSON = withText "SuggestionType" parseSuggestionTypeText
+
+instance FromJSONKey SuggestionType where
+    fromJSONKey = FromJSONKeyTextParser parseSuggestionTypeText
+
+parseSuggestionTypeText :: Text -> Parser SuggestionType
+parseSuggestionTypeText t =
+    case parseRelDir $ T.unpack t of
+        Nothing ->
+            fail "failed to parse SuggestionType, not a valid Path Rel Dir"
+        Just rd -> pure $ SuggestionType rd
+
+instance ToJSON SuggestionType where
+    toJSON = JSON.String . toJSONTextType
+
+instance ToJSONKey SuggestionType where
+    toJSONKey = toJSONKeyText toJSONTextType
+
+toJSONTextType :: SuggestionType -> Text
+toJSONTextType (SuggestionType p) = T.pack $ fromRelDir p
 
 newtype SuggestionIndex a = SuggestionIndex
     { suggestionIndexMap :: Map (SuggestionHash a) SuggestionUuid
@@ -67,6 +97,9 @@ instance FromJSONKey (SuggestionHash a) where
 
 instance FromJSON (SuggestionHash a) where
     parseJSON = withText "SuggestionHash" parseSuggestionHashText
+
+hashSuggestion :: Hashable a => Suggestion a -> SuggestionHash a
+hashSuggestion = SuggestionHash . fromIntegral . hash . suggestionData
 
 parseSuggestionHashText :: Text -> Parser (SuggestionHash a)
 parseSuggestionHashText t =
@@ -88,15 +121,11 @@ data Suggestion a = Suggestion
     , suggestionReason :: Text
     , suggestionTimestamp :: UTCTime
     , suggestionData :: a
-    } deriving (Show, Ord, Generic)
+    } deriving (Show, Ord, Eq, Generic)
 
 instance Validity a => Validity (Suggestion a)
 
-instance Eq a => Eq (Suggestion a) where
-    s1 == s2 =
-        suggestionSuggestor s1 == suggestionSuggestor s2 &&
-        suggestionReason s1 == suggestionReason s2 &&
-        suggestionData s1 == suggestionData s2
+instance Hashable a => Hashable (Suggestion a)
 
 instance NFData a => NFData (Suggestion a)
 
@@ -185,3 +214,48 @@ sameEntrySuggestion =
 
 aaand :: [a -> a -> Bool] -> a -> a -> Bool
 aaand fs a b = all (\f -> f a b) fs
+
+newtype SuggestionRepo = SuggestionRepo
+    { allSuggestions :: Map SuggestionType (SuggestionTypeRepo JSON.Value)
+    } deriving (Show, Eq, Generic, FromJSON, ToJSON)
+
+instance Validity SuggestionRepo
+
+data SuggestionTypeRepo a = SuggestionTypeRepo
+    { suggestionTypeRepoUnused :: Map SuggestionUuid (Suggestion a)
+    , suggestionTypeRepoUsed :: Map SuggestionUuid (Suggestion a)
+    } deriving (Show, Eq, Ord, Generic)
+
+instance (Validity a, Hashable a) => Validity (SuggestionTypeRepo a) where
+    validate SuggestionTypeRepo {..} =
+        mconcat
+            [ suggestionTypeRepoUnused <?!> "suggestionsTypeRepoUnused"
+            , suggestionTypeRepoUsed <?!> "suggestionsTypeRepoUsed"
+            , check
+                  (M.size (M.map hashSuggestion suggestionTypeRepoUnused) ==
+                   M.size suggestionTypeRepoUnused)
+                  "contains no duplicate unused suggestion data"
+            , check
+                  (M.size (M.map hashSuggestion suggestionTypeRepoUsed) ==
+                   M.size suggestionTypeRepoUsed)
+                  "contains no duplicate used suggestion data"
+            , check
+                  (M.null
+                       (M.intersection
+                            suggestionTypeRepoUnused
+                            suggestionTypeRepoUsed))
+                  "contains no duplicate uuids"
+            ]
+    isValid = isValidByValidating
+
+instance FromJSON a => FromJSON (SuggestionTypeRepo a) where
+    parseJSON =
+        withObject "SuggestionTypeRepo" $ \o ->
+            SuggestionTypeRepo <$> o .: "unused" <*> o .: "used"
+
+instance ToJSON a => ToJSON (SuggestionTypeRepo a) where
+    toJSON SuggestionTypeRepo {..} =
+        object
+            [ "unused" .= suggestionTypeRepoUnused
+            , "used" .= suggestionTypeRepoUsed
+            ]
