@@ -25,6 +25,7 @@ module Wolf.Data
     , addIndexEntry
     , createNewPerson
     , addAliases
+    , addAlias
     , lookupOrCreateNewPerson
     , getIndex
     , getIndexWithDefault
@@ -94,6 +95,9 @@ module Wolf.Data
     , SuggestionTypeRepo
     , readAllSuggestions
     , writeAllSuggestions
+    , Agreement(..)
+    , parseAgreement
+    , renderAgreement
     -- * Import and Export
     , Repo
     , repoInitData

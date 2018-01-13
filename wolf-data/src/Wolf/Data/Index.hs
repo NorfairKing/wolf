@@ -18,6 +18,7 @@ module Wolf.Data.Index
     , addIndexEntry
     , createNewPerson
     , addAliases
+    , addAlias
     , lookupOrCreateNewPerson
     -- * Impure operations
     -- ** Index
@@ -98,6 +99,9 @@ addAliases aliases uuid origIndex =
         else let index =
                      foldl (\ix a -> addIndexEntry a uuid ix) origIndex aliases
              in Just index
+
+addAlias :: Alias -> PersonUuid -> Index -> Maybe Index
+addAlias a = addAliases [a]
 
 -- | Look up a `PersonUuid` in the 'Index' by its alias
 -- if the index does not exist, try looking up the text as a uuid.

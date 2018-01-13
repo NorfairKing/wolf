@@ -47,39 +47,25 @@ completionForm uuid AliasSuggestion {..} = do
     token <- genToken
     pure $(widgetFile "suggestions/alias/completion-form")
 
-data Agree
-    = Yes
-    | No
-    deriving (Show, Eq)
-
-parseAgree :: Text -> Either Text Agree
-parseAgree "yes" = Right Yes
-parseAgree "no" = Right No
-parseAgree t = Left $ "Invalid 'Agree' value: " <> t
-
-renderAgree :: Agree -> Text
-renderAgree Yes = "yes"
-renderAgree No = "no"
-
 data CompleteAliasSuggestion = CompleteAliasSuggestion
     { completeAliasSuggestionUuid :: SuggestionUuid
-    , completeAliasSuggestionAgree :: Agree
+    , completeAliasSuggestionAgree :: Agreement
     } deriving (Show, Eq)
 
 completeAliasSuggestionForm :: FormInput Handler CompleteAliasSuggestion
 completeAliasSuggestionForm =
     CompleteAliasSuggestion <$> ireq hiddenField "suggestion" <*>
-    ireq (checkMMap (pure . parseAgree) renderAgree hiddenField) "agree"
+    ireq (checkMMap (pure . parseAgreement) renderAgreement hiddenField) "agree"
 
 postSuggestionsAliasCompleteR :: Handler Html
 postSuggestionsAliasCompleteR = do
     result <- runInputPostResult completeAliasSuggestionForm
     case result of
         FormSuccess CompleteAliasSuggestion {..} -> do
-            liftIO $
-                case completeAliasSuggestionAgree of
-                    Yes -> putStrLn "agreeing"
-                    No -> putStrLn "not agreeing"
+            runData $
+                completeAliasSuggestion
+                    completeAliasSuggestionUuid
+                    completeAliasSuggestionAgree
             setMessage "Alias suggestion completed."
             redirect SuggestionsR
         r -> do

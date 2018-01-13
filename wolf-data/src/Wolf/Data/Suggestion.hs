@@ -35,6 +35,9 @@ module Wolf.Data.Suggestion
     , SuggestionTypeRepo
     , readAllSuggestions
     , writeAllSuggestions
+    , Agreement(..)
+    , parseAgreement
+    , renderAgreement
     ) where
 
 import Import
@@ -180,21 +183,28 @@ addUnusedSuggestions ::
     -> Set (Suggestion a)
     -> m ()
 addUnusedSuggestions typ newSugs = do
-    (SuggestionIndex ix) <- readUnusedSuggestionIndex typ
-    newIx <- foldM go ix newSugs
-    writeUnusedSuggestionIndex typ $ SuggestionIndex newIx
+    (SuggestionIndex uuix) <- readUnusedSuggestionIndex typ
+    (SuggestionIndex uix) <- readUsedSuggestionIndex typ
+    (uuix', uix') <- foldM go (uuix, uix) newSugs
+    writeUnusedSuggestionIndex typ $ SuggestionIndex uuix'
+    writeUsedSuggestionIndex typ $ SuggestionIndex uix'
   where
-    go :: Map (SuggestionHash a) SuggestionUuid
+    go :: ( Map (SuggestionHash a) SuggestionUuid
+          , Map (SuggestionHash a) SuggestionUuid)
        -> Suggestion a
-       -> m (Map (SuggestionHash a) SuggestionUuid)
-    go m s =
+       -> m ( Map (SuggestionHash a) SuggestionUuid
+            , Map (SuggestionHash a) SuggestionUuid)
+    go t@(uuix, uix) s =
         let h = hashSuggestion s
-        in case M.lookup h m of
-               Nothing -> do
-                   u <- nextRandomUUID
-                   writeSuggestion typ u s
-                   pure $ M.insert h u m
-               Just _ -> pure m
+        in case M.lookup h uix of
+               Just _ -> pure t -- Already used, don't add it anymore
+               Nothing ->
+                   case M.lookup h uuix of
+                       Just _ -> pure t -- Already unused, don't add it anymore
+                       Nothing -> do
+                           u <- nextRandomUUID
+                           writeSuggestion typ u s
+                           pure (M.insert h u uuix, uix)
 
 addUnusedSuggestion ::
        forall a m.

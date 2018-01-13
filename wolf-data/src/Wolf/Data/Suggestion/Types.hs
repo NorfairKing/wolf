@@ -17,6 +17,9 @@ module Wolf.Data.Suggestion.Types
     , sameEntrySuggestion
     , SuggestionRepo(..)
     , SuggestionTypeRepo(..)
+    , Agreement(..)
+    , parseAgreement
+    , renderAgreement
     ) where
 
 import Import
@@ -265,3 +268,17 @@ instance ToJSON a => ToJSON (SuggestionTypeRepo a) where
             [ "unused" .= suggestionTypeRepoUnused
             , "used" .= suggestionTypeRepoUsed
             ]
+
+data Agreement
+    = Agree
+    | Disagree
+    deriving (Show, Eq, Generic)
+
+parseAgreement :: Text -> Either Text Agreement
+parseAgreement "yes" = Right Agree
+parseAgreement "no" = Right Disagree
+parseAgreement t = Left $ "Invalid 'Agreement' value: " <> t
+
+renderAgreement :: Agreement -> Text
+renderAgreement Agree = "yes"
+renderAgreement Disagree = "no"

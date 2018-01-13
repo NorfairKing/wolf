@@ -1,5 +1,6 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Wolf.Data.Baked.Suggestion.Alias where
 
@@ -53,3 +54,24 @@ finaliseAliasSuggestion as t =
 
 suggestedAliasFor :: PersonEntry -> Maybe Alias
 suggestedAliasFor pe = alias <$> renderName (fromEntry pe)
+
+completeAliasSuggestion ::
+       (MonadIO m, MonadReader DataSettings m)
+    => SuggestionUuid
+    -> Agreement
+    -> m ()
+completeAliasSuggestion uuid agreement = do
+    liftIO $ print agreement
+    msug <- readSuggestion aliasSuggestionType uuid
+    case msug of
+        Nothing -> pure () -- Fine, do nothing then
+        Just sug -> do
+            when (agreement == Agree) $ do
+                ix <- getIndexWithDefault
+                let AliasSuggestion {..} = suggestionData sug
+                let mix' =
+                        addAlias aliasSuggestionAlias aliasSuggestionPerson ix
+                case mix' of
+                    Nothing -> pure ()
+                    Just ix' -> putIndex ix'
+            recordUsedSuggestion aliasSuggestionType sug
