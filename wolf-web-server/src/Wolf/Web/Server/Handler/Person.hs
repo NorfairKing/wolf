@@ -31,6 +31,8 @@ getPersonR uuid = do
             token <- genToken
             let titleAlias = maybe (uuidText uuid) aliasText malias
             let placeholderAlias = maybe "..." aliasText malias
+            let allOtherRelatedPeople =
+                    S.filter (/= uuid) $ S.unions $ map noteRelevantPeople ns
             withNavBar $(widgetFile "person")
 
 noteWidget :: UTCTime -> Index -> PersonUuid -> Note -> Widget

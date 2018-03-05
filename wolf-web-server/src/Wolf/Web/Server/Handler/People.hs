@@ -23,6 +23,10 @@ import Wolf.Web.Server.Foundation
 getPeopleR :: Handler Html
 getPeopleR = do
     pcs <- runData getAllPeopleCards
+    (nbPeople, nbNotes) <-
+        runData $
+        (,) <$> ((length . indexTuples) <$> getIndexWithDefault) <*>
+        ((S.size . noteIndexSet) <$> getNoteIndex)
     withNavBar $ do
         setTitle "Wolf People"
         $(widgetFile "people")

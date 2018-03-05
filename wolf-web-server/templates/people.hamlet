@@ -1,1 +1,16 @@
-^{pcs}
+<div .ui .segment>
+  <div class="ui two statistics">
+    <div class="statistic">
+      <div class="value">
+        #{nbPeople}
+      <div class="label">
+        People
+
+    <div class="statistic">
+      <div class="value">
+        #{nbNotes}
+      <div class="label">
+        Notes
+
+<div .ui .segment>
+  ^{pcs}
