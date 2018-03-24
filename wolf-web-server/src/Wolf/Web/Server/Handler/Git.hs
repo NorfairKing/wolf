@@ -7,8 +7,6 @@ module Wolf.Web.Server.Handler.Git
 
 import Import
 
-import Control.Monad.Reader
-
 import Network.HTTP.Types as Http
 import Network.Wai as Wai
 import Network.Wai.Application.CGI.Git

@@ -13,6 +13,8 @@ library:
   - conduit-extra
   - containers
   - data-default
+  - hashable
+  - filepath
   - http-client
   - http-types
   - mtl

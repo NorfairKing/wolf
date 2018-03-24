@@ -25,6 +25,7 @@ module Wolf.Data
     , addIndexEntry
     , createNewPerson
     , addAliases
+    , addAlias
     , lookupOrCreateNewPerson
     , getIndex
     , getIndexWithDefault
@@ -73,6 +74,9 @@ module Wolf.Data
     , readNote
     , writeNote
     -- * Suggestions
+    , SuggestionType(..)
+    , parseSuggestionType
+    , SuggestionUuid
     , Suggestion(..)
     , aliasSuggestionType
     , AliasSuggestion(..)
@@ -80,12 +84,20 @@ module Wolf.Data
     , EntrySuggestion(..)
     , sameEntrySuggestionData
     , sameEntrySuggestion
+    , readSuggestion
     , readUnusedSuggestions
     , addUnusedSuggestions
     , addUnusedSuggestion
     , readUsedSuggestions
     , recordUsedSuggestions
     , recordUsedSuggestion
+    , SuggestionRepo
+    , SuggestionTypeRepo
+    , readAllSuggestions
+    , writeAllSuggestions
+    , Agreement(..)
+    , parseAgreement
+    , renderAgreement
     -- * Import and Export
     , Repo
     , repoInitData

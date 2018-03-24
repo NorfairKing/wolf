@@ -30,6 +30,8 @@ main =
         , genValidBench @NoteUuid
         , genValidBench @Note
         , genValidBench @(Suggestion EntrySuggestion)
+        , genValidBench @(SuggestionTypeRepo Double)
+        , genValidBench @SuggestionRepo
         , genValidBench @Repo
         ]
 

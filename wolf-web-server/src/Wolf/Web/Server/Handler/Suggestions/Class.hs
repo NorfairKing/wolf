@@ -4,9 +4,16 @@ import Import
 
 import Yesod
 
+import qualified System.FilePath as FP
+
 import Wolf.Data
 
 import Wolf.Web.Server.Foundation
 
+suggestionR :: SuggestionType -> SuggestionUuid -> Route App
+suggestionR (SuggestionType rf) =
+    SuggestionR (FP.dropTrailingPathSeparator (fromRelDir rf))
+
 class DisplaySuggestion a where
-    suggestionWidget :: Suggestion a -> WolfWidget
+    suggestionPreviewWidget :: SuggestionUuid -> Suggestion a -> Handler Widget
+    suggestionWidget :: SuggestionUuid -> a -> Handler Widget

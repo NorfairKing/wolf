@@ -7,7 +7,6 @@ module Wolf.Data.ExportSpec
 import TestImport
 
 import Wolf.Data
-import Wolf.Data.Export.Types
 import Wolf.Data.Gen ()
 
 import Wolf.Data.TestUtils
@@ -33,11 +32,11 @@ spec =
                                     importRepo repo
                                     exportRepo
                             (func <$> repo') `shouldBe` Just (func repo)
-        roundtrip repoInitData "init data"
-        roundtrip repoPersonIndex "person index"
-        roundtrip repoNoteIndex "note index"
-        roundtrip repoNoteIndices "note indices"
-        roundtrip repoNotes "notes"
-        roundtrip repoEntrySuggestions "entry suggestions"
-        roundtrip repoUsedEntrySuggestions "used entry suggestions"
+        -- Re-activate these if necessary for debugging
+        -- roundtrip repoInitData "init data"
+        -- roundtrip repoPersonIndex "person index"
+        -- roundtrip repoNoteIndex "note index"
+        -- roundtrip repoNoteIndices "note indices"
+        -- roundtrip repoNotes "notes"
+        -- roundtrip repoSuggestions "suggestions"
         roundtrip id "entire repo"

@@ -7,15 +7,17 @@ module Wolf.Google.Suggest.Finalise
 import Import
 
 import qualified Data.Text as T
+import Data.Time
 
 import Wolf.Data
 
-finaliseSuggestion :: EntrySuggestion -> Suggestion EntrySuggestion
-finaliseSuggestion es =
+finaliseSuggestion :: UTCTime -> EntrySuggestion -> Suggestion EntrySuggestion
+finaliseSuggestion now es =
     Suggestion
     { suggestionSuggestor = "Google Contacts"
     , suggestionReason = reason
     , suggestionData = es
+    , suggestionTimestamp = now
     }
   where
     reason =

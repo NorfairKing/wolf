@@ -1,0 +1,15 @@
+<form 
+  method=post
+  action=@{SuggestionsAliasCompleteR}>
+  <input name="suggestion" type="hidden" value=#{uuidText uuid}>
+  ^{token}
+  <div .ui .buttons>
+    <button .ui .positive .button
+      name="agree"
+      value="yes">
+      Yes
+    <div .or>
+    <button .ui .button
+      name="agree"
+      value="no">
+      No

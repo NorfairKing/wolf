@@ -10,6 +10,7 @@ import GHC.Generics as X hiding (Selector)
 import System.Exit as X
 
 import Data.Foldable as X
+import Data.Function as X
 import Data.List as X hiding (head, init, last, tail)
 import Data.Maybe as X
 import Data.Monoid as X
@@ -30,7 +31,9 @@ import Test.Hspec as X
 import Test.QuickCheck as X
 import Test.Validity as X
 import Test.Validity.Aeson as X
+import Test.Validity.Hashable as X
 
+import Data.GenValidity.Aeson as X ()
 import Data.GenValidity.Containers as X
 import Data.GenValidity.Path as X ()
 import Data.GenValidity.Text as X ()

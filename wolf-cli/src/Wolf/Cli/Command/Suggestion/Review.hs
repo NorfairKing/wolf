@@ -9,7 +9,7 @@ module Wolf.Cli.Command.Suggestion.Review
 import Import
 
 import qualified Data.ByteString as SB
-import qualified Data.Set as S
+import qualified Data.Map as M
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import Data.Time
@@ -32,7 +32,7 @@ reviewSuggestion =
     runData $
     withInitCheck_ $ do
         sugs <- readUnusedSuggestions entrySuggestionType
-        case S.toList sugs of
+        case M.elems sugs of
             [] -> liftIO $ putStrLn "No suggestions to review."
             (sug:_) -> reviewSingle sug
 

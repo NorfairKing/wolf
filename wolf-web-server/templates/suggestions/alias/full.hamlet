@@ -1,0 +1,30 @@
+<h2> 
+  <a href=@{suggestionR aliasSuggestionType uuid}>
+    Alias suggestion
+<p> 
+  Do you want to use the alias #{aliasText aliasSuggestionAlias}?
+
+<p>
+  $if null as
+    This person has no aliases
+  $else
+    $if length as == 1
+      This person has the alias 
+      $forall a <- as
+        <b>
+          #{aliasText a}
+    $else
+      This person has the aliases:
+      <ul>
+        $forall a <- as
+          <li>
+            #{aliasText a}
+
+$maybe pe <- mpe
+  The person in question has the following entry:
+  <pre>
+    #{entryContents pe}
+$nothing
+  The person in question has no entry.
+
+^{cf} 
