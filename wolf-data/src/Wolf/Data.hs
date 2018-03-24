@@ -102,10 +102,12 @@ module Wolf.Data
     , Repo
     , repoInitData
     , repoPersonIndex
-    , importRepo
     , exportRepo
+    , importRepo
+    , cleanupRepo
     ) where
 
+import Wolf.Data.Cleanup
 import Wolf.Data.Entry
 import Wolf.Data.Export
 import Wolf.Data.Import

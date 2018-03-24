@@ -50,6 +50,7 @@ combineToInstructions cmd Flags {..} Configuration = do
                     CommandReviewSuggestion ->
                         pure $ DispatchSuggestion DispatchReviewSuggestion
             CommandExport -> pure DispatchExport
+            CommandCleanup -> pure DispatchCleanup
     pure (disp, Settings {setDataSets = ds})
 
 defaultWolfDir :: MonadIO m => m (Path Abs Dir)
@@ -119,6 +120,7 @@ parseCommand =
             , command "random" parseCommandRandomPerson
             , command "suggestion" parseCommandSuggestion
             , command "export" parseCommandExport
+            , command "cleanup" parseCommandCleanup
             ]
 
 parseCommandInit :: ParserInfo Command
@@ -265,6 +267,12 @@ parseCommandExport :: ParserInfo Command
 parseCommandExport =
     let parser = pure CommandExport
         modifier = fullDesc <> progDesc "Export a wolf repository."
+    in info parser modifier
+
+parseCommandCleanup :: ParserInfo Command
+parseCommandCleanup =
+    let parser = pure CommandCleanup
+        modifier = fullDesc <> progDesc "Clean up a wolf repository."
     in info parser modifier
 
 peopleMap :: ParserEnv -> [String]
