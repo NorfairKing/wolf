@@ -23,6 +23,7 @@ data Command
     | CommandRandomPerson
     | CommandSuggestion SuggestionFlags
     | CommandExport
+    | CommandCleanup
     deriving (Show, Eq, Generic)
 
 instance Validity Command
@@ -64,6 +65,7 @@ data Dispatch
     | DispatchRandomPerson
     | DispatchSuggestion SuggestionSettings
     | DispatchExport
+    | DispatchCleanup
     deriving (Show, Eq, Generic)
 
 instance Validity Dispatch

@@ -7,7 +7,7 @@ module Wolf.Data.Note.Types where
 import Import
 
 import Data.Aeson as JSON
-import Data.Set as S
+import qualified Data.Set as S
 import Data.Time
 
 import Wolf.Data.People.Types
@@ -35,8 +35,8 @@ instance FromJSON Note where
 
 instance ToJSON Note where
     toJSON Note {..} =
-        object
-            [ "contents" .= noteContents
-            , "timestamp" .= noteTimestamp
-            , "relevant-people" .= noteRelevantPeople
-            ]
+        object $
+        ["contents" .= noteContents, "timestamp" .= noteTimestamp] ++
+        [ "relevant-people" .= noteRelevantPeople
+        | not $ null noteRelevantPeople
+        ]

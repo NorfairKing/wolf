@@ -5,6 +5,7 @@ module Wolf.Cli where
 import Import
 
 import Wolf.Cli.Command.Alias
+import Wolf.Cli.Command.Cleanup
 import Wolf.Cli.Command.Entry
 import Wolf.Cli.Command.Export
 import Wolf.Cli.Command.Git
@@ -32,3 +33,4 @@ dispatch (DispatchReview pd) = review pd
 dispatch DispatchRandomPerson = randomPerson
 dispatch (DispatchSuggestion ss) = suggestion ss
 dispatch DispatchExport = export
+dispatch DispatchCleanup = cleanup

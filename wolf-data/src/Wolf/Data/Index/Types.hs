@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Wolf.Data.Index.Types
     ( Alias(..)
@@ -54,9 +55,13 @@ instance Validity Index
 
 instance NFData Index
 
-instance FromJSON Index
+instance FromJSON Index where
+    parseJSON v =
+        withObject "Index" (\o -> Index <$> o .: "indexMap") v <|>
+        (Index <$> parseJSON v)
 
-instance ToJSON Index
+instance ToJSON Index where
+    toJSON (Index m) = toJSON m
 
 newIndex :: Index
 newIndex = Index {indexMap = M.empty}
