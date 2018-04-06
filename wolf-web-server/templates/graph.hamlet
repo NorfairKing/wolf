@@ -1,0 +1,69 @@
+<div .ui .segment>
+  <style type="text/css">
+    #graph-container {
+      max-width: 1350px;
+      height: 675px;
+      margin: auto;
+    }
+
+  <div id="graph-container">
+  <script src="https://cdn.jsdelivr.net/npm/sigma@1.2.1/build/sigma.min.js">
+  <script src="https://cdn.jsdelivr.net/npm/sigma@1.2.1/build/plugins/sigma.parsers.json.min.js">
+  <script src="https://cdn.jsdelivr.net/npm/sigma@1.2.1/build/plugins/sigma.layout.forceAtlas2.min.js">
+  <script src="https://cdn.jsdelivr.net/npm/sigma@1.2.1/build/plugins/sigma.plugins.tooltips.min.js">
+  <script>
+    var dat = {
+        "nodes": [
+            $forall (nuuid, _) <- nTups
+              { 
+                "id": "note-#{uuidText nuuid}",
+                "size": 1,
+                "color": "#00aa00",
+              },
+            $forall (puuid, p) <- pTups
+              { 
+                "id": "person-#{uuidText puuid}",
+                "label": "#{p}",
+                "size": 2,
+                "color": "#aa0000",
+              },
+        ],
+        "edges": [
+            $forall (nuuid, n) <- nTups
+              $forall puuid <- S.toList (noteRelevantPeople n)
+                $if elem puuid (map fst pTups)
+                  {
+                    "id": "e-#{uuidText nuuid}-#{uuidText puuid}",
+                    "source": "note-#{uuidText nuuid}",
+                    "target": "person-#{uuidText puuid}",
+                    "color": "#0000aa",
+                  },
+        ]
+      };
+    s = new sigma({ 
+        graph: dat,
+        renderer: {
+          container: 'graph-container'
+        },
+        settings: {
+          "edgeHoverSizeRatio": 2,
+          "minEdgeSize": 1,
+          "nodesPowRatio": 1,
+          "autoRescale": false,
+        }
+      });
+
+    s.graph.nodes().forEach(function(node, i, a) {
+      node.x = Math.cos(Math.PI * 2 * i / (Math.random() * a.length));
+      node.y = Math.sin(Math.PI * 2 * i / (Math.random() * a.length));
+    });
+
+    // Start the layout:
+    s.startForceAtlas2(
+      {
+        "worker": true,
+        "gravity": 10,
+      });
+
+    // Stop the layout after 5 seconds.
+    setTimeout(function() { s.stopForceAtlas2() }, 5000);

@@ -4,6 +4,7 @@
 /people/#PersonUuid             PersonR              GET
 /new-note                       NewNoteR             GET POST
 /new-person                     NewPersonR           GET POST
+/graph                          GraphR               GET
 
 /suggestions                    SuggestionsR         GET
 /suggestions/alias/run          SuggestionsAliasRunR POST
