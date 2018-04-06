@@ -23,4 +23,4 @@ randomPerson =
         let es = M.elems $ indexMap index
         el <- liftIO $ randomRIO (0, length es - 1)
         let chosenPerson = es !! el
-        printSummaryReportFor chosenPerson
+        printSummaryReportFor chosenPerson index

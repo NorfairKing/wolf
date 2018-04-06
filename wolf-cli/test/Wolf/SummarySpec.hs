@@ -25,4 +25,4 @@ spec = do
                 (\e -> e == ExitFailure 1)
     describe "summaryReport" $
         it "produces valid summary reports" $
-        producesValidsOnValids3 summaryReport
+        forAllValid $ \a -> producesValidsOnValids3 $ summaryReport a
