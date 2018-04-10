@@ -4,14 +4,18 @@
 
 module Wolf.Data.Export.Types
     ( Repo(..)
+    , Result(..)
+    , ResultS(..)
+    , Exporter(..)
     ) where
 
 import Import
 
-import Data.Aeson
+import Data.Aeson hiding (Result)
 import qualified Data.Map as M
 
 import Wolf.Data.Entry.Types
+import Wolf.Data.Export.Result
 import Wolf.Data.Index.Types
 import Wolf.Data.Init.Types
 import Wolf.Data.Note.Types
@@ -89,3 +93,11 @@ instance ToJSON Repo where
             , "notes" .= repoNotes
             , "suggestions" .= repoSuggestions
             ]
+
+type Warning = String
+
+type Error = String
+
+type ResultS = Result Warning Error
+
+type Exporter = ResultS Repo

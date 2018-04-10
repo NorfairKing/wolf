@@ -15,3 +15,6 @@ spec = do
     eqSpec @Repo
     genValidSpec @Repo
     jsonSpecOnValid @Repo
+    functorSpecOnValid @ResultS
+    applicativeSpecOnValid @ResultS
+    monadSpecOnValid @ResultS

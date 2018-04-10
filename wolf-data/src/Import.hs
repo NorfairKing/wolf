@@ -33,6 +33,7 @@ import Data.ByteString as X (ByteString)
 import Data.Map as X (Map)
 import Data.Text as X (Text)
 
+import Data.GenValidity as X
 import Data.Validity as X
 import Data.Validity.Aeson as X ()
 import Data.Validity.Containers as X ()

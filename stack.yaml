@@ -19,5 +19,5 @@ extra-deps:
   subdirs:
     - typed-uuid
     - genvalidity-typed-uuid
-
+- QuickCheck-2.10.1
 resolver: lts-10.2

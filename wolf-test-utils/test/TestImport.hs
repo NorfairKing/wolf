@@ -31,7 +31,10 @@ import Test.Hspec as X
 import Test.QuickCheck as X
 import Test.Validity as X
 import Test.Validity.Aeson as X
+import Test.Validity.Applicative as X
+import Test.Validity.Functor as X
 import Test.Validity.Hashable as X
+import Test.Validity.Monad as X
 
 import Data.GenValidity.Aeson as X ()
 import Data.GenValidity.Containers as X
