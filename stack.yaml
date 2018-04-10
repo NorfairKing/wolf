@@ -15,10 +15,15 @@ extra-deps:
 - servant-quickcheck-0.0.2.4
 - sockaddr-0.0.0
 - wai-git-http-0.0.0
+- cautious-0.3.0.0
+- cautious-gen-0.0.0.0
 - git: https://github.com/NorfairKing/typed-uuid.git
   commit: a7baf4999c901ccdeb66dba0221431de692963f1
   subdirs:
     - typed-uuid
     - genvalidity-typed-uuid
+
+nix:
+  packages: [ zlib ]
 
 resolver: lts-10.2

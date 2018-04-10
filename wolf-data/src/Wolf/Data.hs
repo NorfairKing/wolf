@@ -105,6 +105,12 @@ module Wolf.Data
     , exportRepo
     , importRepo
     , cleanupRepo
+    , CautiousExport
+    , prettyShowExportWarning
+    , prettyShowExportError
+    , ExportWarning
+    , ExportProblem(..)
+    , ExportError(..)
     ) where
 
 import Wolf.Data.Cleanup

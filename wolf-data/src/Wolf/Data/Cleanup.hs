@@ -10,9 +10,17 @@ import Wolf.Data.Export
 import Wolf.Data.Import
 import Wolf.Data.Types
 
-cleanupRepo :: (MonadIO m, MonadReader DataSettings m) => m ()
-cleanupRepo = do
-    mr <- exportRepo
+import Cautious.CautiousT
+
+cleanupRepo ::
+       (MonadIO m, MonadReader DataSettings m)
+    => (ExportWarning -> m Bool)
+    -> m ()
+cleanupRepo askToPerformCleanup = do
+    mr <- runCautiousT exportRepo
     case mr of
-        Nothing -> pure ()
-        Just r -> importRepo r
+        CautiousError e -> liftIO . die $ prettyShowExportError e
+        CautiousWarning [] repo -> importRepo repo
+        CautiousWarning w repo -> do
+            performCleanup <- askToPerformCleanup w
+            when performCleanup $ importRepo repo

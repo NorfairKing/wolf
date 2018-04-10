@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Wolf.Cli.Command.Export
     ( export
@@ -14,9 +15,19 @@ import Wolf.Data
 import Wolf.Cli.OptParse
 import Wolf.Cli.Utils
 
+import Cautious.CautiousT
+
 export :: (MonadIO m, MonadReader Settings m) => m ()
 export =
     runData $
     withInitCheck_ $ do
-        e <- exportRepo
-        liftIO . LB8.putStrLn $ encodePretty e
+        cautiousRepository <- runCautiousT exportRepo
+        liftIO $
+            case cautiousRepository of
+                CautiousWarning [] repo -> LB8.putStrLn $ encodePretty repo
+                CautiousWarning w repo -> do
+                    LB8.putStrLn $ encodePretty repo
+                    putStrLn $
+                        "The warnings are:\n" ++ prettyShowExportWarning w
+                CautiousError e ->
+                    putStrLn $ "The errors are\n" ++ prettyShowExportError e

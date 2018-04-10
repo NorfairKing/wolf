@@ -10,7 +10,9 @@ import qualified Data.Set as S
 
 import Wolf.Data.Export.Types
 import Wolf.Data.Index.Types
+import Wolf.Data.Note.Types
 import Wolf.Data.NoteIndex.Types
+import Wolf.Data.People.Types
 
 import Wolf.Data.Index.Types.Gen ()
 import Wolf.Data.Init.Types.Gen ()
@@ -36,7 +38,7 @@ instance GenValid Repo where
                         else do
                             a <- genValid
                             go (addIndexEntry a puuid ix) puuid
-             in foldM go newIndex eps
+            in foldM go newIndex eps
         -- For some people, make a person entry.
         repoPersonEntries <-
             fmap (M.fromList . catMaybes) $
@@ -57,7 +59,42 @@ instance GenValid Repo where
                     then (Just . (,) p) <$> subNoteIndex repoNoteIndex
                     else pure Nothing
         -- For each noteuuid, make a note.
-        repoNotes <-
-            fmap M.fromList $ forM noteUuids $ \uuid -> (,) uuid <$> genValid
+        repoNotesWithWrongPeople <-
+            fmap M.fromList $
+            forM noteUuids $ \nu -> (,) nu . removeRelevantPeople <$> genValid
+        let repoNotes =
+                foldl'
+                    updateNotes
+                    repoNotesWithWrongPeople
+                    (M.toList repoNoteIndices)
         repoSuggestions <- genValid
         pure Repo {..}
+
+removeRelevantPeople :: Note -> Note
+removeRelevantPeople note = note {noteRelevantPeople = S.empty}
+
+updateNotes :: Map NoteUuid Note -> (PersonUuid, NoteIndex) -> Map NoteUuid Note
+updateNotes noteMap (pu, ni) =
+    let noteUuids = S.toList $ noteIndexSet ni
+    in foldl' (addRelevantPerson pu) noteMap noteUuids
+
+addRelevantPerson ::
+       PersonUuid -> Map NoteUuid Note -> NoteUuid -> Map NoteUuid Note
+addRelevantPerson pu noteMap nu =
+    M.adjust
+        (\note ->
+             note {noteRelevantPeople = S.insert pu $ noteRelevantPeople note})
+        nu
+        noteMap
+
+instance GenUnchecked ExportProblem
+
+instance GenValid ExportProblem
+
+instance GenUnchecked InvalidRepoMessage
+
+instance GenValid InvalidRepoMessage
+
+instance GenUnchecked ExportError
+
+instance GenValid ExportError
