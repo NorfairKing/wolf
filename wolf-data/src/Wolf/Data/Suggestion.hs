@@ -196,15 +196,15 @@ addUnusedSuggestions typ newSugs = do
             , Map (SuggestionHash a) SuggestionUuid)
     go t@(uuix, uix) s =
         let h = hashSuggestion s
-        in case M.lookup h uix of
-               Just _ -> pure t -- Already used, don't add it anymore
-               Nothing ->
-                   case M.lookup h uuix of
-                       Just _ -> pure t -- Already unused, don't add it anymore
-                       Nothing -> do
-                           u <- nextRandomUUID
-                           writeSuggestion typ u s
-                           pure (M.insert h u uuix, uix)
+         in case M.lookup h uix of
+                Just _ -> pure t -- Already used, don't add it anymore
+                Nothing ->
+                    case M.lookup h uuix of
+                        Just _ -> pure t -- Already unused, don't add it anymore
+                        Nothing -> do
+                            u <- nextRandomUUID
+                            writeSuggestion typ u s
+                            pure (M.insert h u uuix, uix)
 
 addUnusedSuggestion ::
        forall a m.

@@ -36,7 +36,7 @@ instance GenValid Repo where
                         else do
                             a <- genValid
                             go (addIndexEntry a puuid ix) puuid
-            in foldM go newIndex eps
+             in foldM go newIndex eps
         -- For some people, make a person entry.
         repoPersonEntries <-
             fmap (M.fromList . catMaybes) $

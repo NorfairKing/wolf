@@ -39,11 +39,11 @@ makeWolfApp wse = do
     man <- Http.newManager Http.defaultManagerSettings
     pure
         App
-        { appDataSettings = wse
-        , appHttpManager = man
-        , appStatic = myStatic
-        , appGit = WaiSubsite {runWaiSubsite = gitApplication wse} -- TODO find a better way to not duplicate this sds?
-        }
+            { appDataSettings = wse
+            , appHttpManager = man
+            , appStatic = myStatic
+            , appGit = WaiSubsite {runWaiSubsite = gitApplication wse} -- TODO find a better way to not duplicate this sds?
+            }
 
 runWolfAPIServer :: ServeSettings -> IO ()
 runWolfAPIServer ss@ServeSettings {..} =

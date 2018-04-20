@@ -33,12 +33,12 @@ runGitIn wd args = do
     let cmd = unwords $ gitcmd : args
     let cp =
             (proc gitcmd args)
-            { cwd = Just $ toFilePath wd
-            , std_in = Inherit
-            , std_out = Inherit
-            , std_err = Inherit
-            , env = Just []
-            }
+                { cwd = Just $ toFilePath wd
+                , std_in = Inherit
+                , std_out = Inherit
+                , std_err = Inherit
+                , env = Just []
+                }
     ec <-
         liftIO $ do
             (_, _, _, ph) <- createProcess cp

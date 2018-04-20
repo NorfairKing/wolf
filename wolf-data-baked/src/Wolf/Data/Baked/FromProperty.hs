@@ -20,3 +20,6 @@ fromEntry = fromProperty . personEntryProperties
 instance FromProperty (Maybe Text) where
     fromProperty (PVal ppv) = Just $ personPropertyValueContents ppv
     fromProperty _ = Nothing
+
+instance FromProperty (Maybe PersonProperty) where
+    fromProperty = pure

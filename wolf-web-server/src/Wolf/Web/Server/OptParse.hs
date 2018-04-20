@@ -36,10 +36,10 @@ combineToInstructions (CommandServe ServeFlags {..}) Flags Configuration Environ
     pure
         ( DispatchServe
               ServeSettings
-              { serveSetPort = port
-              , serveSetDataDir = dd
-              , serveSetAPIPort = apiPort
-              }
+                  { serveSetPort = port
+                  , serveSetDataDir = dd
+                  , serveSetAPIPort = apiPort
+                  }
         , Settings)
 
 defaultPort :: Int
@@ -54,10 +54,10 @@ getEnv = do
     let mv k = lookup k env
     pure
         Environment
-        { envPort = mv "PORT" >>= readMaybe
-        , envDataDir = mv "DATA_DIR"
-        , envAPIPort = mv "API_PORT" >>= readMaybe
-        }
+            { envPort = mv "PORT" >>= readMaybe
+            , envDataDir = mv "DATA_DIR"
+            , envAPIPort = mv "API_PORT" >>= readMaybe
+            }
 
 getArguments :: IO Arguments
 getArguments = do
@@ -70,13 +70,13 @@ runArgumentsParser = execParserPure prefs_ argParser
   where
     prefs_ =
         ParserPrefs
-        { prefMultiSuffix = ""
-        , prefDisambiguate = True
-        , prefShowHelpOnError = True
-        , prefShowHelpOnEmpty = True
-        , prefBacktrack = True
-        , prefColumns = 80
-        }
+            { prefMultiSuffix = ""
+            , prefDisambiguate = True
+            , prefShowHelpOnError = True
+            , prefShowHelpOnEmpty = True
+            , prefBacktrack = True
+            , prefColumns = 80
+            }
 
 argParser :: ParserInfo Arguments
 argParser = info (helper <*> parseArgs) help_

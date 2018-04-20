@@ -26,13 +26,13 @@ instance Validity Name
 instance FromProperty Name where
     fromProperty pp =
         Name
-        { namePrefix = pp `atKey` "prefix"
-        , nameFirst = pp `atKey` "first name"
-        , nameMiddle = pp `atKey` "middle name"
-        , nameLast = pp `atKey` "last name"
-        , nameSuffix = pp `atKey` "suffix"
-        , nameNick = pp `atKey` "nick name"
-        }
+            { namePrefix = pp `atKey` "prefix"
+            , nameFirst = pp `atKey` "first name"
+            , nameMiddle = pp `atKey` "middle name"
+            , nameLast = pp `atKey` "last name"
+            , nameSuffix = pp `atKey` "suffix"
+            , nameNick = pp `atKey` "nick name"
+            }
 
 renderName :: Name -> Maybe Text
 renderName Name {..} =

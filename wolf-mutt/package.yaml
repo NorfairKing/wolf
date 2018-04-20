@@ -1,0 +1,61 @@
+name: wolf-mutt
+version: '0.0.0.0'
+category: People
+author: Tom Sydney Kerckhove
+maintainer: syd.kerckhove@gmail.com
+copyright: ! 'Copyright: (c) 2018 Tom Sydney Kerckhove'
+license: AllRightsReserved
+homepage: http://cs-syd.eu
+dependencies:
+- base >=4.9 && <=5
+library:
+  source-dirs: src/
+  default-extensions:
+  - NoImplicitPrelude
+  ghc-options: -Wall
+  exposed-modules:
+  - Wolf.Mutt
+  - Wolf.Mutt.OptParse
+  - Wolf.Mutt.OptParse.Types
+  - Wolf.Mutt.Query
+  - Wolf.Mutt.Query.Types
+  dependencies:
+  - email-validate
+  - mtl
+  - optparse-applicative
+  - text
+  - validity
+  - validity-text
+  - wolf-cli >=0.0 && <0.1
+  - wolf-data >=0.0 && <0.1
+  - wolf-data-baked >=0.0 && <0.1
+
+executables:
+  wolf-mutt:
+    main: Main.hs
+    source-dirs: app/
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - wolf-mutt
+
+tests:
+  wolf-mutt-test:
+    main: Spec.hs
+    source-dirs: test/
+    default-extensions:
+    - NoImplicitPrelude
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -Wall
+    dependencies:
+    - genvalidity
+    - genvalidity-hspec
+    - genvalidity-text
+    - hspec
+    - wolf-mutt
+    - wolf-test-utils

@@ -54,4 +54,4 @@ personCard uuid (aliases, mpe) =
             fromMaybe (aliasText a) $ (fromEntry <$> mpe) >>= renderName
         mmet = metText <$> (mpe >>= fromEntry)
         mgender = mpe >>= fromEntry
-    in (displayName, $(widgetFile "people/item"))
+     in (displayName, $(widgetFile "people/item"))

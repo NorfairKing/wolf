@@ -102,10 +102,10 @@ valCursorModifyValue func ValCursor {..} = vc'
   where
     vc' =
         ValCursor
-        { valCursorParent =
-              rebuildParentCursor (const $ ValC vc') valCursorParent
-        , valCursorSelected = func valCursorSelected
-        }
+            { valCursorParent =
+                  rebuildParentCursor (const $ ValC vc') valCursorParent
+            , valCursorSelected = func valCursorSelected
+            }
 
 instance Rebuild ValCursor where
     rebuild vc =
@@ -134,10 +134,10 @@ listCursorModifyElems func ListCursor {..} = lc'
   where
     lc' =
         ListCursor
-        { listCursorParent =
-              rebuildParentCursor (const $ ListC lc') listCursorParent
-        , listCursorElems = func listCursorElems
-        }
+            { listCursorParent =
+                  rebuildParentCursor (const $ ListC lc') listCursorParent
+            , listCursorElems = func listCursorElems
+            }
 
 instance Rebuild ListCursor where
     rebuild lc =
@@ -166,10 +166,10 @@ mapCursorModifyElems func MapCursor {..} = mc'
   where
     mc' =
         MapCursor
-        { mapCursorParent =
-              rebuildParentCursor (const $ MapC mc') mapCursorParent
-        , mapCursorElems = func mapCursorElems
-        }
+            { mapCursorParent =
+                  rebuildParentCursor (const $ MapC mc') mapCursorParent
+            , mapCursorElems = func mapCursorElems
+            }
 
 instance Rebuild MapCursor where
     rebuild mc =
@@ -224,13 +224,13 @@ listElems lc ls = els
       where
         vec =
             ListElCursor
-            { listElCursorParent = lc
-            , listElCursorPrevElems =
-                  reverse $ filter ((< i) . listElCursorIx) els
-            , listElCursorNextElems = filter ((> i) . listElCursorIx) els
-            , listElCursorIx = i
-            , listElCursorValue = pc
-            }
+                { listElCursorParent = lc
+                , listElCursorPrevElems =
+                      reverse $ filter ((< i) . listElCursorIx) els
+                , listElCursorNextElems = filter ((> i) . listElCursorIx) els
+                , listElCursorIx = i
+                , listElCursorValue = pc
+                }
         pc = propertyCursor (Just $ ListElPC vec) v
 
 instance Rebuild ListElCursor where
@@ -281,14 +281,14 @@ mapElems mc ls = els
       where
         kvc =
             KeyValCursor
-            { keyValCursorParent = mc
-            , keyValCursorPrevElems =
-                  reverse $ filter ((< i) . keyValCursorIx) els
-            , keyValCursorNextElems = filter ((> i) . keyValCursorIx) els
-            , keyValCursorIx = i
-            , keyValCursorKey = kc
-            , keyValCursorValue = pc
-            }
+                { keyValCursorParent = mc
+                , keyValCursorPrevElems =
+                      reverse $ filter ((< i) . keyValCursorIx) els
+                , keyValCursorNextElems = filter ((> i) . keyValCursorIx) els
+                , keyValCursorIx = i
+                , keyValCursorKey = kc
+                , keyValCursorValue = pc
+                }
         kc = keyCursor kvc k
         pc = propertyCursor (Just $ KeyValPC kvc) v
 
@@ -312,10 +312,10 @@ keyCursorModifyKey func kc = kc'
   where
     kc' =
         KeyCursor
-        { keyCursorParent =
-              keyValCursorModifyKey (const kc') (keyCursorParent kc)
-        , keyCursorSelected = func $ keyCursorSelected kc
-        }
+            { keyCursorParent =
+                  keyValCursorModifyKey (const kc') (keyCursorParent kc)
+            , keyCursorSelected = func $ keyCursorSelected kc
+            }
 
 instance Rebuild KeyCursor where
     rebuild = rebuild . keyCursorParent

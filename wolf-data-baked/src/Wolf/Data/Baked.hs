@@ -12,9 +12,42 @@ module Wolf.Data.Baked
 
 import Import
 
+import qualified Data.Text.Encoding as TE
+import Text.Email.Validate as Validate (EmailAddress, emailAddress)
+
+import Wolf.Data
+
 import Wolf.Data.Baked.FromProperty
 import Wolf.Data.Baked.Name
 import Wolf.Data.Baked.Suggestion.Alias
+
+data EmailAddressWithPurpose =
+    EmailAddressWithPurpose (Maybe Text)
+                            EmailAddress
+    deriving (Show, Eq, Generic)
+
+instance FromProperty [EmailAddressWithPurpose] where
+    fromProperty pp =
+        case pp `atKey` "email" of
+            Nothing -> []
+            Just pp' -> emailsFrom pp'
+      where
+        emailsFrom pp' =
+            case pp' of
+                PVal t ->
+                    case Validate.emailAddress $
+                         TE.encodeUtf8 $ personPropertyValueContents t of
+                        Nothing -> []
+                        Just ea -> [EmailAddressWithPurpose Nothing ea]
+                PList ls -> concatMap emailsFrom ls
+                PMap ls ->
+                    flip concatMap ls $ \(t, p) ->
+                        map
+                            (\(EmailAddressWithPurpose mp ea) ->
+                                 EmailAddressWithPurpose
+                                     (Just $ fromMaybe t mp)
+                                     ea) $
+                        emailsFrom p
 
 newtype Met = Met
     { metText :: Text

@@ -195,9 +195,9 @@ postNewAccountR = do
                 if newAccountPassword1 d == newAccountPassword2 d
                     then Right
                              Register
-                             { registerUsername = newAccountUsername d
-                             , registerPassword = newAccountPassword1 d
-                             }
+                                 { registerUsername = newAccountUsername d
+                                 , registerPassword = newAccountPassword1 d
+                                 }
                     else Left [mr Msg.PassMismatch]
     case mdata of
         Left errs -> do

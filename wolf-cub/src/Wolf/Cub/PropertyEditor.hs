@@ -40,10 +40,10 @@ data PropertyEditor n = PropertyEditor
 propertyEditor :: n -> Maybe PersonProperty -> PropertyEditor n
 propertyEditor name mprop =
     PropertyEditor
-    { propertyEditorName = name
-    , propertyEditorCursor = cursor <$> mprop
-    , propertyEditorCurrentEditor = Nothing
-    }
+        { propertyEditorName = name
+        , propertyEditorCursor = cursor <$> mprop
+        , propertyEditorCurrentEditor = Nothing
+        }
 
 renderPropertyEditor ::
        forall n. (Show n, Ord n)
@@ -74,7 +74,7 @@ renderPropertyEditor PropertyEditor {..} =
                 withValueAttr = withSelectedAttr valueSel
                 dash = withDashAttr $ txt "- "
                 valueSide = withValueAttr $ go valueSel v
-            in withListElemAttr $ dash <+> valueSide
+             in withListElemAttr $ dash <+> valueSide
     go msel (PMap tups) =
         withSelectedAttr msel $
         vBox $
@@ -89,10 +89,10 @@ renderPropertyEditor PropertyEditor {..} =
                 mid = txt ": "
                 leftSide = keySide <+> mid
                 valueSide = withValueAttr $ go valueSel v
-            in withKeyValueAttr $
-               case v of
-                   (PVal _) -> leftSide <+> valueSide
-                   _ -> leftSide <=> padLeft (Pad 2) valueSide
+             in withKeyValueAttr $
+                case v of
+                    (PVal _) -> leftSide <+> valueSide
+                    _ -> leftSide <=> padLeft (Pad 2) valueSide
     drillSel msel ix =
         case msel of
             Nothing -> Nothing
@@ -170,20 +170,20 @@ tryToStartSubEditor pe@PropertyEditor {..} =
                             personPropertyValueContents $ valCursorSelected vc
                         AKC kc -> Just $ keyCursorSelected kc
                         _ -> Nothing
-            in case mContents of
-                   Nothing -> pure pe
-                   Just cts ->
-                       pure $
-                       pe
-                       { propertyEditorCurrentEditor =
-                             Just $
-                             editorText
-                                 (propertyEditorName <>
-                                  propertyEditorName -- Weird hack to get the name to be unique.
-                                  )
-                                 (Just 1)
-                                 cts
-                       }
+             in case mContents of
+                    Nothing -> pure pe
+                    Just cts ->
+                        pure $
+                        pe
+                            { propertyEditorCurrentEditor =
+                                  Just $
+                                  editorText
+                                      (propertyEditorName <>
+                                       propertyEditorName -- Weird hack to get the name to be unique.
+                                       )
+                                      (Just 1)
+                                      cts
+                            }
 
 tryToQuitAndSaveEditor ::
        PropertyEditor n -> Editor Text t -> EventM n (PropertyEditor n)
@@ -197,24 +197,26 @@ tryToQuitAndSaveEditor pe@PropertyEditor {..} ed =
                     now <- liftIO getCurrentTime
                     let newValue =
                             PersonPropertyValue
-                            { personPropertyValueLastUpdatedTimestamp = now
-                            , personPropertyValueContents = contents
-                            }
+                                { personPropertyValueLastUpdatedTimestamp = now
+                                , personPropertyValueContents = contents
+                                }
                     pure $
                         pe
-                        { propertyEditorCurrentEditor = Nothing
-                        , propertyEditorCursor =
-                              Just $
-                              APropC $
-                              ValC $ valCursorModifyValue (const newValue) vc
-                        }
+                            { propertyEditorCurrentEditor = Nothing
+                            , propertyEditorCursor =
+                                  Just $
+                                  APropC $
+                                  ValC $
+                                  valCursorModifyValue (const newValue) vc
+                            }
                 AKC kc ->
                     pure $
                     pe
-                    { propertyEditorCurrentEditor = Nothing
-                    , propertyEditorCursor =
-                          Just $ AKC $ keyCursorModifyKey (const contents) kc
-                    }
+                        { propertyEditorCurrentEditor = Nothing
+                        , propertyEditorCursor =
+                              Just $
+                              AKC $ keyCursorModifyKey (const contents) kc
+                        }
                 _ -> pure pe
 
 moveUp :: PropertyEditor n -> EventM n (PropertyEditor n)
@@ -236,8 +238,8 @@ moveCursor ::
 moveCursor move pe =
     pure
         pe
-        { propertyEditorCursor =
-              case propertyEditorCursor pe of
-                  Nothing -> Nothing
-                  Just cur -> Just $ fromMaybe cur $ move cur
-        }
+            { propertyEditorCursor =
+                  case propertyEditorCursor pe of
+                      Nothing -> Nothing
+                      Just cur -> Just $ fromMaybe cur $ move cur
+            }

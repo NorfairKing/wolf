@@ -47,8 +47,8 @@ reviewReport pd now ix ns =
                                 (uuidText uuid)
                                 aliasText
                                 (reverseIndexLookupSingleAlias uuid ix)
-                in (n, as)
-    in ReviewReport {reviewReportTimestamp = now, reviewReportNotes = noteTups}
+                 in (n, as)
+     in ReviewReport {reviewReportTimestamp = now, reviewReportNotes = noteTups}
 
 inPeriod :: UTCTime -> PeriodDescription -> UTCTime -> Bool
 inPeriod now pd time = now `diffUTCTime` time <= days
@@ -71,14 +71,14 @@ instance Validity ReviewReport
 reviewReportReport :: ReviewReport -> Report
 reviewReportReport ReviewReport {..} =
     let entries = sortOn (noteTimestamp . fst) $ M.toList reviewReportNotes
-    in mconcat $
-       flip map entries $ \(Note {..}, names) ->
-           unlinesReport
-               [ colored [SetColor Foreground Dull Blue] $
-                 T.unwords
-                     [ T.intercalate ", " names <> ","
-                     , formatMomentNicely reviewReportTimestamp noteTimestamp
-                     ]
-               , textReport noteContents
-               , mempty
-               ]
+     in mconcat $
+        flip map entries $ \(Note {..}, names) ->
+            unlinesReport
+                [ colored [SetColor Foreground Dull Blue] $
+                  T.unwords
+                      [ T.intercalate ", " names <> ","
+                      , formatMomentNicely reviewReportTimestamp noteTimestamp
+                      ]
+                , textReport noteContents
+                , mempty
+                ]

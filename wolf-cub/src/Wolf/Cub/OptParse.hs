@@ -45,13 +45,13 @@ runArgumentsParser pe = execParserPure prefs_ $ argParser pe
   where
     prefs_ =
         ParserPrefs
-        { prefMultiSuffix = ""
-        , prefDisambiguate = True
-        , prefShowHelpOnError = True
-        , prefShowHelpOnEmpty = True
-        , prefBacktrack = True
-        , prefColumns = 80
-        }
+            { prefMultiSuffix = ""
+            , prefDisambiguate = True
+            , prefShowHelpOnError = True
+            , prefShowHelpOnEmpty = True
+            , prefBacktrack = True
+            , prefColumns = 80
+            }
 
 argParser :: Cli.ParserEnv -> ParserInfo Arguments
 argParser pEnv = info (helper <*> parseArgs pEnv) help_
