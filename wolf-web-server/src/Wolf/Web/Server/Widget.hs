@@ -6,7 +6,10 @@ import Data.Default
 import Language.Haskell.TH.Syntax (Exp, Q)
 
 import Yesod.Default.Util
-       (WidgetFileSettings, widgetFileNoReload, widgetFileReload)
+    ( WidgetFileSettings
+    , widgetFileNoReload
+    , widgetFileReload
+    )
 
 import Wolf.Web.Server.Constants
 

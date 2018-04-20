@@ -39,13 +39,13 @@ runArgumentsParser = execParserPure prefs_ argParser
   where
     prefs_ =
         ParserPrefs
-        { prefMultiSuffix = ""
-        , prefDisambiguate = True
-        , prefShowHelpOnError = True
-        , prefShowHelpOnEmpty = True
-        , prefBacktrack = True
-        , prefColumns = 80
-        }
+            { prefMultiSuffix = ""
+            , prefDisambiguate = True
+            , prefShowHelpOnError = True
+            , prefShowHelpOnEmpty = True
+            , prefBacktrack = True
+            , prefColumns = 80
+            }
 
 argParser :: ParserInfo Arguments
 argParser = info (helper <*> parseArgs) help_

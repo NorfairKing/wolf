@@ -45,11 +45,11 @@ exportRepo = do
             pure $
                 Just
                     Repo
-                    { repoInitData = initData
-                    , repoPersonIndex = mi
-                    , repoPersonEntries = entries
-                    , repoNoteIndex = noteIndex
-                    , repoNoteIndices = noteIxs
-                    , repoNotes = notes
-                    , repoSuggestions = sugs
-                    }
+                        { repoInitData = initData
+                        , repoPersonIndex = mi
+                        , repoPersonEntries = entries
+                        , repoNoteIndex = noteIndex
+                        , repoNoteIndices = noteIxs
+                        , repoNotes = notes
+                        , repoSuggestions = sugs
+                        }

@@ -36,20 +36,20 @@ suggest = do
                     Nothing ->
                         pure
                             EntrySuggestion
-                            { entrySuggestionEntry = pe
-                            , entrySuggestionNewAliases = aliases
-                            , entrySuggestionLikelyRelevantPerson = Nothing
-                            }
+                                { entrySuggestionEntry = pe
+                                , entrySuggestionNewAliases = aliases
+                                , entrySuggestionLikelyRelevantPerson = Nothing
+                                }
                     Just (pc, score) -> do
                         (aliases', pp') <- adaptToPerson aliases pe pc
                         pe' <- personEntry pp'
                         pure
                             EntrySuggestion
-                            { entrySuggestionEntry = pe'
-                            , entrySuggestionNewAliases = aliases'
-                            , entrySuggestionLikelyRelevantPerson =
-                                  Just (personContextUuid pc, score)
-                            }
+                                { entrySuggestionEntry = pe'
+                                , entrySuggestionNewAliases = aliases'
+                                , entrySuggestionLikelyRelevantPerson =
+                                      Just (personContextUuid pc, score)
+                                }
     let finalisedSugs = map (finaliseSuggestion now) sugs
     addUnusedSuggestions entrySuggestionType $ S.fromList finalisedSugs
 
@@ -63,7 +63,7 @@ getPeopleContexts = do
         let aliases = map fst $ filter ((== uuid) . snd) $ indexTuples index
         pure
             PersonContext
-            { personContextUuid = uuid
-            , personContextAliases = aliases
-            , personContextEntry = mpe
-            }
+                { personContextUuid = uuid
+                , personContextAliases = aliases
+                , personContextEntry = mpe
+                }

@@ -29,24 +29,24 @@ runWolfCub = do
 initialState :: UTCTime -> Index -> DataSettings -> CubState
 initialState now i ds =
     CubState
-    { cubStateShown =
-          CubShowPersonList
-              PersonListState
-              { personListStateInitialPeople = indexTuples i
-              , personListStatePeopleList = makePersonList i
-              , personListStateShowHelp = False
-              , personListStateSearchBox = Nothing
-              }
-    , cubStateNow = now
-    , cubStateDataSettings = ds
-    }
+        { cubStateShown =
+              CubShowPersonList
+                  PersonListState
+                      { personListStateInitialPeople = indexTuples i
+                      , personListStatePeopleList = makePersonList i
+                      , personListStateShowHelp = False
+                      , personListStateSearchBox = Nothing
+                      }
+        , cubStateNow = now
+        , cubStateDataSettings = ds
+        }
 
 cubApp :: App CubState () ResourceName
 cubApp =
     App
-    { appDraw = drawUI
-    , appChooseCursor = showFirstCursor
-    , appHandleEvent = handleEvent
-    , appStartEvent = return
-    , appAttrMap = const theMap
-    }
+        { appDraw = drawUI
+        , appChooseCursor = showFirstCursor
+        , appHandleEvent = handleEvent
+        , appStartEvent = return
+        , appAttrMap = const theMap
+        }

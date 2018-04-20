@@ -9,6 +9,7 @@ packages:
 - wolf-server
 - wolf-web-server
 - wolf-test-utils
+- wolf-mutt-query
 
 extra-deps:
 - servant-quickcheck-0.0.2.4

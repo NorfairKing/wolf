@@ -14,11 +14,11 @@ import Wolf.Data
 finaliseSuggestion :: UTCTime -> EntrySuggestion -> Suggestion EntrySuggestion
 finaliseSuggestion now es =
     Suggestion
-    { suggestionSuggestor = "Google Contacts"
-    , suggestionReason = reason
-    , suggestionData = es
-    , suggestionTimestamp = now
-    }
+        { suggestionSuggestor = "Google Contacts"
+        , suggestionReason = reason
+        , suggestionData = es
+        , suggestionTimestamp = now
+        }
   where
     reason =
         case entrySuggestionLikelyRelevantPerson es of

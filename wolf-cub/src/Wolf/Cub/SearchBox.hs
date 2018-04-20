@@ -27,10 +27,10 @@ data SearchBox n a = SearchBox
 searchBox :: n -> [(Text, a)] -> SearchBox n a
 searchBox name ts =
     SearchBox
-    { searchBoxName = name
-    , searchBoxCurrentContent = ""
-    , searchBoxSelectable = ts
-    }
+        { searchBoxName = name
+        , searchBoxCurrentContent = ""
+        , searchBoxSelectable = ts
+        }
 
 searchBoxCurrentlySelected :: SearchBox n a -> [(Text, a)]
 searchBoxCurrentlySelected SearchBox {..} =
@@ -44,8 +44,12 @@ handleSearchBox sb e =
     case e of
         (EvKey (KChar c) []) ->
             sb
-            {searchBoxCurrentContent = searchBoxCurrentContent sb <> T.pack [c]}
+                { searchBoxCurrentContent =
+                      searchBoxCurrentContent sb <> T.pack [c]
+                }
         (EvKey KBS []) ->
             sb
-            {searchBoxCurrentContent = T.dropEnd 1 $ searchBoxCurrentContent sb}
+                { searchBoxCurrentContent =
+                      T.dropEnd 1 $ searchBoxCurrentContent sb
+                }
         _ -> sb

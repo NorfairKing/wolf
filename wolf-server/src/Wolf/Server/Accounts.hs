@@ -45,10 +45,10 @@ registerAccount Register {..} = do
                 Just uuid -> do
                     let acc =
                             Account
-                            { accountUUID = uuid
-                            , accountUsername = registerUsername
-                            , accountPasswordHash = ph
-                            }
+                                { accountUUID = uuid
+                                , accountUsername = registerUsername
+                                , accountPasswordHash = ph
+                                }
                     storeAccount acc
                     add <- accountDataDir $ accountUUID acc
                     ensureDir add

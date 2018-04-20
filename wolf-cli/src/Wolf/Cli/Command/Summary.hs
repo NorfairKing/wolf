@@ -57,11 +57,11 @@ summaryReport ::
        UTCTime -> [Alias] -> Maybe PersonEntry -> [Note] -> SummaryReport
 summaryReport now as mpe pns =
     SummaryReport
-    { summaryReportTimestamp = now
-    , summaryReportAliases = as
-    , summaryReportPersonEntry = mpe
-    , summaryReportNotes = sortOn noteTimestamp pns
-    }
+        { summaryReportTimestamp = now
+        , summaryReportAliases = as
+        , summaryReportPersonEntry = mpe
+        , summaryReportNotes = sortOn noteTimestamp pns
+        }
 
 data SummaryReport = SummaryReport
     { summaryReportTimestamp :: UTCTime

@@ -87,13 +87,13 @@ runArgumentsParser env = execParserPure prefs_ $ runReaderT argParser env
   where
     prefs_ =
         ParserPrefs
-        { prefMultiSuffix = ""
-        , prefDisambiguate = True
-        , prefShowHelpOnError = True
-        , prefShowHelpOnEmpty = True
-        , prefBacktrack = True
-        , prefColumns = 80
-        }
+            { prefMultiSuffix = ""
+            , prefDisambiguate = True
+            , prefShowHelpOnError = True
+            , prefShowHelpOnEmpty = True
+            , prefBacktrack = True
+            , prefColumns = 80
+            }
 
 argParser :: ReaderT ParserEnv ParserInfo Arguments
 argParser =
@@ -127,7 +127,7 @@ parseCommandInit :: ParserInfo Command
 parseCommandInit =
     let parser = pure CommandInit
         modifier = fullDesc <> progDesc "Initialise the wolf data repository."
-    in info parser modifier
+     in info parser modifier
 
 parseCommandNote :: ReaderT ParserEnv ParserInfo Command
 parseCommandNote =
@@ -154,7 +154,7 @@ parseCommandNote =
                               , completeWith $ peopleMap env
                               ]))
             modifier = fullDesc <> progDesc "Make a note."
-        in info parser modifier
+         in info parser modifier
 
 parseCommandSummary :: ReaderT ParserEnv ParserInfo Command
 parseCommandSummary =
@@ -169,7 +169,7 @@ parseCommandSummary =
                          , completer $ listCompleter $ peopleMap env
                          ])
             modifier = fullDesc <> progDesc "Show the summary for a person."
-        in info parser modifier
+         in info parser modifier
 
 parseCommandEntry :: ReaderT ParserEnv ParserInfo Command
 parseCommandEntry =
@@ -184,7 +184,7 @@ parseCommandEntry =
                          , completer $ listCompleter $ peopleMap env
                          ])
             modifier = fullDesc <> progDesc "Edit a person's entry"
-        in info parser modifier
+         in info parser modifier
 
 parseCommandGit :: ParserInfo Command
 parseCommandGit =
@@ -199,7 +199,7 @@ parseCommandGit =
                           ]))
         modifier =
             fullDesc <> progDesc "Perform a git command on the wolf data."
-    in info parser modifier
+     in info parser modifier
 
 parseCommandAlias :: ReaderT ParserEnv ParserInfo Command
 parseCommandAlias =
@@ -219,13 +219,13 @@ parseCommandAlias =
             modifier =
                 fullDesc <>
                 progDesc "Alias one identifier to an other identifier."
-        in info parser modifier
+         in info parser modifier
 
 parseCommandReview :: ParserInfo Command
 parseCommandReview =
     let parser = CommandReview <$> periodDescriptionParser
         modifier = fullDesc <> progDesc "Review notes."
-    in info parser modifier
+     in info parser modifier
   where
     periodDescriptionParser =
         optional $
@@ -237,7 +237,7 @@ parseCommandRandomPerson :: ParserInfo Command
 parseCommandRandomPerson =
     let parser = pure CommandRandomPerson
         modifier = fullDesc <> progDesc "Summarise a random person."
-    in info parser modifier
+     in info parser modifier
 
 parseCommandSuggestion :: ParserInfo Command
 parseCommandSuggestion =
@@ -249,31 +249,31 @@ parseCommandSuggestion =
                 , command "review" parseCommandSuggestionReview
                 ]
         modifier = fullDesc <> progDesc "Manipulate Suggestions."
-    in info parser modifier
+     in info parser modifier
 
 parseCommandSuggestionList :: ParserInfo SuggestionFlags
 parseCommandSuggestionList =
     let parser = pure CommandListSuggestions
         modifier = fullDesc <> progDesc "List all suggestions."
-    in info parser modifier
+     in info parser modifier
 
 parseCommandSuggestionReview :: ParserInfo SuggestionFlags
 parseCommandSuggestionReview =
     let parser = pure CommandReviewSuggestion
         modifier = fullDesc <> progDesc "Review the next suggestion."
-    in info parser modifier
+     in info parser modifier
 
 parseCommandExport :: ParserInfo Command
 parseCommandExport =
     let parser = pure CommandExport
         modifier = fullDesc <> progDesc "Export a wolf repository."
-    in info parser modifier
+     in info parser modifier
 
 parseCommandCleanup :: ParserInfo Command
 parseCommandCleanup =
     let parser = pure CommandCleanup
         modifier = fullDesc <> progDesc "Clean up a wolf repository."
-    in info parser modifier
+     in info parser modifier
 
 peopleMap :: ParserEnv -> [String]
 peopleMap =

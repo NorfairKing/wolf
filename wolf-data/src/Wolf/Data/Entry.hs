@@ -32,8 +32,7 @@ import Data.Conduit
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 import Data.Time
-import Data.Yaml as Yaml
-       (ParseException(..), prettyPrintParseException)
+import Data.Yaml as Yaml (ParseException(..), prettyPrintParseException)
 import Data.Yaml.Builder as Yaml
 import Data.Yaml.Parser as Yaml
 import Text.Libyaml as Yaml
@@ -95,27 +94,27 @@ prettyPrintEntryParseException (EntryParseException ye) =
 reconstructPersonEntry :: UTCTime -> PersonEntry -> RawYaml -> Maybe PersonEntry
 reconstructPersonEntry now old new =
     let oldProp = personEntryProperties old
-    in personEntry $ go oldProp new
+     in personEntry $ go oldProp new
   where
     fillWithNow :: RawYaml -> PersonProperty
     fillWithNow (RVal n) =
         PVal
             PersonPropertyValue
-            { personPropertyValueContents = n
-            , personPropertyValueLastUpdatedTimestamp = now
-            }
+                { personPropertyValueContents = n
+                , personPropertyValueLastUpdatedTimestamp = now
+                }
     fillWithNow (RList ns) = PList $ map fillWithNow ns
     fillWithNow (RMap tups) = PMap $ map (second fillWithNow) tups
     go :: PersonProperty -> RawYaml -> PersonProperty
     go (PVal vo) (RVal vn) =
         PVal
             PersonPropertyValue
-            { personPropertyValueContents = vn
-            , personPropertyValueLastUpdatedTimestamp =
-                  if vn == personPropertyValueContents vo
-                      then personPropertyValueLastUpdatedTimestamp vo
-                      else now
-            }
+                { personPropertyValueContents = vn
+                , personPropertyValueLastUpdatedTimestamp =
+                      if vn == personPropertyValueContents vo
+                          then personPropertyValueLastUpdatedTimestamp vo
+                          else now
+                }
     go (PList ol) (RList nl) =
         PList $ zipWith f (map Just ol ++ repeat Nothing) nl
       where
@@ -155,11 +154,11 @@ parseEntryFileContents bs =
     let parse = do
             rawDoc <- runResourceT $ Yaml.decode bs $$ Yaml.sinkRawDoc
             parseRawDoc rawDoc >>= (evaluate . force)
-    in (Right `liftM` parse) `catches`
-       [ Handler $ pure . Left . EntryYamlParseException
-       , Handler $ pure . Left . EntryYamlException
-       , Handler $ pure . Left . EntryParseException
-       ]
+     in (Right `liftM` parse) `catches`
+        [ Handler $ pure . Left . EntryYamlParseException
+        , Handler $ pure . Left . EntryYamlException
+        , Handler $ pure . Left . EntryParseException
+        ]
 
 {-# NOINLINE parseEntryFileContents #-}
 data RawYaml

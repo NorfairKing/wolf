@@ -16,7 +16,7 @@ import Zifter.Hindent
 import Zifter.Hlint
 import Zifter.Stack
 
-import Data.List (sort)
+import Data.List ((\\))
 
 main :: IO ()
 main =
@@ -45,6 +45,10 @@ main =
                           [ Lib "wolf-cli:lib"
                           , Test "wolf-cli:test:wolf-cli-test"
                           ]
+                    , Pkg "wolf-mutt-query"
+                          [ Lib "wolf-mutt-query:lib"
+                          , Test "wolf-mutt-query:test:wolf-mutt-query-test"
+                          ]
                     , Pkg "wolf-client" [Lib "wolf-client:lib"]
                     , Pkg "wolf-server"
                           [ Lib "wolf-server:lib"
@@ -60,8 +64,12 @@ main =
                           , Test "wolf-web-server:test:wolf-web-server-test"
                           ]
                     ]
-            if sort pkgs_ == sort pkgs
-                then do
+            case pkgs_ \\ pkgs of
+                [] -> do
                     stack "build"
                     mapM_ bePedanticAboutPackage pkgs
-                else fail "Not all packages are pedanticly built."
+                dpkgs ->
+                    fail $
+                    unlines $
+                    "Not all packages are pedanticly built, these are not: " :
+                    map show dpkgs
