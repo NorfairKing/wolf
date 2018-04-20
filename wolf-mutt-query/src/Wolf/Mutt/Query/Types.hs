@@ -7,7 +7,7 @@ module Wolf.Mutt.Query.Types
 
 import Import
 
-type SearchQuery = String
+type SearchQuery = Text
 
 data SearchResult = SearchResult
     { searchResultEmailAddress :: Text

@@ -8,6 +8,8 @@ import Wolf.Data
 
 import Wolf.Cli.OptParse.Types (DataFlags(..))
 
+import Wolf.Mutt.Query.Types
+
 data Arguments =
     Arguments Command
               Flags
@@ -37,7 +39,7 @@ data Configuration =
 instance Validity Configuration
 
 newtype Dispatch =
-    DispatchQuery Text
+    DispatchQuery SearchQuery
     deriving (Show, Eq, Generic)
 
 instance Validity Dispatch

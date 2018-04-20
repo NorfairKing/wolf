@@ -19,6 +19,8 @@ library:
   - Wolf.Mutt.Query.OptParse.Types
   - Wolf.Mutt.Query.Types
   dependencies:
+  - email-validate
+  - mtl
   - optparse-applicative
   - text
   - validity
@@ -55,3 +57,4 @@ tests:
     - genvalidity-text
     - hspec
     - wolf-mutt-query
+    - wolf-test-utils

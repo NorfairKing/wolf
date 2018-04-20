@@ -2,6 +2,9 @@
 
 module Wolf.Mutt.Query.OptParse
     ( getInstructions
+    , Instructions(..)
+    , Dispatch(..)
+    , Settings(..)
     ) where
 
 import Import

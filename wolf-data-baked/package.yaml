@@ -26,6 +26,7 @@ dependencies:
 - validity-text
 - validity-time
 - validity-uuid
+- email-validate
 - wolf-data
 library:
   source-dirs: src/
