@@ -1,6 +1,6 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module Wolf.Mutt.Query.OptParse
+module Wolf.Mutt.OptParse
     ( getInstructions
     , Instructions(..)
     , Dispatch(..)
@@ -17,7 +17,7 @@ import Options.Applicative
 
 import Wolf.Cli.OptParse (deriveDataSettings, parseDataFlags')
 
-import Wolf.Mutt.Query.OptParse.Types
+import Wolf.Mutt.OptParse.Types
 
 getInstructions :: IO Instructions
 getInstructions = do
@@ -54,7 +54,7 @@ runArgumentsParser = execParserPure prefs_ argParser
             }
 
 argParser :: ParserInfo Arguments
-argParser = info (helper <*> parseArgs) (fullDesc <> progDesc "Wolf")
+argParser = info (helper <*> parseArgs) (fullDesc <> progDesc "wolf-mutt")
 
 parseArgs :: Parser Arguments
 parseArgs = Arguments <$> parseCommand <*> parseFlags

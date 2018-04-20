@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module Wolf.Mutt.Query.OptParse.Types where
+module Wolf.Mutt.OptParse.Types where
 
 import Import
 

@@ -45,9 +45,9 @@ main =
                           [ Lib "wolf-cli:lib"
                           , Test "wolf-cli:test:wolf-cli-test"
                           ]
-                    , Pkg "wolf-mutt-query"
-                          [ Lib "wolf-mutt-query:lib"
-                          , Test "wolf-mutt-query:test:wolf-mutt-query-test"
+                    , Pkg "wolf-mutt"
+                          [ Lib "wolf-mutt:lib"
+                          , Test "wolf-mutt:test:wolf-mutt-test"
                           ]
                     , Pkg "wolf-client" [Lib "wolf-client:lib"]
                     , Pkg "wolf-server"

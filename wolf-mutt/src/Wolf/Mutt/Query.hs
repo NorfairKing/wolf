@@ -1,4 +1,5 @@
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Wolf.Mutt.Query
@@ -23,12 +24,12 @@ import Text.Email.Validate as EmailAddress (toByteString)
 import Wolf.Data
 import Wolf.Data.Baked (EmailAddressWithPurpose(..), fromEntry)
 
-import Wolf.Mutt.Query.OptParse
+import Wolf.Mutt.OptParse
 import Wolf.Mutt.Query.Types
 
-wolfMuttQuery :: IO ()
-wolfMuttQuery = do
-    Instructions (DispatchQuery q) (Settings dataSets) <- getInstructions
+wolfMuttQuery :: (MonadIO m, MonadReader Settings m) => SearchQuery -> m ()
+wolfMuttQuery q = do
+    dataSets <- asks setDataSets
     results <-
         flip runReaderT dataSets $ do
             ix <- getIndexWithDefault
@@ -39,7 +40,7 @@ wolfMuttQuery = do
                             mpe <- getPersonEntry uuid
                             pure $ searchResultsFor a mpe
                         else pure []
-    TIO.putStr $ formatSearchResults results
+    liftIO $ TIO.putStr $ formatSearchResults results
 
 searchResultsFor :: Alias -> Maybe PersonEntry -> [SearchResult]
 searchResultsFor _ Nothing = []

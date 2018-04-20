@@ -1,4 +1,4 @@
-name: wolf-mutt-query
+name: wolf-mutt
 version: '0.0.0.0'
 category: People
 author: Tom Sydney Kerckhove
@@ -14,9 +14,10 @@ library:
   - NoImplicitPrelude
   ghc-options: -Wall
   exposed-modules:
+  - Wolf.Mutt
+  - Wolf.Mutt.OptParse
+  - Wolf.Mutt.OptParse.Types
   - Wolf.Mutt.Query
-  - Wolf.Mutt.Query.OptParse
-  - Wolf.Mutt.Query.OptParse.Types
   - Wolf.Mutt.Query.Types
   dependencies:
   - email-validate
@@ -30,7 +31,7 @@ library:
   - wolf-data-baked >=0.0 && <0.1
 
 executables:
-  wolf-mutt-query:
+  wolf-mutt:
     main: Main.hs
     source-dirs: app/
     ghc-options:
@@ -38,10 +39,10 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - wolf-mutt-query
+    - wolf-mutt
 
 tests:
-  wolf-mutt-query-test:
+  wolf-mutt-test:
     main: Spec.hs
     source-dirs: test/
     default-extensions:
@@ -56,5 +57,5 @@ tests:
     - genvalidity-hspec
     - genvalidity-text
     - hspec
-    - wolf-mutt-query
+    - wolf-mutt
     - wolf-test-utils

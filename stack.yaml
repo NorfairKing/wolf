@@ -6,10 +6,10 @@ packages:
 - wolf-data
 - wolf-data-baked
 - wolf-google
+- wolf-mutt
 - wolf-server
-- wolf-web-server
 - wolf-test-utils
-- wolf-mutt-query
+- wolf-web-server
 
 extra-deps:
 - servant-quickcheck-0.0.2.4
