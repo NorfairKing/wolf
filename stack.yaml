@@ -5,6 +5,7 @@ packages:
 - wolf-cub
 - wolf-data
 - wolf-data-baked
+- wolf-email
 - wolf-google
 - wolf-mutt
 - wolf-server
