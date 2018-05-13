@@ -21,5 +21,9 @@ extra-deps:
   subdirs:
     - typed-uuid
     - genvalidity-typed-uuid
-
+- mime-0.4.0.2
+- git: https://github.com/mkawalec/emailparse
+  commit: 39987dc1c2159b0660521824323e1f3974a233f0
+- either-4.4.1.1
+- strptime-1.0.10
 resolver: lts-10.2

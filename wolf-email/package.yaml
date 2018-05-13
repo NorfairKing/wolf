@@ -20,7 +20,9 @@ library:
   - Wolf.Email.Suggest
   - Wolf.Email.Suggest.Types
   dependencies:
-  - email-validate
+  - bytestring
+  - emailparse
+  - mime
   - mtl
   - optparse-applicative
   - text
