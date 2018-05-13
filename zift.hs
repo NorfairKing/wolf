@@ -59,6 +59,10 @@ main =
                           [ Lib "wolf-google:lib"
                           , Test "wolf-google:test:wolf-google-test"
                           ]
+                    , Pkg "wolf-email"
+                          [ Lib "wolf-email:lib"
+                          , Test "wolf-email:test:wolf-email-test"
+                          ]
                     , Pkg "wolf-web-server"
                           [ Lib "wolf-web-server:lib"
                           , Test "wolf-web-server:test:wolf-web-server-test"

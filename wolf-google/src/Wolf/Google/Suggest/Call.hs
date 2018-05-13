@@ -62,10 +62,10 @@ wolfScopes = contactsReadOnlyScope
 wolfOauthClient :: OAuthClient
 wolfOauthClient =
     OAuthClient
-        { _clientId =
-              "130660029870-3e5q0l0nde157qkaehe5i3ib3tq730n7.apps.googleusercontent.com"
-        , _clientSecret = "oqz9acOZo7JSSw3UUYGHmbFK"
-        }
+    { _clientId =
+          "130660029870-3e5q0l0nde157qkaehe5i3ib3tq730n7.apps.googleusercontent.com"
+    , _clientSecret = "oqz9acOZo7JSSw3UUYGHmbFK"
+    }
 
 getUserAuth ::
        forall s proxy. AllowScopes (s :: [Symbol])

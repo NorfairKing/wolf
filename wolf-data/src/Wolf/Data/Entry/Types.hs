@@ -47,15 +47,15 @@ instance FromJSON PersonEntry where
              strs <- o .: "personEntryProperties"
              pure
                  PersonEntry
-                     { personEntryProperties =
-                           PMap $
-                           map
-                               (second
-                                    (PVal .
-                                     (`PersonPropertyValue` unsafePerformIO
-                                                                getCurrentTime)))
-                               (M.toList strs)
-                     })
+                 { personEntryProperties =
+                       PMap $
+                       map
+                           (second
+                                (PVal .
+                                 (`PersonPropertyValue` unsafePerformIO
+                                                            getCurrentTime)))
+                           (M.toList strs)
+                 })
             ob <|>
         (withObject "PersonEntry" $ \o -> PersonEntry <$> o .: "properties") ob
 
@@ -79,7 +79,7 @@ instance Validity PersonProperty where
             [ isValid tups
             , not (null tups)
             , let ls = map fst tups
-               in nub ls == ls
+              in nub ls == ls
             ]
 
 instance Hashable PersonProperty

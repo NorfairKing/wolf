@@ -98,7 +98,7 @@ addAliases aliases uuid origIndex =
         then Nothing
         else let index =
                      foldl (\ix a -> addIndexEntry a uuid ix) origIndex aliases
-              in Just index
+             in Just index
 
 addAlias :: Alias -> PersonUuid -> Index -> Maybe Index
 addAlias a = addAliases [a]

@@ -39,9 +39,9 @@ spec =
                                     clientPostSetPersonAlias
                                         ad
                                         SetPersonAlias
-                                            { setPersonAliasPersonUuid = uuid
-                                            , setPersonAliasAlias = alias
-                                            }
+                                        { setPersonAliasPersonUuid = uuid
+                                        , setPersonAliasAlias = alias
+                                        }
                                     uuid' <- clientGetPersonByAlias ad alias
                                     pure (uuid, uuid')
                             uuid' `shouldBe` uuid

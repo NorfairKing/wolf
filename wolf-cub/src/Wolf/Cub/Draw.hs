@@ -59,7 +59,7 @@ drawPerson now PersonState {..} = [helpUI | personStateShowHelp] ++ [personUI]
         case personStateEntry of
             Nothing ->
                 let str_ = "No entry found."
-                 in str str_
+                in str str_
             Just pe -> personEntryWidget now pe
     personNotesPart =
         vLimit 1 (center (withAttr headerAttr $ txt "Notes")) <=>
@@ -90,9 +90,9 @@ personEntryWidget now pe = go $ personEntryProperties pe
         vBox $
         flip map tups $ \(k, v) ->
             let leftSide = withAttr entryKeyAttr (txt k) <+> txt ": "
-             in case v of
-                    (PVal _) -> leftSide <+> go v
-                    _ -> leftSide <=> padLeft (Pad 2) (go v)
+            in case v of
+                   (PVal _) -> leftSide <+> go v
+                   _ -> leftSide <=> padLeft (Pad 2) (go v)
 
 drawEditPerson :: EditPersonState -> [Widget ResourceName]
 drawEditPerson eps = [editUi]

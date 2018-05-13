@@ -7,9 +7,7 @@ import Import
 import Wolf.Data
 
 import Wolf.Cli.Command.Suggestion.Internal
-    ( renderEntrySuggestion
-    , renderSuggestion
-    )
+       (renderEntrySuggestion, renderSuggestion)
 import Wolf.Cli.OptParse.Types
 import Wolf.Cli.Report
 import Wolf.Cli.Utils

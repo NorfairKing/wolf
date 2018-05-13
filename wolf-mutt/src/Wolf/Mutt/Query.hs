@@ -48,11 +48,11 @@ searchResultsFor a (Just pe) = do
     EmailAddressWithPurpose mpur ea <- fromEntry pe :: [EmailAddressWithPurpose]
     pure
         SearchResult
-            { searchResultEmailAddress =
-                  TE.decodeUtf8 $ EmailAddress.toByteString ea
-            , searchResultLongName = aliasText a
-            , searchResultOtherInfo = fromMaybe "" mpur
-            }
+        { searchResultEmailAddress =
+              TE.decodeUtf8 $ EmailAddress.toByteString ea
+        , searchResultLongName = aliasText a
+        , searchResultOtherInfo = fromMaybe "" mpur
+        }
 
 matchesAlias :: SearchQuery -> Alias -> Bool
 matchesAlias q = matchesText q . aliasText

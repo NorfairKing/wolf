@@ -25,7 +25,9 @@ library:
   - mime
   - mtl
   - optparse-applicative
+  - path
   - text
+  - time
   - validity
   - validity-text
   - wolf-cli >=0.0 && <0.1

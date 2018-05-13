@@ -20,11 +20,11 @@ makeSuggestionProperty now = suggestionProperty now . deduplicateGathering
 deduplicateGathering :: GatheredPerson -> GatheredPerson
 deduplicateGathering GatheredPerson {..} =
     GatheredPerson
-        { gatheredPersonAliases = nub gatheredPersonAliases
-        , gatheredPersonNames = nub gatheredPersonNames
-        , gatheredPersonEmails = nub gatheredPersonEmails
-        , gatheredPersonPhoneNumbers = nub gatheredPersonPhoneNumbers
-        }
+    { gatheredPersonAliases = nub gatheredPersonAliases
+    , gatheredPersonNames = nub gatheredPersonNames
+    , gatheredPersonEmails = nub gatheredPersonEmails
+    , gatheredPersonPhoneNumbers = nub gatheredPersonPhoneNumbers
+    }
 
 suggestionProperty :: UTCTime -> GatheredPerson -> ([Alias], PersonProperty)
 suggestionProperty now GatheredPerson {..} = (aliases, PMap $ ns ++ es ++ ps)
@@ -43,13 +43,13 @@ suggestionProperty now GatheredPerson {..} = (aliases, PMap $ ns ++ es ++ ps)
         singleOrListMap "name" $
         flip map gatheredPersonNames $ \n ->
             let mval tk func = (,) tk <$> (val now <$> func n)
-             in catMaybes
-                    [ mval "prefix" gatheredNamePrefix
-                    , mval "first name" gatheredNameFirstName
-                    , mval "middle name" gatheredNameMiddleName
-                    , mval "last name" gatheredNameLastName
-                    , mval "suffix" gatheredNameSuffix
-                    ]
+            in catMaybes
+                   [ mval "prefix" gatheredNamePrefix
+                   , mval "first name" gatheredNameFirstName
+                   , mval "middle name" gatheredNameMiddleName
+                   , mval "last name" gatheredNameLastName
+                   , mval "suffix" gatheredNameSuffix
+                   ]
     singleOrList _ [] = []
     singleOrList key [v] = [(key, v)]
     singleOrList key vs = [(key, PList vs)]
@@ -60,6 +60,6 @@ val :: UTCTime -> Text -> PersonProperty
 val now t =
     PVal
         PersonPropertyValue
-            { personPropertyValueLastUpdatedTimestamp = now
-            , personPropertyValueContents = t
-            }
+        { personPropertyValueLastUpdatedTimestamp = now
+        , personPropertyValueContents = t
+        }

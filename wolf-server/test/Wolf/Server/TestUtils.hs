@@ -97,19 +97,19 @@ withValidNewUser cenv func =
                 let snf =
                         expectationFailure $
                         "Registration should not fail with error: " <> show err
-                 in case err of
-                        FailureResponse {} ->
-                            if statusCode (responseStatus err) == 409
-                                then pure () -- Username already exists, just stop here then.
-                                else snf
-                        _ -> snf
+                in case err of
+                       FailureResponse {} ->
+                           if statusCode (responseStatus err) == 409
+                               then pure () -- Username already exists, just stop here then.
+                               else snf
+                       _ -> snf
             Right _ -> do
                 let basicAuthData =
                         BasicAuthData
-                            { basicAuthUsername =
-                                  TE.encodeUtf8 $
-                                  usernameText $ registerUsername register
-                            , basicAuthPassword =
-                                  TE.encodeUtf8 $ registerPassword register
-                            }
+                        { basicAuthUsername =
+                              TE.encodeUtf8 $
+                              usernameText $ registerUsername register
+                        , basicAuthPassword =
+                              TE.encodeUtf8 $ registerPassword register
+                        }
                 func basicAuthData

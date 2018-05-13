@@ -56,10 +56,10 @@ postNewNoteR = do
         noteUuid <-
             createNewNote
                 Note
-                    { noteContents = newNoteContents
-                    , noteTimestamp = now
-                    , noteRelevantPeople = S.singleton newNotePerson
-                    }
+                { noteContents = newNoteContents
+                , noteTimestamp = now
+                , noteRelevantPeople = S.singleton newNotePerson
+                }
         makeGitCommit $
             unwords
                 [ "Added note on person with uuid"

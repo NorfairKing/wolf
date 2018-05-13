@@ -1,5 +1,3 @@
-{-# LANGUAGE TypeApplications #-}
-
 module Wolf.Email.Suggest.TypesSpec
     ( spec
     ) where

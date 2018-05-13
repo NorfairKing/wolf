@@ -1,4 +1,6 @@
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
 
@@ -12,10 +14,13 @@ import qualified Data.ByteString as SB
 import Data.List (find)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
+import Data.Time
 
 import System.Exit
 
 import Control.Monad.Reader
+
+import Path
 
 import qualified Codec.MIME.Parse as Email
 import qualified Codec.MIME.Type as Email
@@ -36,15 +41,37 @@ wolfEmailSuggest = do
     let headers = Email.mime_val_headers message
     -- liftIO $ mapM_ print headers
     let personParams =
-            catMaybes $
-            map
+            mapMaybe
                 (\hn -> find ((== hn) . Email.paramName) headers)
                 ["from", "to", "cc"]
     liftIO $ mapM_ print personParams
     let addresses =
             fmap concat $
             forM personParams $ Email.parseEmailAddressList . Email.paramValue
-    liftIO $
+    liftIO $ do
+        now <- getCurrentTime
         case addresses of
             Left err -> die $ T.unpack err
-            Right as -> mapM_ print as
+            Right as ->
+                mapM_ print $
+                flip mapMaybe as $ \a ->
+                    case emailLabel a of
+                        Nothing -> Nothing
+                        Just label ->
+                            Just
+                                Suggestion
+                                { suggestionSuggestor = "wolf-email"
+                                , suggestionReason =
+                                      "There was an email with this data"
+                                , suggestionTimestamp = now
+                                , suggestionData =
+                                      EmailNameSuggestion
+                                      { emailSuggestionName = label
+                                      , emailSuggestionEmailAddress =
+                                            emailAddress a
+                                      }
+                                }
+
+emailNameSuggestionType :: SuggestionType
+emailNameSuggestionType =
+    SuggestionType {suggestionTypePath = $(mkRelDir "email-name")}

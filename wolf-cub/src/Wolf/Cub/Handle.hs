@@ -43,11 +43,11 @@ handleEventShowPersonList state e pls@PersonListState {..} =
         (VtyEvent ve) ->
             if personListStateShowHelp
                 then let unhelp = setPersonListShowHelp state pls False
-                      in case ve of
-                             (EvKey V.KEsc []) -> unhelp
-                             (EvKey (V.KChar 'q') []) -> unhelp
-                             (EvKey (V.KChar 'h') []) -> unhelp
-                             _ -> continue state
+                     in case ve of
+                            (EvKey V.KEsc []) -> unhelp
+                            (EvKey (V.KChar 'q') []) -> unhelp
+                            (EvKey (V.KChar 'h') []) -> unhelp
+                            _ -> continue state
                 else case personListStateSearchBox of
                          Nothing ->
                              case ve of
@@ -72,14 +72,10 @@ handleEventShowPersonList state e pls@PersonListState {..} =
                                              personListStatePeopleList
                                      let ns =
                                              pls
-                                                 { personListStatePeopleList =
-                                                       nl
-                                                 }
+                                             {personListStatePeopleList = nl}
                                      continue $
                                          state
-                                             { cubStateShown =
-                                                   CubShowPersonList ns
-                                             }
+                                         {cubStateShown = CubShowPersonList ns}
                          Just sb ->
                              let unsearch =
                                      continue $
@@ -87,29 +83,28 @@ handleEventShowPersonList state e pls@PersonListState {..} =
                                          state
                                          pls
                                          Nothing
-                              in case ve of
-                                     (EvKey V.KEsc []) -> unsearch
-                                     (EvKey V.KEnter []) -> unsearch
-                                     _ -> do
-                                         let sb' = handleSearchBox sb ve
-                                         let pls' =
-                                                 pls
-                                                     { personListStateSearchBox =
-                                                           Just sb'
-                                                     }
-                                         let state' =
-                                                 state
-                                                     { cubStateShown =
-                                                           CubShowPersonList
-                                                               pls'
-                                                     }
-                                         continue $
-                                             if sb == sb'
-                                                 then state'
-                                                 else refreshListFromSearch
-                                                          state'
-                                                          pls'
-                                                          sb'
+                             in case ve of
+                                    (EvKey V.KEsc []) -> unsearch
+                                    (EvKey V.KEnter []) -> unsearch
+                                    _ -> do
+                                        let sb' = handleSearchBox sb ve
+                                        let pls' =
+                                                pls
+                                                { personListStateSearchBox =
+                                                      Just sb'
+                                                }
+                                        let state' =
+                                                state
+                                                { cubStateShown =
+                                                      CubShowPersonList pls'
+                                                }
+                                        continue $
+                                            if sb == sb'
+                                                then state'
+                                                else refreshListFromSearch
+                                                         state'
+                                                         pls'
+                                                         sb'
         _ -> continue state
 
 setPersonListShowHelp ::
@@ -117,9 +112,7 @@ setPersonListShowHelp ::
 setPersonListShowHelp state pls b =
     continue
         state
-            { cubStateShown =
-                  CubShowPersonList pls {personListStateShowHelp = b}
-            }
+        {cubStateShown = CubShowPersonList pls {personListStateShowHelp = b}}
 
 showNewSearchBox :: CubState -> PersonListState -> EventM n (Next CubState)
 showNewSearchBox state pls@PersonListState {..} =
@@ -135,7 +128,7 @@ setPersonListShowSearchBox ::
     -> CubState
 setPersonListShowSearchBox state pls msb =
     state
-        {cubStateShown = CubShowPersonList pls {personListStateSearchBox = msb}}
+    {cubStateShown = CubShowPersonList pls {personListStateSearchBox = msb}}
 
 refreshListFromSearch ::
        CubState
@@ -144,17 +137,17 @@ refreshListFromSearch ::
     -> CubState
 refreshListFromSearch state pls sb =
     state
-        { cubStateShown =
-              CubShowPersonList
-                  pls
-                      { personListStatePeopleList =
-                            first alias <$>
-                            list
-                                "person-list"
-                                (V.fromList $ searchBoxCurrentlySelected sb)
-                                1
-                      }
-        }
+    { cubStateShown =
+          CubShowPersonList
+              pls
+              { personListStatePeopleList =
+                    first alias <$>
+                    list
+                        "person-list"
+                        (V.fromList $ searchBoxCurrentlySelected sb)
+                        1
+              }
+    }
 
 handleEventShowPerson ::
        CubState
@@ -166,27 +159,27 @@ handleEventShowPerson state e ps@PersonState {..} =
         (VtyEvent ve) ->
             if personStateShowHelp
                 then let unhelp = setPersonShowHelp state ps False
-                      in case ve of
-                             (EvKey V.KEsc []) -> unhelp
-                             (EvKey (V.KChar 'q') []) -> unhelp
-                             (EvKey (V.KChar 'h') []) -> unhelp
-                             _ -> continue state
+                     in case ve of
+                            (EvKey V.KEsc []) -> unhelp
+                            (EvKey (V.KChar 'q') []) -> unhelp
+                            (EvKey (V.KChar 'h') []) -> unhelp
+                            _ -> continue state
                 else let unpop = showPersonList state
-                      in case ve of
-                             (EvKey V.KEsc []) -> unpop
-                             (EvKey (V.KChar 'q') []) -> unpop
-                             (EvKey (V.KChar 'h') []) ->
-                                 setPersonShowHelp state ps True
-                             (EvKey (V.KChar 'e') []) ->
-                                 editPerson state personStateUuid
-                             _ -> do
-                                 nl <- handleListEvent ve personStateNotes
-                                 continue $
-                                     state
-                                         { cubStateShown =
-                                               CubShowPerson $
-                                               ps {personStateNotes = nl}
-                                         }
+                     in case ve of
+                            (EvKey V.KEsc []) -> unpop
+                            (EvKey (V.KChar 'q') []) -> unpop
+                            (EvKey (V.KChar 'h') []) ->
+                                setPersonShowHelp state ps True
+                            (EvKey (V.KChar 'e') []) ->
+                                editPerson state personStateUuid
+                            _ -> do
+                                nl <- handleListEvent ve personStateNotes
+                                continue $
+                                    state
+                                    { cubStateShown =
+                                          CubShowPerson $
+                                          ps {personStateNotes = nl}
+                                    }
         _ -> continue state
 
 setPersonShowHelp :: CubState -> PersonState -> Bool -> EventM n (Next CubState)
@@ -212,10 +205,10 @@ handleEditPerson state e eps@EditPersonState {..} =
                             editPersonStatePropertyEditor
                     continue $
                         state
-                            { cubStateShown =
-                                  CubEditPerson $
-                                  eps {editPersonStatePropertyEditor = ne}
-                            }
+                        { cubStateShown =
+                              CubEditPerson $
+                              eps {editPersonStatePropertyEditor = ne}
+                        }
         _ -> continue state
   where
     unpop = do
@@ -244,30 +237,30 @@ showPerson state personUuid = do
     let nl = list "notes" (V.fromList ns) 1
     continue $
         state
-            { cubStateShown =
-                  CubShowPerson
-                      PersonState
-                          { personStateUuid = personUuid
-                          , personStateEntry = mpe
-                          , personStateNotes = nl
-                          , personStateShowHelp = False
-                          }
-            }
+        { cubStateShown =
+              CubShowPerson
+                  PersonState
+                  { personStateUuid = personUuid
+                  , personStateEntry = mpe
+                  , personStateNotes = nl
+                  , personStateShowHelp = False
+                  }
+        }
 
 showPersonList :: CubState -> EventM n (Next CubState)
 showPersonList state = do
     index <- runReaderT getIndexWithDefault $ cubStateDataSettings state
     continue $
         state
-            { cubStateShown =
-                  CubShowPersonList
-                      PersonListState
-                          { personListStateInitialPeople = indexTuples index
-                          , personListStatePeopleList = makePersonList index
-                          , personListStateShowHelp = False
-                          , personListStateSearchBox = Nothing
-                          }
-            }
+        { cubStateShown =
+              CubShowPersonList
+                  PersonListState
+                  { personListStateInitialPeople = indexTuples index
+                  , personListStatePeopleList = makePersonList index
+                  , personListStateShowHelp = False
+                  , personListStateSearchBox = Nothing
+                  }
+        }
 
 editPerson :: CubState -> PersonUuid -> EventM n (Next CubState)
 editPerson state personUuid = do
@@ -276,13 +269,13 @@ editPerson state personUuid = do
         flip runReaderT (cubStateDataSettings state) $ getPersonEntry personUuid
     continue $
         state
-            { cubStateShown =
-                  CubEditPerson
-                      EditPersonState
-                          { editPersonStateUuid = personUuid
-                          , editPersonStateStartingEntry = mpe
-                          , editPersonStatePropertyEditor =
-                                propertyEditor "edit-person" $
-                                personEntryProperties <$> mpe
-                          }
-            }
+        { cubStateShown =
+              CubEditPerson
+                  EditPersonState
+                  { editPersonStateUuid = personUuid
+                  , editPersonStateStartingEntry = mpe
+                  , editPersonStatePropertyEditor =
+                        propertyEditor "edit-person" $
+                        personEntryProperties <$> mpe
+                  }
+        }

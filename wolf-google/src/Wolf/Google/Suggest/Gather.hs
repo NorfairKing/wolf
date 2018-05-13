@@ -14,11 +14,11 @@ import Wolf.Google.Suggest.Types
 gatherData :: Person -> GatheredPerson
 gatherData p =
     GatheredPerson
-        { gatheredPersonAliases = gatherAliases p
-        , gatheredPersonNames = gatherNames p
-        , gatheredPersonEmails = gatherEmails p
-        , gatheredPersonPhoneNumbers = gatherPhoneNumbers p
-        }
+    { gatheredPersonAliases = gatherAliases p
+    , gatheredPersonNames = gatherNames p
+    , gatheredPersonEmails = gatherEmails p
+    , gatheredPersonPhoneNumbers = gatherPhoneNumbers p
+    }
 
 gatherAliases :: Person -> [Alias]
 gatherAliases p =
@@ -31,12 +31,12 @@ gatherNames :: Person -> [GatheredName]
 gatherNames p =
     flip map (p ^. perNames) $ \n ->
         GatheredName
-            { gatheredNamePrefix = n ^. nHonorificPrefix
-            , gatheredNameFirstName = n ^. nGivenName
-            , gatheredNameMiddleName = n ^. nMiddleName
-            , gatheredNameLastName = n ^. nFamilyName
-            , gatheredNameSuffix = n ^. nHonorificSuffix
-            }
+        { gatheredNamePrefix = n ^. nHonorificPrefix
+        , gatheredNameFirstName = n ^. nGivenName
+        , gatheredNameMiddleName = n ^. nMiddleName
+        , gatheredNameLastName = n ^. nFamilyName
+        , gatheredNameSuffix = n ^. nHonorificSuffix
+        }
 
 gatherEmails :: Person -> [Text]
 gatherEmails p = flip mapMaybe (p ^. perEmailAddresses) $ \ea -> ea ^. eaValue

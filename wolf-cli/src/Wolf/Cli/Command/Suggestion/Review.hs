@@ -20,9 +20,7 @@ import Wolf.Data
 import Wolf.Data.Git
 
 import Wolf.Cli.Command.Suggestion.Internal
-    ( renderEntrySuggestion
-    , renderSuggestion
-    )
+       (renderEntrySuggestion, renderSuggestion)
 import Wolf.Cli.Editor
 import Wolf.Cli.OptParse.Types
 import Wolf.Cli.Prompt
@@ -153,12 +151,12 @@ showData s@Suggestion {..} = do
                     , "Score: " <> stringReport (show score)
                     ] ++
                     let yellow = colored [SetColor Foreground Dull Yellow]
-                     in case mentry of
-                            Nothing -> [yellow "No entry found."]
-                            Just entry ->
-                                [ yellow "Entry: "
-                                , textReport $ entryContents entry
-                                ]
+                    in case mentry of
+                           Nothing -> [yellow "No entry found."]
+                           Just entry ->
+                               [ yellow "Entry: "
+                               , textReport $ entryContents entry
+                               ]
     let infoReport =
             unlinesReport
                 [ white "Suggestion:"

@@ -35,10 +35,10 @@ serveGetPersonEntry acc personUuid = do
         Nothing ->
             throwError $
             err404
-                { errBody =
-                      "Person entry for person with uuid " <> uuidLBs personUuid <>
-                      " not found."
-                }
+            { errBody =
+                  "Person entry for person with uuid " <> uuidLBs personUuid <>
+                  " not found."
+            }
         Just pe -> pure pe
 
 servePostNewPerson :: Account -> PersonEntry -> WolfHandler PersonUuid
@@ -54,11 +54,11 @@ serveGetPersonByAlias acc key = do
         Nothing ->
             throwError $
             err404
-                { errBody =
-                      "Person uuid for person with alias " <>
-                      LB.fromStrict (TE.encodeUtf8 $ aliasText key) <>
-                      " not found."
-                }
+            { errBody =
+                  "Person uuid for person with alias " <>
+                  LB.fromStrict (TE.encodeUtf8 $ aliasText key) <>
+                  " not found."
+            }
         Just personUuid -> pure personUuid
 
 servePostPersonSetAlias :: Account -> SetPersonAlias -> WolfHandler ()

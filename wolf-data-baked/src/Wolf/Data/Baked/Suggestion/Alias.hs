@@ -34,9 +34,9 @@ makeAliasSuggestions = do
                                 else do
                                     let asug =
                                             AliasSuggestion
-                                                { aliasSuggestionPerson = puuid
-                                                , aliasSuggestionAlias = sa
-                                                }
+                                            { aliasSuggestionPerson = puuid
+                                            , aliasSuggestionAlias = sa
+                                            }
                                     let sas = finaliseAliasSuggestion asug now
                                     pure [sas]
     addUnusedSuggestions aliasSuggestionType $ S.fromList $ concat sugs
@@ -45,12 +45,12 @@ finaliseAliasSuggestion ::
        AliasSuggestion -> UTCTime -> Suggestion AliasSuggestion
 finaliseAliasSuggestion as t =
     Suggestion
-        { suggestionSuggestor = "Alias suggestor"
-        , suggestionReason =
-              "The entry contained enough information to suggest this alias."
-        , suggestionTimestamp = t
-        , suggestionData = as
-        }
+    { suggestionSuggestor = "Alias suggestor"
+    , suggestionReason =
+          "The entry contained enough information to suggest this alias."
+    , suggestionTimestamp = t
+    , suggestionData = as
+    }
 
 suggestedAliasFor :: PersonEntry -> Maybe Alias
 suggestedAliasFor pe = alias <$> renderName (fromEntry pe)

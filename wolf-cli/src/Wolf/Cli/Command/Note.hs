@@ -39,10 +39,10 @@ note people =
                 contents <- liftIO $ T.readFile $ toFilePath tnf
                 let n =
                         Note
-                            { noteContents = contents
-                            , noteTimestamp = now
-                            , noteRelevantPeople = S.fromList peopleUuids
-                            }
+                        { noteContents = contents
+                        , noteTimestamp = now
+                        , noteRelevantPeople = S.fromList peopleUuids
+                        }
                 putIndex index
                 noteUuid <- createNewNote n
                 makeGitCommit $
