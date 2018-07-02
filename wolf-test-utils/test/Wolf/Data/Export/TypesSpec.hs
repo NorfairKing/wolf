@@ -15,3 +15,10 @@ spec = do
     eqSpec @Repo
     genValidSpec @Repo
     jsonSpecOnValid @Repo
+    eqSpec @ExportProblem
+    genValidSpec @ExportProblem
+    eqSpec @ExportWarning
+    genValidSpec @ExportWarning
+    monoidSpecOnValid @ExportWarning
+    eqSpec @ExportError
+    genValidSpec @ExportError
