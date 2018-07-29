@@ -1,10 +1,10 @@
-FROM fpco/ubuntu-with-libgmp:14.04
+FROM ubuntu:18.04
 
 ARG PORT=8000
 ARG API_PORT=8001
 
 run apt-get -y update
-run apt-get -y install software-properties-common python-software-properties
+run apt-get -y install libgmp10 software-properties-common
 run add-apt-repository -y ppa:git-core/ppa
 run apt-get -y update
 run apt-get -y install git
