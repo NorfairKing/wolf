@@ -22,7 +22,7 @@ note people =
         origIndex <- getIndexWithDefault
         (peopleUuids, index) <-
             getRelevantPeopleUuidsAndNewIndex people origIndex
-        tnf <- tmpNoteFile peopleUuids
+        tnf <- tmpNoteFile
         liftIO $ ignoringAbsence $ removeFile tnf
         editingResult <- startEditorOn tnf
         case editingResult of
@@ -64,7 +64,8 @@ getRelevantPeopleUuidsAndNewIndex (t:ts) origIndex = do
     (puuids, index') <- getRelevantPeopleUuidsAndNewIndex ts index
     pure (personUuid : puuids, index')
 
-tmpNoteFile :: MonadIO m => [PersonUuid] -> m (Path Abs File)
-tmpNoteFile uuids = do
+tmpNoteFile :: MonadIO m =>  m (Path Abs File)
+tmpNoteFile = do
     tmpDir <- liftIO getTempDir
-    liftIO $ resolveFile tmpDir $ concatMap uuidString uuids ++ ".txt"
+    uuid <- nextRandomUUID
+    liftIO $ resolveFile tmpDir $ uuidString uuid ++ ".txt"
