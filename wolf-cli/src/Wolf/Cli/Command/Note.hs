@@ -64,7 +64,7 @@ getRelevantPeopleUuidsAndNewIndex (t:ts) origIndex = do
     (puuids, index') <- getRelevantPeopleUuidsAndNewIndex ts index
     pure (personUuid : puuids, index')
 
-tmpNoteFile :: MonadIO m =>  m (Path Abs File)
+tmpNoteFile :: MonadIO m => m (Path Abs File)
 tmpNoteFile = do
     tmpDir <- liftIO getTempDir
     uuid <- nextRandomUUID

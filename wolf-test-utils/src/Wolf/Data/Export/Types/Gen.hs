@@ -38,7 +38,7 @@ instance GenValid Repo where
                         else do
                             a <- genValid
                             go (addIndexEntry a puuid ix) puuid
-            in foldM go newIndex eps
+             in foldM go newIndex eps
         -- For some people, make a person entry.
         repoPersonEntries <-
             fmap (M.fromList . catMaybes) $
@@ -76,7 +76,7 @@ removeRelevantPeople note = note {noteRelevantPeople = S.empty}
 updateNotes :: Map NoteUuid Note -> (PersonUuid, NoteIndex) -> Map NoteUuid Note
 updateNotes noteMap (pu, ni) =
     let noteUuids = S.toList $ noteIndexSet ni
-    in foldl' (addRelevantPerson pu) noteMap noteUuids
+     in foldl' (addRelevantPerson pu) noteMap noteUuids
 
 addRelevantPerson ::
        PersonUuid -> Map NoteUuid Note -> NoteUuid -> Map NoteUuid Note

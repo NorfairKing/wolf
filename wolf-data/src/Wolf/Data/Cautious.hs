@@ -100,9 +100,9 @@ addNoteUuidRef nu pu = do
     state $ \x@NotesAndPeople {..} ->
         ( ()
         , x
-          { people =
-                M.update
-                    (Just . NoteIndex . S.insert nu . noteIndexSet)
-                    pu
-                    people
-          })
+              { people =
+                    M.update
+                        (Just . NoteIndex . S.insert nu . noteIndexSet)
+                        pu
+                        people
+              })
