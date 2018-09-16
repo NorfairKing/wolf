@@ -40,7 +40,8 @@ newNoteForm :: [(PersonUuid, Alias)] -> FormInput Handler NewNote
 newNoteForm il =
     NewNote <$>
     ireq
-        (multiSelectField $ pure
+        (multiSelectField $
+         pure
              OptionList
                  { olOptions =
                        map
@@ -75,8 +76,8 @@ postNewNoteR = do
                 [ "Added note on"
                 , intercalate ", " $
                   flip map newNotePeople $ \u ->
-                      fromMaybe (uuidString u) $
-                      aliasString <$> reverseIndexLookupSingleAlias u ix
+                      maybe (uuidString u) aliasString $
+                      reverseIndexLookupSingleAlias u ix
                 , "with uuid"
                 , uuidString noteUuid
                 , "via wolf-web-server."
