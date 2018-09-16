@@ -8,11 +8,11 @@
   .ui .form
   method=post
   action=@{NewNoteR}>
-  
+
   <div .field>
     <label>
       Relevant people
-    <select
+    <select multiple
       name="uuid">
       $forall (uuid, alias) <- il
         <option value=#{uuidText uuid}>

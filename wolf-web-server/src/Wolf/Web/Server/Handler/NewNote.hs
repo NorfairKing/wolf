@@ -26,7 +26,7 @@ getNewNoteR = do
     withNavBar $(widgetFile "new-note")
 
 data NewNote = NewNote
-    { newNotePerson :: PersonUuid
+    { newNotePeople :: [PersonUuid]
     , newNoteContents :: Text
     }
 
@@ -36,21 +36,31 @@ newtype InvalidNewNote =
 instance RenderMessage App InvalidNewNote where
     renderMessage _ _ (InvalidPersonUuid t) = "Invalid Person Uuid: " <> t
 
-newNoteForm :: FormInput Handler NewNote
-newNoteForm =
+newNoteForm :: [(PersonUuid, Alias)] -> FormInput Handler NewNote
+newNoteForm il =
     NewNote <$>
     ireq
-        (checkMMap
-             (\t ->
-                  pure . maybe (Left $ InvalidPersonUuid t) Right $ parseUUID t)
-             uuidText
-             textField)
+        (multiSelectField $ pure
+             OptionList
+                 { olOptions =
+                       map
+                           (\(u, a) ->
+                                Option
+                                    { optionDisplay = aliasText a
+                                    , optionInternalValue = u
+                                    , optionExternalValue = uuidText u
+                                    })
+                           il
+                 , olReadExternal = parseUUID
+                 })
         "uuid" <*>
     ireq textField "contents"
 
 postNewNoteR :: Handler Html
 postNewNoteR = do
-    NewNote {..} <- runInputPost newNoteForm
+    ix <- runData getIndexWithDefault
+    let il = sortOn snd $ M.toList $ reverseIndexSingleAlias ix
+    NewNote {..} <- runInputPost $ newNoteForm il
     now <- liftIO getCurrentTime
     runData $ do
         noteUuid <-
@@ -58,12 +68,15 @@ postNewNoteR = do
                 Note
                     { noteContents = newNoteContents
                     , noteTimestamp = now
-                    , noteRelevantPeople = S.singleton newNotePerson
+                    , noteRelevantPeople = S.fromList newNotePeople
                     }
         makeGitCommit $
             unwords
-                [ "Added note on person with uuid"
-                , uuidString newNotePerson
+                [ "Added note on"
+                , intercalate ", " $
+                  flip map newNotePeople $ \u ->
+                      fromMaybe (uuidString u) $
+                      aliasString <$> reverseIndexLookupSingleAlias u ix
                 , "with uuid"
                 , uuidString noteUuid
                 , "via wolf-web-server."
