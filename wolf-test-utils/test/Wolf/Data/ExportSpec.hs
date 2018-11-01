@@ -21,6 +21,8 @@ import qualified Data.Set as S
 spec :: Spec
 spec =
     withDataSetsGen $
+    modifyMaxSize (`quot` 10) $
+    modifyMaxSuccess (`quot` 10) $
     describe "export" $ do
         it "exports 'Nothing' if no wolf repository has been initialised" $ \gen ->
             forAll gen $ \sets -> do

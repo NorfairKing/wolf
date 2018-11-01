@@ -53,6 +53,7 @@ instance Validity Repo where
             , annotate repoNoteIndex "repoNoteIndex"
             , annotate repoNoteIndices "repoNoteIndices"
             , annotate repoNotes "repoNotes"
+            , annotate repoSuggestions "repoSuggestions"
             , check
                   (M.keysSet repoNotes == noteIndexSet repoNoteIndex)
                   "The key set of repoNotes equals the note UUID's in the global note index."
@@ -67,7 +68,6 @@ instance Validity Repo where
                       , "Person note index: " ++ show noteIndex
                       , "Global note index: " ++ show repoNoteIndex
                       ])
-            , annotate repoSuggestions "repoSuggestions"
             , mconcat $
               itsNotesMentionPerson repoNoteIndices repoNotes <$>
               (snd <$> indexTuples repoPersonIndex) -- If pu refers to nu, nu refers to pu

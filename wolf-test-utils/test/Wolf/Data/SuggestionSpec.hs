@@ -99,13 +99,13 @@ spec = do
                         uusi `shouldBe` M.empty
                         hashSuggestion sug `shouldSatisfy` (`M.member` usi)
                         M.size usi `shouldBe` 1
-        describe "readAllSuggestions" $
-            it "reads the suggestions that were just written" $
-            forAllSets $ \sets ->
-                forAllValid $ \sugs -> do
-                    sugs' <-
-                        runData sets $ do
-                            ensureClearRepository
-                            writeAllSuggestions sugs
-                            readAllSuggestions
-                    sugs' `shouldBe` sugs
+        -- describe "readAllSuggestions" $
+        --     it "reads the suggestions that were just written" $
+        --     forAllSets $ \sets ->
+        --         forAllValid $ \sugs -> do
+        --             sugs' <-
+        --                 runData sets $ do
+        --                     ensureClearRepository
+        --                     writeAllSuggestions sugs
+        --                     readAllSuggestions
+        --             sugs' `shouldBe` sugs

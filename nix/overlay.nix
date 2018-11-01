@@ -2,7 +2,6 @@ final:
   previous:
     with final.haskell.lib;
     {
-
       wolfPackages =
             let wolfPkg = name:
                 (failOnAllWarnings (final.haskellPackages.callCabal2nix name (../. + "/${name}") {}));

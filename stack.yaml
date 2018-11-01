@@ -1,4 +1,4 @@
-resolver: lts-10.10
+resolver: lts-10.8
 
 packages:
 - wolf-api
@@ -16,9 +16,18 @@ packages:
 extra-deps:
 - servant-quickcheck-0.0.2.4
 - sockaddr-0.0.0
+- git-0.2.2
+- hashable-time-0.2.0.2
+- patience-0.1.1
 - wai-git-http-0.0.0
+
 - cautious-0.3.0.0
 - cautious-gen-0.0.0.0
+
+- gogol-0.3.0
+- gogol-core-0.3.0
+- gogol-people-0.3.0
+
 - git: https://github.com/NorfairKing/typed-uuid.git
   commit: 155c9ec880ca1c12f7dd8a8468b3626de8164823
   subdirs:
@@ -26,7 +35,7 @@ extra-deps:
     - genvalidity-typed-uuid
 
 - git: https://github.com/NorfairKing/validity
-  commit: 550327539d84d72ba8be8412025b0074d14c4188
+  commit: 7c1ed124c0ffbbb25d487673539f662756b02a16
   subdirs:
   - genvalidity-aeson
   - genvalidity-bytestring
@@ -58,6 +67,7 @@ extra-deps:
   - validity-uuid
   - validity-vector
   - validity
+
 nix:
   packages: [ zlib ]
 

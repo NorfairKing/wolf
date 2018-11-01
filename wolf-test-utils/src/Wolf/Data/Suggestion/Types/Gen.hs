@@ -14,37 +14,40 @@ import Wolf.Data.People.Types.Gen ()
 
 instance GenUnchecked (SuggestionIndex a)
 
-instance GenValid (SuggestionIndex a)
+instance GenValid (SuggestionIndex a) where
+    genValid = genValidStructurallyWithoutExtraChecking
 
 instance GenUnchecked SuggestionType
 
-instance GenValid SuggestionType
+instance GenValid SuggestionType where
+    genValid = genValidStructurallyWithoutExtraChecking
 
 instance GenUnchecked (SuggestionHash a)
 
-instance GenValid (SuggestionHash a)
+instance GenValid (SuggestionHash a) where
+    genValid = genValidStructurallyWithoutExtraChecking
 
 instance GenUnchecked a => GenUnchecked (Suggestion a)
 
 instance GenValid a => GenValid (Suggestion a) where
-    genValid = Suggestion <$> genValid <*> genValid <*> genValid <*> genValid
+    genValid = genValidStructurallyWithoutExtraChecking
 
 instance GenUnchecked AliasSuggestion
 
 instance GenValid AliasSuggestion where
-    genValid = AliasSuggestion <$> genValid <*> genValid
+    genValid = genValidStructurallyWithoutExtraChecking
 
 instance GenUnchecked EntrySuggestion
 
 instance GenValid EntrySuggestion where
-    genValid = EntrySuggestion <$> genValid <*> genValid <*> genValid
+    genValid = genValidStructurallyWithoutExtraChecking
 
 instance GenUnchecked SuggestionRepo
 
 instance GenValid SuggestionRepo where
-    genValid = genValidStructurally
+    genValid = genValidStructurallyWithoutExtraChecking
 
 instance GenUnchecked a => GenUnchecked (SuggestionTypeRepo a)
 
 instance (GenValid a, Hashable a) => GenValid (SuggestionTypeRepo a) where
-    genValid = (SuggestionTypeRepo <$> genValid <*> genValid) `suchThat` isValid
+    genValid = genValidStructurally

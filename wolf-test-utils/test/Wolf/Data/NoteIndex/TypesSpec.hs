@@ -13,6 +13,6 @@ import Wolf.Data.Gen ()
 spec :: Spec
 spec = do
     genValidSpec @NoteIndex
-    jsonSpec @NoteIndex
+    jsonSpecOnValid @NoteIndex
     genValidSpec @NoteUuid
     jsonSpec @NoteUuid

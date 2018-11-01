@@ -15,7 +15,7 @@ spec = do
     eqSpec @AliasSuggestion
     genValidSpec @AliasSuggestion
     jsonSpecOnValid @AliasSuggestion
-    eqSpec @EntrySuggestion
+    eqSpecOnValid @EntrySuggestion
     genValidSpec @EntrySuggestion
     jsonSpecOnValid @EntrySuggestion
     eqSpec @(SuggestionIndex Double)
@@ -24,14 +24,14 @@ spec = do
     eqSpec @(SuggestionHash Double)
     genValidSpec @(SuggestionHash Double)
     jsonSpecOnValid @(SuggestionHash Double)
-    eqSpec @(Suggestion Double)
+    eqSpecOnValid @(Suggestion Double)
     genValidSpec @(Suggestion Double)
     jsonSpecOnValid @(Suggestion Double)
     hashableSpecOnValid @(Suggestion Double)
     functorSpecOnValid @Suggestion
-    eqSpec @(SuggestionTypeRepo Int)
+    eqSpecOnValid @(SuggestionTypeRepo Int)
     genValidSpec @(SuggestionTypeRepo Int)
     jsonSpecOnValid @(SuggestionTypeRepo Int)
-    eqSpec @SuggestionRepo
+    eqSpecOnValid @SuggestionRepo
     genValidSpec @SuggestionRepo
     jsonSpecOnValid @SuggestionRepo
