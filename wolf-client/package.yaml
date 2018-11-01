@@ -9,12 +9,12 @@ homepage: http://cs-syd.eu
 default-extensions:
 - NoImplicitPrelude
 dependencies:
-- base >=4.9 && <=5
-- servant >=0.11 && <0.12
-- servant-client >=0.11 && <0.12
-- text >=1.2 && <1.3
-- wolf-api >=0.0 && <0.1
-- wolf-data >=0.0 && <0.1
+- base >=4.9
+- servant >=0.11
+- servant-client >=0.11
+- text >=1.2
+- wolf-api >=0.0
+- wolf-data >=0.0
 library:
   source-dirs: src/
   ghc-options: -Wall

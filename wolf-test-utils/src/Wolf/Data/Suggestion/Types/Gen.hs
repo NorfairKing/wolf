@@ -41,7 +41,8 @@ instance GenValid EntrySuggestion where
 
 instance GenUnchecked SuggestionRepo
 
-instance GenValid SuggestionRepo
+instance GenValid SuggestionRepo where
+    genValid = genValidStructurally
 
 instance GenUnchecked a => GenUnchecked (SuggestionTypeRepo a)
 

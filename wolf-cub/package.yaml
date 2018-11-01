@@ -24,15 +24,15 @@ library:
   - Wolf.Cub.SearchBox
   - Wolf.Cub.Types
   dependencies:
-  - brick >=0.29 && <0.30
+  - brick >=0.29
   - mtl
   - optparse-applicative
-  - safe >=0.3 && <0.4
-  - text >=1.2 && <1.3
-  - time >=1.8 && <1.9
-  - typed-uuid >=0.0 && <0.1
-  - vector >=0.12 && <0.13
-  - vty >=5.19 && <5.20
+  - safe >=0.3
+  - text >=1.2
+  - time >=1.8
+  - typed-uuid >=0.0
+  - vector >=0.12
+  - vty >=5.19
   - wolf-cli
   - wolf-data
 executables:

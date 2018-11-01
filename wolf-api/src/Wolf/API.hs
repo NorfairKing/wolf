@@ -58,7 +58,11 @@ newtype Username = Username
     } deriving (Show, Eq, Ord, Generic)
 
 instance Validity Username where
-    isValid (Username t) = T.all validUsernameChar t
+    validate (Username t) =
+        decorateList (T.unpack t) $ \c ->
+            check
+                (validUsernameChar c)
+                "The character is a valid username character"
 
 validUsernameChar :: Char -> Bool
 validUsernameChar c =

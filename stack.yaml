@@ -1,3 +1,5 @@
+resolver: lts-10.10
+
 packages:
 - wolf-api
 - wolf-cli
@@ -18,14 +20,44 @@ extra-deps:
 - cautious-0.3.0.0
 - cautious-gen-0.0.0.0
 - git: https://github.com/NorfairKing/typed-uuid.git
-  commit: a7baf4999c901ccdeb66dba0221431de692963f1
+  commit: 155c9ec880ca1c12f7dd8a8468b3626de8164823
   subdirs:
     - typed-uuid
     - genvalidity-typed-uuid
 
+- git: https://github.com/NorfairKing/validity
+  commit: 550327539d84d72ba8be8412025b0074d14c4188
+  subdirs:
+  - genvalidity-aeson
+  - genvalidity-bytestring
+  - genvalidity-containers
+  - genvalidity-hspec-aeson
+  - genvalidity-hspec-binary
+  - genvalidity-hspec-cereal
+  - genvalidity-hspec-hashable
+  - genvalidity-hspec-optics
+  - genvalidity-hspec
+  - genvalidity-path
+  - genvalidity-property
+  - genvalidity-scientific
+  - genvalidity-text
+  - genvalidity-time
+  - genvalidity-unordered-containers
+  - genvalidity-uuid
+  - genvalidity-vector
+  - genvalidity
+  - validity-aeson
+  - validity-bytestring
+  - validity-containers
+  - validity-path
+  - validity-primitive
+  - validity-scientific
+  - validity-text
+  - validity-time
+  - validity-unordered-containers
+  - validity-uuid
+  - validity-vector
+  - validity
 nix:
   packages: [ zlib ]
 
-resolver: lts-10.2
-nix:
-  packages: [zlib]

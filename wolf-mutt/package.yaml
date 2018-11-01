@@ -26,9 +26,9 @@ library:
   - text
   - validity
   - validity-text
-  - wolf-cli >=0.0 && <0.1
-  - wolf-data >=0.0 && <0.1
-  - wolf-data-baked >=0.0 && <0.1
+  - wolf-cli >=0.0
+  - wolf-data >=0.0
+  - wolf-data-baked >=0.0
 
 executables:
   wolf-mutt:

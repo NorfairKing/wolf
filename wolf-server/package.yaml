@@ -26,29 +26,29 @@ library:
   - Wolf.Server.Types
   - Wolf.Server.Utils
   dependencies:
-  - bytestring >=0.10 && <0.11
-  - containers >=0.5 && <0.6
-  - git >=0.2 && <0.3
-  - mtl >=2.2 && <2.3
+  - bytestring >=0.10
+  - containers >=0.5
+  - git >=0.2
+  - mtl >=2.2
   - optparse-applicative >=0.13
-  - path >=0.6 && <0.7
-  - path-io >=1.3 && <1.4
-  - servant >=0.11 && <0.12
-  - servant-server >=0.11 && <0.12
-  - system-filepath >=0.4 && <0.5
-  - text >=1.2 && <1.3
-  - typed-uuid >=0.0 && <0.1
-  - unordered-containers >=0.2 && <0.3
-  - uuid >=1.3 && <1.4
-  - validity >=0.4 && <0.5
-  - validity-containers >=0.2 && <0.3
-  - validity-text >=0.2 && <0.3
-  - validity-time >=0.1 && <0.2
-  - wai >=3.2 && <3.3
-  - warp >=3.2 && <3.3
-  - wolf-api >=0.0 && <0.1
-  - wolf-cli >=0.0 && <0.1
-  - wolf-data >=0.0 && <0.1
+  - path >=0.6
+  - path-io >=1.3
+  - servant >=0.11
+  - servant-server >=0.11
+  - system-filepath >=0.4
+  - text >=1.2
+  - typed-uuid >=0.0
+  - unordered-containers >=0.2
+  - uuid >=1.3
+  - validity >=0.4
+  - validity-containers >=0.2
+  - validity-text >=0.2
+  - validity-time >=0.1
+  - wai >=3.2
+  - warp >=3.2
+  - wolf-api >=0.0
+  - wolf-cli >=0.0
+  - wolf-data >=0.0
 executables:
   wolf-server:
     main: Main.hs

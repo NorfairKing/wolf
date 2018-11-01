@@ -18,7 +18,7 @@ library:
   - http-client
   - http-types
   - mtl
-  - optparse-applicative >=0.13 && <0.15
+  - optparse-applicative
   - path
   - path-io
   - process

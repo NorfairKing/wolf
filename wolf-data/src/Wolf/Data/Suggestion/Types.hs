@@ -53,13 +53,12 @@ parseSuggestionType fp = SuggestionType <$> parseRelDir fp >>= constructValid
 instance Validity SuggestionType where
     validate (SuggestionType p) =
         mconcat
-            [ p <?!> "suggestionTypePath"
+            [ annotate p "suggestionTypePath"
             , check
                   (length (filter (/= ".") . FP.splitDirectories $ fromRelDir p) ==
                    1)
                   "only contains one path component"
             ]
-    isValid = isValidByValidating
 
 instance NFData SuggestionType
 
@@ -236,8 +235,8 @@ data SuggestionTypeRepo a = SuggestionTypeRepo
 instance (Validity a, Hashable a) => Validity (SuggestionTypeRepo a) where
     validate SuggestionTypeRepo {..} =
         mconcat
-            [ suggestionTypeRepoUnused <?!> "suggestionsTypeRepoUnused"
-            , suggestionTypeRepoUsed <?!> "suggestionsTypeRepoUsed"
+            [ annotate suggestionTypeRepoUnused "suggestionsTypeRepoUnused"
+            , annotate suggestionTypeRepoUsed  "suggestionsTypeRepoUsed"
             , check
                   (M.size (M.map hashSuggestion suggestionTypeRepoUnused) ==
                    M.size suggestionTypeRepoUnused)
@@ -253,7 +252,6 @@ instance (Validity a, Hashable a) => Validity (SuggestionTypeRepo a) where
                             suggestionTypeRepoUsed))
                   "contains no duplicate uuids"
             ]
-    isValid = isValidByValidating
 
 instance NFData a => NFData (SuggestionTypeRepo a)
 

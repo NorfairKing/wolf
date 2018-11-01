@@ -47,26 +47,27 @@ data Repo = Repo
 instance Validity Repo where
     validate Repo {..} =
         mconcat
-            [ repoInitData <?!> "repoInitData"
-            , repoPersonIndex <?!> "repoPersonIndex"
-            , repoPersonEntries <?!> "repoPersonEntries"
-            , repoNoteIndex <?!> "repoNoteIndex"
-            , repoNoteIndices <?!> "repoNoteIndices"
-            , repoNotes <?!> "repoNotes"
-            , M.keysSet repoNotes ==
-              noteIndexSet repoNoteIndex <?@>
-              "The key set of repoNotes equals the note UUID's in the global note index."
+            [ annotate repoInitData "repoInitData"
+            , annotate repoPersonIndex "repoPersonIndex"
+            , annotate repoPersonEntries "repoPersonEntries"
+            , annotate repoNoteIndex "repoNoteIndex"
+            , annotate repoNoteIndices "repoNoteIndices"
+            , annotate repoNotes "repoNotes"
+            , check
+                  (M.keysSet repoNotes == noteIndexSet repoNoteIndex)
+                  "The key set of repoNotes equals the note UUID's in the global note index."
             , mconcat $
               flip map (M.toList repoNoteIndices) $ \(personUuid, noteIndex) ->
-                  noteIndex `isSubNoteIndexOf` repoNoteIndex <?@>
-                  unlines
+                  check
+                      (noteIndex `isSubNoteIndexOf` repoNoteIndex)(
+                      unlines
                       [ "The person note index for person"
                       , uuidString personUuid
                       , "is a sub-noteindex of the global note index."
                       , "Person note index: " ++ show noteIndex
                       , "Global note index: " ++ show repoNoteIndex
-                      ]
-            , repoSuggestions <?!> "repoSuggestions"
+                      ])
+            , annotate repoSuggestions "repoSuggestions"
             , mconcat $
               itsNotesMentionPerson repoNoteIndices repoNotes <$>
               (snd <$> indexTuples repoPersonIndex) -- If pu refers to nu, nu refers to pu
@@ -75,7 +76,6 @@ instance Validity Repo where
               S.toList (noteIndexSet repoNoteIndex)
             -- If nu refers to pu, pu refers to nu
             ]
-    isValid = isValidByValidating
 
 getPersonNotes :: Map PersonUuid NoteIndex -> PersonUuid -> [NoteUuid]
 getPersonNotes noteIndices pu =

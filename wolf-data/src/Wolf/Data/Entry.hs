@@ -74,10 +74,11 @@ data UpdateResult a
     deriving (Show, Generic)
 
 instance Validity a => Validity (UpdateResult a) where
-    isValid (UpdateSuccess a) = isValid a
-    isValid _ = True
-    validate (UpdateSuccess a) = a <?!> "UpdateSuccess"
-    validate ur = validateByCheckingName "UpdateResult" ur
+    validate (UpdateSuccess a) = decorate "UpdateSuccess" $ validate a
+    validate UpdateUnchanged = valid
+    validate (UpdateParseFailure epe) = trivialValidation epe
+    validate UpdateValidityFailure = valid
+    validate UpdateWasDeletion = valid
 
 data EntryParseException
     = EntryYamlParseException YamlParseException

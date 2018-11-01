@@ -72,14 +72,17 @@ data PersonProperty
     deriving (Show, Eq, Ord, Generic)
 
 instance Validity PersonProperty where
-    isValid (PVal ppv) = isValid ppv
-    isValid (PList pl) = isValid pl
-    isValid (PMap tups) =
-        and
-            [ isValid tups
-            , not (null tups)
-            , let ls = map fst tups
-               in nub ls == ls
+    validate (PVal ppv) = decorate "PVal" $ validate ppv
+    validate (PList pl) = decorate "PList" $ validate pl
+    validate (PMap tups) =
+        decorate "PMap" $
+        mconcat
+            [ validate tups
+            , check (not (null tups)) "The list of properties are not empty"
+            , check
+                  (let ls = map fst tups
+                    in nub ls == ls)
+                  "The keys of the map are usique"
             ]
 
 instance Hashable PersonProperty

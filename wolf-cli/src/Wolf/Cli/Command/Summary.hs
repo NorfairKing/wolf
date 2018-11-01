@@ -71,13 +71,10 @@ data SummaryReport = SummaryReport
     } deriving (Show, Eq, Generic)
 
 instance Validity SummaryReport where
-    isValid SummaryReport {..} =
-        and
-            [ isValid summaryReportTimestamp
-            , isValid summaryReportAliases
-            , isValid summaryReportPersonEntry
-            , isValid summaryReportNotes
-            , sortOn noteTimestamp summaryReportNotes == summaryReportNotes
+    validate sr@SummaryReport {..} =
+        mconcat
+            [ genericValidate sr
+            , check (sortOn noteTimestamp summaryReportNotes == summaryReportNotes) "The notes are sorted by timestamp."
             ]
 
 summaryReportReport :: SummaryReport -> Report
