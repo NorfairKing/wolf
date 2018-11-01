@@ -33,8 +33,8 @@ spec =
                                 expectationFailure $
                                 "Should not fail with error: " <> show err
                          in case err of
-                                FailureResponse {} ->
-                                    if statusCode (responseStatus err) == 409
+                                FailureResponse r ->
+                                    if statusCode (responseStatusCode r) == 409
                                         then pure ()
                                         else snf
                                 _ -> snf
@@ -54,8 +54,8 @@ spec =
                                     expectationFailure $
                                     "Should not fail with error: " <> show err
                              in case err of
-                                    FailureResponse {} ->
-                                        if statusCode (responseStatus err) ==
+                                    FailureResponse r ->
+                                        if statusCode (responseStatusCode r) ==
                                            409
                                             then pure ()
                                             else snf

@@ -1,4 +1,4 @@
-resolver: lts-10.8
+resolver: lts-11.16
 
 packages:
 - wolf-api
@@ -7,26 +7,24 @@ packages:
 - wolf-cub
 - wolf-data
 - wolf-data-baked
-- wolf-google
+# - wolf-google 
 - wolf-mutt
 - wolf-server
 - wolf-test-utils
 - wolf-web-server
 
 extra-deps:
-- servant-quickcheck-0.0.2.4
-- sockaddr-0.0.0
-- git-0.2.2
-- hashable-time-0.2.0.2
-- patience-0.1.1
-- wai-git-http-0.0.0
 
 - cautious-0.3.0.0
 - cautious-gen-0.0.0.0
 
-- gogol-0.3.0
-- gogol-core-0.3.0
-- gogol-people-0.3.0
+# - gogol-0.3.0
+# - gogol-core-0.3.0
+# - gogol-people-0.3.0
+- sockaddr-0.0.0
+
+- git: https://github.com/NorfairKing/wai-git-http
+  commit: 6da3d87d9227e233d351e1df935a92171551e3ef
 
 - git: https://github.com/NorfairKing/typed-uuid.git
   commit: 155c9ec880ca1c12f7dd8a8468b3626de8164823

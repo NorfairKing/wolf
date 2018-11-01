@@ -1,7 +1,8 @@
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE ViewPatterns #-}
@@ -42,11 +43,11 @@ import Wolf.Web.Server.Widget
 
 type WolfWidget = WolfWidget' ()
 
-type WolfWidget' = WidgetT App IO
+type WolfWidget' = WidgetFor App
 
-type WolfHandler = HandlerT App IO
+type WolfHandler = HandlerFor App
 
-type WolfAuthHandler = HandlerT Auth WolfHandler
+type WolfAuthHandler a = AuthHandler App a
 
 data App = App
     { appDataSettings :: WolfServerEnv
@@ -68,9 +69,9 @@ instance YesodAuth App where
     type AuthId App = AccountUUID
     loginDest _ = HomeR
     logoutDest _ = HomeR
-    authHttpManager = appHttpManager
+    authHttpManager = getsYesod appHttpManager
     authenticate creds = do
-        senv <- asks appDataSettings
+        senv <- getsYesod appDataSettings
         if credsPlugin creds == wolfAuthPluginName
             then case username $ credsIdent creds of
                      Nothing -> pure $ UserError Msg.NoIdentifierProvided
@@ -97,6 +98,7 @@ wolfAuthPluginName = "wolf-auth-plugin"
 wolfAuthPlugin :: AuthPlugin App
 wolfAuthPlugin = AuthPlugin wolfAuthPluginName dispatch loginWidget
   where
+    dispatch :: Text -> [Text] -> WolfAuthHandler TypedContent
     dispatch "POST" ["login"] = postLoginR >>= sendResponse
     dispatch "GET" ["register"] = getNewAccountR >>= sendResponse
     dispatch "POST" ["register"] = postNewAccountR >>= sendResponse
@@ -117,11 +119,11 @@ loginFormPostTargetR = PluginR wolfAuthPluginName ["login"]
 
 postLoginR :: WolfAuthHandler TypedContent
 postLoginR = do
-    senv <- lift $ asks appDataSettings
+    senv <- getsYesod appDataSettings
     let loginInputForm =
             LoginData <$> ireq textField "userkey" <*>
             ireq passwordField "passphrase"
-    result <- lift $ runInputPostResult loginInputForm
+    result <- liftHandler $ runInputPostResult loginInputForm
     muser <-
         case result of
             FormMissing -> invalidArgs ["Form is missing"]
@@ -148,7 +150,7 @@ postLoginR = do
     case muser of
         Left err -> loginErrorMessageI LoginR err
         Right acc ->
-            lift $
+            liftHandler $
             setCredsRedirect $
             Creds wolfAuthPluginName (usernameText $ accountUsername acc) []
 
@@ -159,7 +161,7 @@ getNewAccountR :: WolfAuthHandler Html
 getNewAccountR = do
     token <- genToken
     msgs <- getMessages
-    lift $ defaultLayout $(widgetFile "auth/register")
+    liftHandler $ defaultLayout $(widgetFile "auth/register")
 
 data NewAccount = NewAccount
     { newAccountUsername :: Username
@@ -169,7 +171,7 @@ data NewAccount = NewAccount
 
 postNewAccountR :: WolfAuthHandler Html
 postNewAccountR = do
-    senv <- lift $ asks appDataSettings
+    senv <- getsYesod appDataSettings
     let newAccountInputForm =
             NewAccount <$>
             ireq
@@ -184,8 +186,8 @@ postNewAccountR = do
                 "username" <*>
             ireq passwordField "passphrase" <*>
             ireq passwordField "passphrase-confirm"
-    mr <- lift getMessageRender
-    result <- lift $ runInputPostResult newAccountInputForm
+    mr <- liftHandler getMessageRender
+    result <- liftHandler $ runInputPostResult newAccountInputForm
     mdata <-
         case result of
             FormMissing -> invalidArgs ["Form is missing"]
@@ -202,19 +204,19 @@ postNewAccountR = do
     case mdata of
         Left errs -> do
             setMessage $ toHtml $ T.concat errs
-            redirect registerR
+            redirect $ AuthR registerR
         Right reg -> do
             errOrUuid <- flip runReaderT senv $ registerAccount reg
             case errOrUuid of
-                Left _ -> redirect registerR
+                Left _ -> redirect $ AuthR registerR
                 Right _ -> do
-                    lift $
+                    liftHandler $
                         setCreds True $
                         Creds
                             wolfAuthPluginName
                             (usernameText $ registerUsername reg)
                             []
-                    redirect LoginR
+                    redirect $ AuthR LoginR
 
 runDataApp :: App -> ReaderT DataSettings IO a -> Handler a
 runDataApp app func = do
@@ -236,7 +238,7 @@ instance PathPiece (UUID a) where
     fromPathPiece = parseUUID
     toPathPiece = uuidText
 
-withNavBar :: WidgetT App IO () -> HandlerT App IO Html
+withNavBar :: WolfWidget -> WolfHandler Html
 withNavBar widget = do
     mauth <- maybeAuthId
     msgs <- getMessages

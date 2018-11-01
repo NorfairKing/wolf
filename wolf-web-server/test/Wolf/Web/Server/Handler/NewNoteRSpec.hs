@@ -48,4 +48,4 @@ spec =
                     addPostParam "uuid" $ uuidText puuid
                 statusIs 303
                 loc <- getLocation
-                lift $ loc `shouldBe` Right HomeR
+                liftIO $ loc `shouldBe` Right HomeR

@@ -153,7 +153,7 @@ parseEntryFileContents ::
 parseEntryFileContents bs =
     unsafePerformIO $
     let parse = do
-            rawDoc <- runResourceT $ Yaml.decode bs $$ Yaml.sinkRawDoc
+            rawDoc <- runResourceT $ runConduit $ Yaml.decode bs .| Yaml.sinkRawDoc
             parseRawDoc rawDoc >>= (evaluate . force)
      in (Right `liftM` parse) `catches`
         [ Handler $ pure . Left . EntryYamlParseException

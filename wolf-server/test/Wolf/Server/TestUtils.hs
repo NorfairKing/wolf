@@ -60,7 +60,7 @@ withWolfServer specFunc = do
             ignoringAbsence $ removeDirRecur $ wseDataDir env
             let getServer = pure $ makeWolfServer env
             withServantServerAndContext wolfAPI (authContext env) getServer $ \burl ->
-                func $ ClientEnv man burl
+                func $ ClientEnv man burl Nothing
     beforeAll setupMan $ aroundWith withApp specFunc
 
 -- | Like 'withServantServer', but allows passing in a 'Context' to the
@@ -98,8 +98,8 @@ withValidNewUser cenv func =
                         expectationFailure $
                         "Registration should not fail with error: " <> show err
                  in case err of
-                        FailureResponse {} ->
-                            if statusCode (responseStatus err) == 409
+                        FailureResponse r ->
+                            if statusCode (responseStatusCode r) == 409
                                 then pure () -- Username already exists, just stop here then.
                                 else snf
                         _ -> snf

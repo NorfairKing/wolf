@@ -29,10 +29,12 @@ wolfApp se =
     Servant.serveWithContext wolfAPI (authContext se) (makeWolfServer se)
 
 makeWolfServer :: WolfServerEnv -> Server WolfAPI
-makeWolfServer cfg = enter (readerToEither cfg) wolfServer
-  where
-    readerToEither :: WolfServerEnv -> (WolfHandler :~> Handler)
-    readerToEither = runReaderTNat
+makeWolfServer cfg =
+    hoistServerWithContext
+        wolfAPI
+        (Proxy :: Proxy '[ BasicAuthCheck Account])
+        (`runReaderT` cfg)
+        wolfServer
 
 wolfServer :: ServerT WolfAPI WolfHandler
 wolfServer = accountServer :<|> personServer

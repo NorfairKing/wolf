@@ -36,9 +36,9 @@ clientGetPersonQuery :: BasicAuthData -> PersonQuery -> ClientM [PersonUuid]
 clientGetPersonEntry :<|> clientPostNewPerson :<|> clientGetPersonByAlias :<|> clientPostSetPersonAlias :<|> clientGetPersonQuery =
     personClient
 
-accountClient :: Client AccountAPI
-personClient :: Client PersonAPI
+accountClient :: Client ClientM AccountAPI
+personClient :: Client ClientM PersonAPI
 accountClient :<|> personClient = wolfClient
 
-wolfClient :: Client WolfAPI
+wolfClient :: Client ClientM WolfAPI
 wolfClient = client wolfAPI
