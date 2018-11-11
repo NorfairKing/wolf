@@ -1,16 +1,13 @@
 let pkgs = import (../default.nix);
 in rec {
-  smos-static = pkgs.haskell.lib.justStaticExecutables pkgs.haskellPackages.smos;
+  wolf-static = pkgs.haskell.lib.justStaticExecutables pkgs.haskellPackages.wolf;
   release-target = pkgs.stdenv.mkDerivation {
-      name = "smos-release";
-      buildInputs = [ smos-static ];
+      name = "wolf-release";
+      buildInputs = [ wolf-static ];
       nativeBuildInputs =
-           pkgs.lib.attrsets.attrValues pkgs.smosPackages
-        ++ pkgs.lib.attrsets.attrValues pkgs.cursorPackages
-        ++ pkgs.lib.attrsets.attrValues pkgs.fuzzyTimePackages
-        ++ pkgs.lib.attrsets.attrValues pkgs.cursorFuzzyTimePackages;
+           pkgs.lib.attrsets.attrValues pkgs.wolfPackages;
       buildCommand = ''
-        cp -r ${smos-static} $out
+        cp -r ${wolf-static} $out
       '';
     };
 }

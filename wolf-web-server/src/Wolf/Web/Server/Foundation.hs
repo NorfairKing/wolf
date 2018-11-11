@@ -59,6 +59,7 @@ data App = App
 mkYesodData "App" $(parseRoutesFile "routes")
 
 instance Yesod App where
+    approot = ApprootRelative
     defaultLayout widget = do
         pc <- widgetToPageContent $(widgetFile "default-body")
         withUrlRenderer $(hamletFile "templates/default-page.hamlet")
