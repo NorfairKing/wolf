@@ -1,0 +1,89 @@
+- entry: Features
+  forest:
+  - entry: wolf-data
+    forest:
+    - Documentation of the data model
+    - Figure out who is in a note automatically?
+    - Edges between people
+    - Edges between people with predefined ways to speak about biological relations
+    - header: Edges between people with autocompletion of biological relationships
+      contents: ! 'A -[mother]-> B -[mother]-> C
+
+        should imply
+
+        A -[grandmother]-> C'
+    - Test reconstruction of an etry after editing more thoroughly
+    - Suggestions can become irrelevant when a suggestion has been processed, deal
+      with that?
+    - A way to merge and/or deduplicate two people
+    - entry:
+        header: A way to store binary data for people, not just notes, but they should
+          probably be kept seperate (and also by type)
+        contents: ! 'By type, we may want to normalise and offer apis.
+
+          For chat, for example, we can offer a nice overview.'
+      forest:
+      - pictures
+      - pdfs
+      - chats
+    - ! 'A way to integrate with tickler: set reminders to talk to people again later'
+  - entry: wolf-cli
+    forest:
+    - Show statistics in wolf-review
+    - ! 'When editing a note: maybe show alias again in comment?'
+    - Figure out what to do with notes that don't end in a newline
+    - make init make a git repo by default?
+    - Autocompletion with quotes instead of backlashes so that it works for multiple
+      shells.
+    - don't show UUIDs to the user anywhere
+    - A predicted alias should include the middle name or nick-name
+    - review --monthly, --quarterly, --yearly
+  - entry: cub
+    forest:
+    - Use cursors from 'cursor'
+    - Don't show UUIDs to users
+    - Highlight what was matched on in the search?
+  - entry: wolf-server
+    forest:
+    - An overview of how much space is used
+    - admins and an admin panel
+  - entry: wolf-web-server
+    forest:
+    - Convert to an API-first calling of the server via wolf-server
+    - Remember a user being logged-in
+    - notes page with overview of latest notes
+    - review page with nice overview of things to review
+    - An email link to click on if someone has an email address
+    - Show people in an easier way than yaml
+    - search
+    - Tooltip with last-changed timestamp for properties
+    - Show all aliases on the person page
+    - ! 'Account page: wolf git remote add instructions'
+    - an overview of the latest entries?
+    - Set messages on success
+    - repo-granular locking at the API server
+  - entry: wolf-mut
+    forest:
+    - a way to add email addresses from emails
+  - entry: Other projects to start
+    forest:
+    - wolf-abook
+    - wolf-google-calendar
+    - wolf-gender
+    - wolf-facebook
+    - wolf-linkedin
+    - wolf-slack
+    - wolf-whatsapp
+    - wolf-telegram
+    - wolf-email
+    - wolf-github
+    - wolf-wikipedia
+    - wolf-business-card
+- entry: Bugs
+  forest:
+  - entry: wolf-cli
+    forest:
+    - ! 'note doesn''t work accross system users: permissions problem'
+  - entry: wolf-google
+    forest:
+    - ! 'Doesn''t build anymore: wait for a new version of gogol and then fix it'
