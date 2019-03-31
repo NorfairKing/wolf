@@ -10,24 +10,26 @@ import qualified Data.Set as S
 
 {-# ANN module ("HLint: ignore Use &&" :: Text) #-}
 
-newtype NoteIndex = NoteIndex
+newtype NoteIndex =
+  NoteIndex
     { noteIndexSet :: Set NoteUuid
-    } deriving (Show, Eq, Ord, Generic)
+    }
+  deriving (Show, Eq, Ord, Generic)
 
 instance Validity NoteIndex
 
 instance NFData NoteIndex
 
 instance FromJSON NoteIndex where
-    parseJSON ob =
-        (withObject "NoteIndex" $ \o -> NoteIndex <$> o .: "noteIndexList") ob -- TODO remove old JSON parsing
-         <|>
-        (withArray "NoteIndex" $
-         fmap (NoteIndex . S.fromList . toList) . traverse parseJSON)
-            ob
+  parseJSON ob =
+    (withObject "NoteIndex" $ \o -> NoteIndex <$> o .: "noteIndexList") ob -- TODO remove old JSON parsing
+     <|>
+    (withArray "NoteIndex" $
+     fmap (NoteIndex . S.fromList . toList) . traverse parseJSON)
+      ob
 
 instance ToJSON NoteIndex where
-    toJSON = toJSON . noteIndexSet
+  toJSON = toJSON . noteIndexSet
 
 newNoteIndex :: NoteIndex
 newNoteIndex = NoteIndex {noteIndexSet = S.empty}

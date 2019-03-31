@@ -11,29 +11,33 @@ type Arguments = (Command, Flags)
 type Instructions = (Dispatch, Settings)
 
 newtype Command =
-    CommandRun RunFlags
-    deriving (Show, Eq)
+  CommandRun RunFlags
+  deriving (Show, Eq)
 
-newtype RunFlags = RunFlags
+newtype RunFlags =
+  RunFlags
     { flagDataFlags :: Cli.DataFlags
-    } deriving (Show, Eq)
+    }
+  deriving (Show, Eq)
 
 data Flags =
-    Flags
-    deriving (Show, Eq)
+  Flags
+  deriving (Show, Eq)
 
 data Configuration =
-    Configuration
-    deriving (Show, Eq)
+  Configuration
+  deriving (Show, Eq)
 
 newtype Dispatch =
-    DispatchRun RunSettings
-    deriving (Show, Eq)
+  DispatchRun RunSettings
+  deriving (Show, Eq)
 
 data Settings =
-    Settings
-    deriving (Show, Eq)
+  Settings
+  deriving (Show, Eq)
 
-newtype RunSettings = RunSettings
+newtype RunSettings =
+  RunSettings
     { runSetDataSettings :: DataSettings
-    } deriving (Show, Eq)
+    }
+  deriving (Show, Eq)

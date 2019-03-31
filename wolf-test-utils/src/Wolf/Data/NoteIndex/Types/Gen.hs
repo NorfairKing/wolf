@@ -1,8 +1,8 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Wolf.Data.NoteIndex.Types.Gen
-    ( subNoteIndex
-    ) where
+  ( subNoteIndex
+  ) where
 
 import Import
 
@@ -14,8 +14,8 @@ import Wolf.Data.People.Types.Gen ()
 instance GenUnchecked NoteIndex
 
 instance GenValid NoteIndex where
-    genValid = NoteIndex <$> genValid
+  genValid = NoteIndex <$> genValid
 
 subNoteIndex :: NoteIndex -> Gen NoteIndex
 subNoteIndex (NoteIndex nis) =
-    (NoteIndex . S.fromList) <$> sublistOf (S.toList nis)
+  (NoteIndex . S.fromList) <$> sublistOf (S.toList nis)

@@ -19,8 +19,8 @@ import Wolf.Cli.OptParse
 
 wolf :: IO ()
 wolf = do
-    (disp, sets) <- getInstructions
-    runReaderT (dispatch disp) sets
+  (disp, sets) <- getInstructions
+  runReaderT (dispatch disp) sets
 
 dispatch :: (MonadIO m, MonadReader Settings m) => Dispatch -> m ()
 dispatch DispatchInit = init

@@ -15,39 +15,39 @@ import Wolf.Data.People.Types.Gen ()
 instance GenUnchecked (SuggestionIndex a)
 
 instance GenValid (SuggestionIndex a) where
-    genValid = genValidStructurallyWithoutExtraChecking
+  genValid = genValidStructurallyWithoutExtraChecking
 
 instance GenUnchecked SuggestionType
 
 instance GenValid SuggestionType where
-    genValid = genValidStructurallyWithoutExtraChecking
+  genValid = genValidStructurallyWithoutExtraChecking
 
 instance GenUnchecked (SuggestionHash a)
 
 instance GenValid (SuggestionHash a) where
-    genValid = genValidStructurallyWithoutExtraChecking
+  genValid = genValidStructurallyWithoutExtraChecking
 
 instance GenUnchecked a => GenUnchecked (Suggestion a)
 
 instance GenValid a => GenValid (Suggestion a) where
-    genValid = genValidStructurallyWithoutExtraChecking
+  genValid = genValidStructurallyWithoutExtraChecking
 
 instance GenUnchecked AliasSuggestion
 
 instance GenValid AliasSuggestion where
-    genValid = genValidStructurallyWithoutExtraChecking
+  genValid = genValidStructurallyWithoutExtraChecking
 
 instance GenUnchecked EntrySuggestion
 
 instance GenValid EntrySuggestion where
-    genValid = genValidStructurallyWithoutExtraChecking
+  genValid = genValidStructurallyWithoutExtraChecking
 
 instance GenUnchecked SuggestionRepo
 
 instance GenValid SuggestionRepo where
-    genValid = genValidStructurallyWithoutExtraChecking
+  genValid = genValidStructurallyWithoutExtraChecking
 
 instance GenUnchecked a => GenUnchecked (SuggestionTypeRepo a)
 
 instance (GenValid a, Hashable a) => GenValid (SuggestionTypeRepo a) where
-    genValid = genValidStructurally
+  genValid = genValidStructurally

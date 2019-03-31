@@ -1,6 +1,6 @@
 module Wolf.Data.People.Types
-    ( PersonUuid
-    ) where
+  ( PersonUuid
+  ) where
 
 import Import
 

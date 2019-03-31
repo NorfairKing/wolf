@@ -9,9 +9,9 @@ import Wolf.Web.Server.TestUtils
 
 spec :: Spec
 spec =
-    wolfWebServerPersonalSpec $
-    ydescribe "HomeR" $
-    yit "gets a 200 for an example user" $
-    withExampleAccount_ $ do
-        get HomeR
-        statusIs 200
+  wolfWebServerPersonalSpec $
+  ydescribe "HomeR" $
+  yit "gets a 200 for an example user" $
+  withExampleAccount_ $ do
+    get HomeR
+    statusIs 200

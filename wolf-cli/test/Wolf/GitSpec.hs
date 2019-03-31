@@ -1,6 +1,6 @@
 module Wolf.GitSpec
-    ( spec
-    ) where
+  ( spec
+  ) where
 
 import TestImport
 import TestUtils
@@ -14,12 +14,12 @@ import Wolf.Data.Gen ()
 
 spec :: Spec
 spec =
-    describe "git" $
-    withSandbox $
-    it "fails if no wolf repo has been initialised" $ \sb ->
-        once $
-        forAllValid $ \args ->
-            runReaderT
-                (git args)
-                Settings {setDataSets = DataSettings {dataSetWolfDir = sb}} `shouldThrow`
-            (\e -> e == ExitFailure 1)
+  describe "git" $
+  withSandbox $
+  it "fails if no wolf repo has been initialised" $ \sb ->
+    once $
+    forAllValid $ \args ->
+      runReaderT
+        (git args)
+        Settings {setDataSets = DataSettings {dataSetWolfDir = sb}} `shouldThrow`
+      (\e -> e == ExitFailure 1)

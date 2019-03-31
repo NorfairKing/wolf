@@ -1,6 +1,6 @@
 module Wolf.Mutt
-    ( wolfMutt
-    ) where
+  ( wolfMutt
+  ) where
 
 import Import
 
@@ -11,7 +11,7 @@ import Wolf.Mutt.Query
 
 wolfMutt :: IO ()
 wolfMutt = do
-    Instructions disp sets <- getInstructions
-    flip runReaderT sets $
-        case disp of
-            DispatchQuery q -> wolfMuttQuery q
+  Instructions disp sets <- getInstructions
+  flip runReaderT sets $
+    case disp of
+      DispatchQuery q -> wolfMuttQuery q

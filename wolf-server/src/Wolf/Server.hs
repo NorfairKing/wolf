@@ -1,6 +1,6 @@
 module Wolf.Server
-    ( runWolfServer
-    ) where
+  ( runWolfServer
+  ) where
 
 import Import
 
@@ -9,5 +9,5 @@ import Wolf.Server.Serve
 
 runWolfServer :: IO ()
 runWolfServer = do
-    (DispatchServe ss, sets) <- getInstructions
-    serve ss sets
+  (DispatchServe ss, sets) <- getInstructions
+  serve ss sets

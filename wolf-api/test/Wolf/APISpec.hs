@@ -1,8 +1,8 @@
 {-# LANGUAGE TypeApplications #-}
 
 module Wolf.APISpec
-    ( spec
-    ) where
+  ( spec
+  ) where
 
 import TestImport
 
@@ -12,5 +12,5 @@ import Wolf.API.Gen ()
 
 spec :: Spec
 spec = do
-    jsonSpecOnValid @SetPersonAlias
-    jsonSpecOnValid @PersonQuery
+  jsonSpecOnValid @SetPersonAlias
+  jsonSpecOnValid @PersonQuery

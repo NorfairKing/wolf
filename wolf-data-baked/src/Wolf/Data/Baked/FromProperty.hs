@@ -8,7 +8,7 @@ import Import
 import Wolf.Data
 
 class FromProperty a where
-    fromProperty :: PersonProperty -> a
+  fromProperty :: PersonProperty -> a
 
 atKey :: FromProperty (Maybe a) => PersonProperty -> Text -> Maybe a
 atKey (PMap tups) key = lookup key tups >>= fromProperty
@@ -18,8 +18,8 @@ fromEntry :: FromProperty a => PersonEntry -> a
 fromEntry = fromProperty . personEntryProperties
 
 instance FromProperty (Maybe Text) where
-    fromProperty (PVal ppv) = Just $ personPropertyValueContents ppv
-    fromProperty _ = Nothing
+  fromProperty (PVal ppv) = Just $ personPropertyValueContents ppv
+  fromProperty _ = Nothing
 
 instance FromProperty (Maybe PersonProperty) where
-    fromProperty = pure
+  fromProperty = pure

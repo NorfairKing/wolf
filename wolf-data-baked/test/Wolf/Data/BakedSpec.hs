@@ -1,8 +1,8 @@
 {-# LANGUAGE TypeApplications #-}
 
 module Wolf.Data.BakedSpec
-    ( spec
-    ) where
+  ( spec
+  ) where
 
 import TestImport
 
@@ -13,9 +13,9 @@ import Wolf.Data.Gen ()
 
 spec :: Spec
 spec = do
-    eqSpec @Met
-    genValidSpec @Met
-    eqSpec @Gender
-    genValidSpec @Gender
-    eqSpec @Name
-    genValidSpec @Name
+  eqSpec @Met
+  genValidSpec @Met
+  eqSpec @Gender
+  genValidSpec @Gender
+  eqSpec @Name
+  genValidSpec @Name

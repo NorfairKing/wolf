@@ -1,8 +1,8 @@
 {-# LANGUAGE FlexibleContexts #-}
 
 module Wolf.Cli.Command.Cleanup
-    ( cleanup
-    ) where
+  ( cleanup
+  ) where
 
 import Import
 
@@ -14,8 +14,8 @@ import Wolf.Cli.Utils
 
 cleanup :: (MonadIO m, MonadReader Settings m) => m ()
 cleanup =
-    runData . withInitCheck_ . cleanupRepo $ \warn ->
-        liftIO $ do
-            putStrLn $ prettyShowExportWarning warn
-            (== Yes) <$>
-                promptYesNo No "Do you want to clean up the repository anyway?"
+  runData . withInitCheck_ . cleanupRepo $ \warn ->
+    liftIO $ do
+      putStrLn $ prettyShowExportWarning warn
+      (== Yes) <$>
+        promptYesNo No "Do you want to clean up the repository anyway?"

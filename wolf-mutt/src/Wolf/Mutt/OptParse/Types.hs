@@ -11,41 +11,43 @@ import Wolf.Cli.OptParse.Types (DataFlags(..))
 import Wolf.Mutt.Query.Types
 
 data Arguments =
-    Arguments Command
-              Flags
-    deriving (Show, Eq, Generic)
+  Arguments Command Flags
+  deriving (Show, Eq, Generic)
 
 data Instructions =
-    Instructions Dispatch
-                 Settings
-    deriving (Show, Eq, Generic)
+  Instructions Dispatch Settings
+  deriving (Show, Eq, Generic)
 
 newtype Command =
-    CommandQuery String
-    deriving (Show, Eq, Generic)
+  CommandQuery String
+  deriving (Show, Eq, Generic)
 
 instance Validity Command
 
-newtype Flags = Flags
+newtype Flags =
+  Flags
     { flagDataFlags :: DataFlags
-    } deriving (Show, Eq, Generic)
+    }
+  deriving (Show, Eq, Generic)
 
 instance Validity Flags
 
 data Configuration =
-    Configuration
-    deriving (Show, Eq, Generic)
+  Configuration
+  deriving (Show, Eq, Generic)
 
 instance Validity Configuration
 
 newtype Dispatch =
-    DispatchQuery SearchQuery
-    deriving (Show, Eq, Generic)
+  DispatchQuery SearchQuery
+  deriving (Show, Eq, Generic)
 
 instance Validity Dispatch
 
-newtype Settings = Settings
+newtype Settings =
+  Settings
     { setDataSets :: DataSettings
-    } deriving (Show, Eq, Generic)
+    }
+  deriving (Show, Eq, Generic)
 
 instance Validity Settings

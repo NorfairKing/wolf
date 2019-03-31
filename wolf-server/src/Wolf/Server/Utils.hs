@@ -1,7 +1,7 @@
 module Wolf.Server.Utils
-    ( runDataForAccount
-    , runDataForAccountUUID
-    ) where
+  ( runDataForAccount
+  , runDataForAccountUUID
+  ) where
 
 import Import
 
@@ -15,8 +15,8 @@ runDataForAccount :: Account -> ReaderT DataSettings IO a -> WolfHandler a
 runDataForAccount acc = runDataForAccountUUID (accountUUID acc)
 
 runDataForAccountUUID ::
-       AccountUUID -> ReaderT DataSettings IO a -> WolfHandler a
+     AccountUUID -> ReaderT DataSettings IO a -> WolfHandler a
 runDataForAccountUUID uuid func = do
-    dd <- accountDataDir uuid
-    let ds = DataSettings {dataSetWolfDir = dd}
-    liftIO $ runReaderT func ds
+  dd <- accountDataDir uuid
+  let ds = DataSettings {dataSetWolfDir = dd}
+  liftIO $ runReaderT func ds

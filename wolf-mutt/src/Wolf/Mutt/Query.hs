@@ -3,13 +3,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Wolf.Mutt.Query
-    ( wolfMuttQuery
-    , SearchQuery
-    , SearchResult(..)
-    , searchResultsFor
-    , formatSearchResult
-    , formatSearchResults
-    ) where
+  ( wolfMuttQuery
+  , SearchQuery
+  , SearchResult(..)
+  , searchResultsFor
+  , formatSearchResult
+  , formatSearchResults
+  ) where
 
 import Import
 
@@ -29,30 +29,29 @@ import Wolf.Mutt.Query.Types
 
 wolfMuttQuery :: (MonadIO m, MonadReader Settings m) => SearchQuery -> m ()
 wolfMuttQuery q = do
-    dataSets <- asks setDataSets
-    results <-
-        flip runReaderT dataSets $ do
-            ix <- getIndexWithDefault
-            fmap concat $
-                forM (indexTuples ix) $ \(a, uuid) ->
-                    if matchesAlias q a
-                        then do
-                            mpe <- getPersonEntry uuid
-                            pure $ searchResultsFor a mpe
-                        else pure []
-    liftIO $ TIO.putStr $ formatSearchResults results
+  dataSets <- asks setDataSets
+  results <-
+    flip runReaderT dataSets $ do
+      ix <- getIndexWithDefault
+      fmap concat $
+        forM (indexTuples ix) $ \(a, uuid) ->
+          if matchesAlias q a
+            then do
+              mpe <- getPersonEntry uuid
+              pure $ searchResultsFor a mpe
+            else pure []
+  liftIO $ TIO.putStr $ formatSearchResults results
 
 searchResultsFor :: Alias -> Maybe PersonEntry -> [SearchResult]
 searchResultsFor _ Nothing = []
 searchResultsFor a (Just pe) = do
-    EmailAddressWithPurpose mpur ea <- fromEntry pe :: [EmailAddressWithPurpose]
-    pure
-        SearchResult
-            { searchResultEmailAddress =
-                  TE.decodeUtf8 $ EmailAddress.toByteString ea
-            , searchResultLongName = aliasText a
-            , searchResultOtherInfo = fromMaybe "" mpur
-            }
+  EmailAddressWithPurpose mpur ea <- fromEntry pe :: [EmailAddressWithPurpose]
+  pure
+    SearchResult
+      { searchResultEmailAddress = TE.decodeUtf8 $ EmailAddress.toByteString ea
+      , searchResultLongName = aliasText a
+      , searchResultOtherInfo = fromMaybe "" mpur
+      }
 
 matchesAlias :: SearchQuery -> Alias -> Bool
 matchesAlias q = matchesText q . aliasText
@@ -66,14 +65,14 @@ matchesText q t = T.toLower q `T.isInfixOf` T.toLower t
 -- > `<email address> <tab> <long name> <tab> <other info> <newline>`
 formatSearchResult :: SearchResult -> Text
 formatSearchResult SearchResult {..} =
-    T.concat
-        [ searchResultEmailAddress
-        , "\t"
-        , searchResultLongName
-        , "\t"
-        , searchResultOtherInfo
-        , "\n"
-        ]
+  T.concat
+    [ searchResultEmailAddress
+    , "\t"
+    , searchResultLongName
+    , "\t"
+    , searchResultOtherInfo
+    , "\n"
+    ]
 
 formatSearchResults :: [SearchResult] -> Text
 formatSearchResults results = T.concat $ "\n" : map formatSearchResult results

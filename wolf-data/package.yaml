@@ -21,6 +21,7 @@ dependencies:
 - filepath >=1.4
 - hashable >=1.2
 - hashable-time >=0.2
+- libyaml
 - mtl >=2.2
 - path >=0.6
 - path-io >=1.3

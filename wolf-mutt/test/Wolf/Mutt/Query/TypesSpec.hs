@@ -1,8 +1,8 @@
 {-# LANGUAGE TypeApplications #-}
 
 module Wolf.Mutt.Query.TypesSpec
-    ( spec
-    ) where
+  ( spec
+  ) where
 
 import TestImport
 

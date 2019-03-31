@@ -1,9 +1,9 @@
 module Wolf.Google.OptParse
-    ( getInstructions
-    , Instructions
-    , Dispatch(..)
-    , Settings(..)
-    ) where
+  ( getInstructions
+  , Instructions
+  , Dispatch(..)
+  , Settings(..)
+  ) where
 
 import Import
 
@@ -17,36 +17,36 @@ import Wolf.Google.OptParse.Types
 
 getInstructions :: IO Instructions
 getInstructions = do
-    (cmd, flags) <- getArguments
-    config <- getConfiguration cmd flags
-    combineToInstructions cmd flags config
+  (cmd, flags) <- getArguments
+  config <- getConfiguration cmd flags
+  combineToInstructions cmd flags config
 
 combineToInstructions :: Command -> Flags -> Configuration -> IO Instructions
 combineToInstructions (CommandSuggest df) Flags Configuration = do
-    ds <- Cli.deriveDataSettings df
-    pure (DispatchSuggest ds, Settings)
+  ds <- Cli.deriveDataSettings df
+  pure (DispatchSuggest ds, Settings)
 
 getConfiguration :: Command -> Flags -> IO Configuration
 getConfiguration _ _ = pure Configuration
 
 getArguments :: IO Arguments
 getArguments = do
-    args <- getArgs
-    let result = runArgumentsParser args
-    handleParseResult result
+  args <- getArgs
+  let result = runArgumentsParser args
+  handleParseResult result
 
 runArgumentsParser :: [String] -> ParserResult Arguments
 runArgumentsParser = execParserPure prefs_ argParser
   where
     prefs_ =
-        ParserPrefs
-            { prefMultiSuffix = ""
-            , prefDisambiguate = True
-            , prefShowHelpOnError = True
-            , prefShowHelpOnEmpty = True
-            , prefBacktrack = True
-            , prefColumns = 80
-            }
+      ParserPrefs
+        { prefMultiSuffix = ""
+        , prefDisambiguate = True
+        , prefShowHelpOnError = True
+        , prefShowHelpOnEmpty = True
+        , prefBacktrack = True
+        , prefColumns = 80
+        }
 
 argParser :: ParserInfo Arguments
 argParser = info (helper <*> parseArgs) help_

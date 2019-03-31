@@ -1,8 +1,8 @@
 {-# LANGUAGE TypeApplications #-}
 
 module Wolf.Data.Note.TypesSpec
-    ( spec
-    ) where
+  ( spec
+  ) where
 
 import TestImport
 
@@ -12,5 +12,5 @@ import Wolf.Data.Gen ()
 
 spec :: Spec
 spec = do
-    genValidSpec @Note
-    jsonSpecOnValid @Note
+  genValidSpec @Note
+  jsonSpecOnValid @Note

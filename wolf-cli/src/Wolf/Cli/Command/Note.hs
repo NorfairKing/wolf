@@ -17,55 +17,51 @@ import Wolf.Data.Git
 
 note :: (MonadIO m, MonadReader Settings m) => [Alias] -> m ()
 note people =
-    runData $
-    withInitCheck_ $ do
-        origIndex <- getIndexWithDefault
-        (peopleUuids, index) <-
-            getRelevantPeopleUuidsAndNewIndex people origIndex
-        tnf <- tmpNoteFile
-        liftIO $ ignoringAbsence $ removeFile tnf
-        editingResult <- startEditorOn tnf
-        case editingResult of
-            EditingFailure reason ->
-                liftIO $
-                putStrLn $
-                unwords
-                    [ "ERROR: failed to edit the note file:"
-                    , show reason
-                    , ",not saving."
-                    ]
-            EditingSuccess -> do
-                now <- liftIO getCurrentTime
-                contents <- liftIO $ T.readFile $ toFilePath tnf
-                let n =
-                        Note
-                            { noteContents = contents
-                            , noteTimestamp = now
-                            , noteRelevantPeople = S.fromList peopleUuids
-                            }
-                putIndex index
-                noteUuid <- createNewNote n
-                makeGitCommit $
-                    unwords
-                        [ "Added note on"
-                        , intercalate ", " $ map aliasString people
-                        , "with uuid"
-                        , uuidString noteUuid
-                        ]
+  runData $
+  withInitCheck_ $ do
+    origIndex <- getIndexWithDefault
+    (peopleUuids, index) <- getRelevantPeopleUuidsAndNewIndex people origIndex
+    tnf <- tmpNoteFile
+    liftIO $ ignoringAbsence $ removeFile tnf
+    editingResult <- startEditorOn tnf
+    case editingResult of
+      EditingFailure reason ->
+        liftIO $
+        putStrLn $
+        unwords
+          ["ERROR: failed to edit the note file:", show reason, ",not saving."]
+      EditingSuccess -> do
+        now <- liftIO getCurrentTime
+        contents <- liftIO $ T.readFile $ toFilePath tnf
+        let n =
+              Note
+                { noteContents = contents
+                , noteTimestamp = now
+                , noteRelevantPeople = S.fromList peopleUuids
+                }
+        putIndex index
+        noteUuid <- createNewNote n
+        makeGitCommit $
+          unwords
+            [ "Added note on"
+            , intercalate ", " $ map aliasString people
+            , "with uuid"
+            , uuidString noteUuid
+            ]
 
 getRelevantPeopleUuidsAndNewIndex ::
-       (MonadIO m, MonadReader DataSettings m)
-    => [Alias]
-    -> Index
-    -> m ([PersonUuid], Index)
+     (MonadIO m, MonadReader DataSettings m)
+  => [Alias]
+  -> Index
+  -> m ([PersonUuid], Index)
 getRelevantPeopleUuidsAndNewIndex [] origIndex = pure ([], origIndex)
 getRelevantPeopleUuidsAndNewIndex (t:ts) origIndex = do
-    (personUuid, index) <- lookupOrCreateNewPerson t origIndex
-    (puuids, index') <- getRelevantPeopleUuidsAndNewIndex ts index
-    pure (personUuid : puuids, index')
+  (personUuid, index) <- lookupOrCreateNewPerson t origIndex
+  (puuids, index') <- getRelevantPeopleUuidsAndNewIndex ts index
+  pure (personUuid : puuids, index')
 
 tmpNoteFile :: MonadIO m => m (Path Abs File)
 tmpNoteFile = do
-    tmpDir <- liftIO getTempDir
-    uuid <- nextRandomUUID
-    liftIO $ resolveFile tmpDir $ uuidString uuid ++ ".txt"
+  tmpDir <- liftIO getTempDir
+  uuid <- nextRandomUUID
+  liftIO $ resolveFile tmpDir $ uuidString uuid ++ ".txt"

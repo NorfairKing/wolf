@@ -19,34 +19,33 @@ import Wolf.Cub.Types
 
 runWolfCub :: IO ()
 runWolfCub = do
-    (DispatchRun RunSettings {..}, Settings) <- getInstructions
-    index <- runReaderT getIndexWithDefault runSetDataSettings
-    now <- getCurrentTime
-    void $
-        Brick.Main.defaultMain cubApp $
-        initialState now index runSetDataSettings
+  (DispatchRun RunSettings {..}, Settings) <- getInstructions
+  index <- runReaderT getIndexWithDefault runSetDataSettings
+  now <- getCurrentTime
+  void $
+    Brick.Main.defaultMain cubApp $ initialState now index runSetDataSettings
 
 initialState :: UTCTime -> Index -> DataSettings -> CubState
 initialState now i ds =
-    CubState
-        { cubStateShown =
-              CubShowPersonList
-                  PersonListState
-                      { personListStateInitialPeople = indexTuples i
-                      , personListStatePeopleList = makePersonList i
-                      , personListStateShowHelp = False
-                      , personListStateSearchBox = Nothing
-                      }
-        , cubStateNow = now
-        , cubStateDataSettings = ds
-        }
+  CubState
+    { cubStateShown =
+        CubShowPersonList
+          PersonListState
+            { personListStateInitialPeople = indexTuples i
+            , personListStatePeopleList = makePersonList i
+            , personListStateShowHelp = False
+            , personListStateSearchBox = Nothing
+            }
+    , cubStateNow = now
+    , cubStateDataSettings = ds
+    }
 
 cubApp :: App CubState () ResourceName
 cubApp =
-    App
-        { appDraw = drawUI
-        , appChooseCursor = showFirstCursor
-        , appHandleEvent = handleEvent
-        , appStartEvent = return
-        , appAttrMap = const theMap
-        }
+  App
+    { appDraw = drawUI
+    , appChooseCursor = showFirstCursor
+    , appHandleEvent = handleEvent
+    , appStartEvent = return
+    , appAttrMap = const theMap
+    }

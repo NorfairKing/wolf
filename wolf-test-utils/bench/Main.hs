@@ -18,26 +18,26 @@ import Wolf.Data.Gen ()
 
 main :: IO ()
 main =
-    Criterion.defaultMain
-        [ genValidBench @DataSettings
-        , genValidBench @InitData
-        , genValidBench @PersonUuid
-        , genValidBench @Alias
-        , genValidBench @Index
-        , genValidBench @PersonPropertyValue
-        , genValidBench @PersonProperty
-        , genValidBench @PersonEntry
-        , genValidBench @NoteUuid
-        , genValidBench @Note
-        , genValidBench @(Suggestion EntrySuggestion)
-        , genValidBench @(SuggestionTypeRepo Double)
-        , genValidBench @SuggestionRepo
-        , genValidBench @Repo
-        ]
+  Criterion.defaultMain
+    [ genValidBench @DataSettings
+    , genValidBench @InitData
+    , genValidBench @PersonUuid
+    , genValidBench @Alias
+    , genValidBench @Index
+    , genValidBench @PersonPropertyValue
+    , genValidBench @PersonProperty
+    , genValidBench @PersonEntry
+    , genValidBench @NoteUuid
+    , genValidBench @Note
+    , genValidBench @(Suggestion EntrySuggestion)
+    , genValidBench @(SuggestionTypeRepo Double)
+    , genValidBench @SuggestionRepo
+    , genValidBench @Repo
+    ]
 
 genValidBench ::
-       forall a. (Typeable a, GenValid a, NFData a)
-    => Benchmark
+     forall a. (Typeable a, GenValid a, NFData a)
+  => Benchmark
 genValidBench =
-    bench ("genValid :: Gen " ++ show (typeRep (Proxy @a))) $
-    nfIO $ generate (genValid :: Gen a)
+  bench ("genValid :: Gen " ++ show (typeRep (Proxy @a))) $
+  nfIO $ generate (genValid :: Gen a)

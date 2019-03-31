@@ -1,35 +1,35 @@
 {-# LANGUAGE FlexibleContexts #-}
 
 module Wolf.Data.Index
-    ( Alias
-    , alias
-    , aliasText
-    , aliasString
-    , Index
-    , indexMap
-    , newIndex
-    , indexKeys
-    , indexTuples
-    , lookupInIndex
-    , reverseIndex
-    , reverseIndexSingleAlias
-    , reverseIndexLookup
-    , reverseIndexLookupSingleAlias
-    , addIndexEntry
-    , createNewPerson
-    , addAliases
-    , addAlias
-    , lookupOrCreateNewPerson
+  ( Alias
+  , alias
+  , aliasText
+  , aliasString
+  , Index
+  , indexMap
+  , newIndex
+  , indexKeys
+  , indexTuples
+  , lookupInIndex
+  , reverseIndex
+  , reverseIndexSingleAlias
+  , reverseIndexLookup
+  , reverseIndexLookupSingleAlias
+  , addIndexEntry
+  , createNewPerson
+  , addAliases
+  , addAlias
+  , lookupOrCreateNewPerson
     -- * Impure operations
     -- ** Index
-    , getIndex
-    , getIndexWithDefault
-    , putIndex
+  , getIndex
+  , getIndexWithDefault
+  , putIndex
     -- ** Person Entry
-    , getPersonEntry
-    , putPersonEntry
-    , deletePersonEntry
-    ) where
+  , getPersonEntry
+  , putPersonEntry
+  , deletePersonEntry
+  ) where
 
 import Import
 
@@ -52,10 +52,11 @@ indexTuples = M.toList . indexMap
 reverseIndex :: Index -> Map PersonUuid (Set Alias)
 reverseIndex = M.foldlWithKey go M.empty . indexMap
   where
-    go :: Map PersonUuid (Set Alias)
-       -> Alias
-       -> PersonUuid
-       -> Map PersonUuid (Set Alias)
+    go ::
+         Map PersonUuid (Set Alias)
+      -> Alias
+      -> PersonUuid
+      -> Map PersonUuid (Set Alias)
     go m a u = M.alter add u m
       where
         add Nothing = Just $ S.singleton a
@@ -72,33 +73,32 @@ reverseIndexSingleAlias = M.foldlWithKey go M.empty . indexMap
 
 reverseIndexLookup :: PersonUuid -> Index -> [Alias]
 reverseIndexLookup uuid index =
-    map fst $ filter ((== uuid) . snd) (M.toList $ indexMap index)
+  map fst $ filter ((== uuid) . snd) (M.toList $ indexMap index)
 
 reverseIndexLookupSingleAlias :: PersonUuid -> Index -> Maybe Alias
 reverseIndexLookupSingleAlias uuid i =
-    case reverseIndexLookup uuid i of
-        [] -> Nothing
-        (a:_) -> Just a
+  case reverseIndexLookup uuid i of
+    [] -> Nothing
+    (a:_) -> Just a
 
 -- | Create a new person, if the given aliases was unasigned
 createNewPerson ::
-       (MonadIO m, MonadReader DataSettings m)
-    => [Alias]
-    -> Index
-    -> m (Maybe (PersonUuid, Index))
+     (MonadIO m, MonadReader DataSettings m)
+  => [Alias]
+  -> Index
+  -> m (Maybe (PersonUuid, Index))
 createNewPerson aliases origIndex = do
-    uuid <- nextRandomUUID
-    let index = addAliases aliases uuid origIndex
-    pure $ (,) uuid <$> index
+  uuid <- nextRandomUUID
+  let index = addAliases aliases uuid origIndex
+  pure $ (,) uuid <$> index
 
 -- | Add aliases for a 'PersonUuid', if the aliases were all unasigned
 addAliases :: [Alias] -> PersonUuid -> Index -> Maybe Index
 addAliases aliases uuid origIndex =
-    if any (isJust . (`lookupInIndex` origIndex)) aliases
-        then Nothing
-        else let index =
-                     foldl (\ix a -> addIndexEntry a uuid ix) origIndex aliases
-              in Just index
+  if any (isJust . (`lookupInIndex` origIndex)) aliases
+    then Nothing
+    else let index = foldl (\ix a -> addIndexEntry a uuid ix) origIndex aliases
+          in Just index
 
 addAlias :: Alias -> PersonUuid -> Index -> Maybe Index
 addAlias a = addAliases [a]
@@ -108,20 +108,20 @@ addAlias a = addAliases [a]
 -- If neither exist, then create a new 'PersonUuid' and put it in the
 -- 'Index' at the given alias if it does not exist yet.
 lookupOrCreateNewPerson ::
-       (MonadIO m, MonadReader DataSettings m)
-    => Alias
-    -> Index
-    -> m (PersonUuid, Index)
+     (MonadIO m, MonadReader DataSettings m)
+  => Alias
+  -> Index
+  -> m (PersonUuid, Index)
 lookupOrCreateNewPerson person origIndex =
-    case lookupInIndex person origIndex of
-        Just i -> pure (i, origIndex)
-        Nothing ->
-            case find ((== aliasText person) . uuidText) $
-                 M.elems (indexMap origIndex) of
-                Just puuid -> pure (puuid, origIndex)
-                Nothing -> do
-                    uuid <- nextRandomUUID
-                    pure (uuid, addIndexEntry person uuid origIndex)
+  case lookupInIndex person origIndex of
+    Just i -> pure (i, origIndex)
+    Nothing ->
+      case find ((== aliasText person) . uuidText) $
+           M.elems (indexMap origIndex) of
+        Just puuid -> pure (puuid, origIndex)
+        Nothing -> do
+          uuid <- nextRandomUUID
+          pure (uuid, addIndexEntry person uuid origIndex)
 
 -- | Get the index if it is there
 getIndex :: (MonadIO m, MonadReader DataSettings m) => m (Maybe Index)
@@ -134,29 +134,29 @@ getIndexWithDefault = indexFile >>= readJSONWithDefault newIndex
 -- | Save an index.
 putIndex :: (MonadIO m, MonadReader DataSettings m) => Index -> m ()
 putIndex index = do
-    i <- indexFile
-    writeJSON i index
+  i <- indexFile
+  writeJSON i index
 
 -- | Get a person's entry by its 'PersonUuid', return Nothing if it does not exist.
 getPersonEntry ::
-       (MonadIO m, MonadReader DataSettings m)
-    => PersonUuid
-    -> m (Maybe PersonEntry)
+     (MonadIO m, MonadReader DataSettings m)
+  => PersonUuid
+  -> m (Maybe PersonEntry)
 getPersonEntry personUuid = personEntryFile personUuid >>= readJSONWithMaybe
 
 -- | Put a person's entry by its 'PersonUuid'.
 putPersonEntry ::
-       (MonadIO m, MonadReader DataSettings m)
-    => PersonUuid
-    -> PersonEntry
-    -> m ()
+     (MonadIO m, MonadReader DataSettings m)
+  => PersonUuid
+  -> PersonEntry
+  -> m ()
 putPersonEntry personUuid pe = do
-    pef <- personEntryFile personUuid
-    writeJSON pef pe
+  pef <- personEntryFile personUuid
+  writeJSON pef pe
 
 -- | Delete a person's entry by its 'PersonUuid'.
 deletePersonEntry ::
-       (MonadIO m, MonadReader DataSettings m) => PersonUuid -> m ()
+     (MonadIO m, MonadReader DataSettings m) => PersonUuid -> m ()
 deletePersonEntry personUuid = do
-    pef <- personEntryFile personUuid
-    liftIO $ removeFile pef
+  pef <- personEntryFile personUuid
+  liftIO $ removeFile pef

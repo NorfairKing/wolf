@@ -21,20 +21,20 @@ import Wolf.Server.Types
 
 serve :: ServeSettings -> Settings -> IO ()
 serve ServeSettings {..} Settings = do
-    let env = WolfServerEnv {wseDataDir = serveSetDataDir}
-    Warp.run serveSetPort $ wolfApp env
+  let env = WolfServerEnv {wseDataDir = serveSetDataDir}
+  Warp.run serveSetPort $ wolfApp env
 
 wolfApp :: WolfServerEnv -> Wai.Application
 wolfApp se =
-    Servant.serveWithContext wolfAPI (authContext se) (makeWolfServer se)
+  Servant.serveWithContext wolfAPI (authContext se) (makeWolfServer se)
 
 makeWolfServer :: WolfServerEnv -> Server WolfAPI
 makeWolfServer cfg =
-    hoistServerWithContext
-        wolfAPI
-        (Proxy :: Proxy '[ BasicAuthCheck Account])
-        (`runReaderT` cfg)
-        wolfServer
+  hoistServerWithContext
+    wolfAPI
+    (Proxy :: Proxy '[ BasicAuthCheck Account])
+    (`runReaderT` cfg)
+    wolfServer
 
 wolfServer :: ServerT WolfAPI WolfHandler
 wolfServer = accountServer :<|> personServer

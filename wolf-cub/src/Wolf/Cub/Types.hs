@@ -15,45 +15,56 @@ import Wolf.Data
 import Wolf.Cub.PropertyEditor
 import Wolf.Cub.SearchBox
 
-data CubState = CubState
+data CubState =
+  CubState
     { cubStateShown :: CubShown
     , cubStateNow :: UTCTime
     , cubStateDataSettings :: DataSettings
-    } deriving (Generic)
+    }
+  deriving (Generic)
 
 data CubShown
-    = CubShowPersonList PersonListState
-    | CubShowPerson PersonState
-    | CubEditPerson EditPersonState
-    deriving (Generic)
+  = CubShowPersonList PersonListState
+  | CubShowPerson PersonState
+  | CubEditPerson EditPersonState
+  deriving (Generic)
 
-data PersonListState = PersonListState
+data PersonListState =
+  PersonListState
     { personListStateInitialPeople :: [(Alias, PersonUuid)]
     , personListStatePeopleList :: List ResourceName (Alias, PersonUuid)
     , personListStateShowHelp :: Bool
     , personListStateSearchBox :: Maybe (SearchBox ResourceName PersonUuid)
-    } deriving (Show, Generic)
+    }
+  deriving (Show, Generic)
 
-data PersonState = PersonState
+data PersonState =
+  PersonState
     { personStateUuid :: PersonUuid
     , personStateEntry :: Maybe PersonEntry
     , personStateNotes :: List ResourceName (NoteUuid, Note)
     , personStateShowHelp :: Bool
-    } deriving (Show, Generic)
+    }
+  deriving (Show, Generic)
 
-data EditPersonState = EditPersonState
+data EditPersonState =
+  EditPersonState
     { editPersonStateUuid :: PersonUuid
     , editPersonStateStartingEntry :: Maybe PersonEntry
     , editPersonStatePropertyEditor :: PropertyEditor ResourceName
-    } deriving (Generic)
+    }
+  deriving (Generic)
 
 newtype ResourceName =
-    ResourceName String
-    deriving (Show, Read, Eq, Ord, Generic)
+  ResourceName String
+  deriving (Show, Read, Eq, Ord, Generic)
 
 instance IsString ResourceName where
-    fromString = ResourceName
+  fromString = ResourceName
+
+instance Semigroup ResourceName where
+  (ResourceName s1) <> (ResourceName s2) = ResourceName $ s1 ++ s2
 
 instance Monoid ResourceName where
-    mempty = ""
-    mappend (ResourceName s1) (ResourceName s2) = ResourceName $ s1 ++ s2
+  mempty = ""
+  mappend = (<>)

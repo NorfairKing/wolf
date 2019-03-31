@@ -2,8 +2,8 @@
 {-# LANGUAGE RecordWildCards #-}
 
 module Wolf.Data.Import
-    ( importRepo
-    ) where
+  ( importRepo
+  ) where
 
 import Import
 
@@ -19,10 +19,10 @@ import Wolf.Data.Types
 
 importRepo :: (MonadIO m, MonadReader DataSettings m) => Repo -> m ()
 importRepo Repo {..} = do
-    writeInitData repoInitData
-    putIndex repoPersonIndex
-    void $ M.traverseWithKey putPersonEntry repoPersonEntries
-    putNoteIndex repoNoteIndex
-    void $ M.traverseWithKey putPersonNoteIndex repoNoteIndices
-    void $ M.traverseWithKey writeNote repoNotes
-    writeAllSuggestions repoSuggestions
+  writeInitData repoInitData
+  putIndex repoPersonIndex
+  void $ M.traverseWithKey putPersonEntry repoPersonEntries
+  putNoteIndex repoNoteIndex
+  void $ M.traverseWithKey putPersonNoteIndex repoNoteIndices
+  void $ M.traverseWithKey writeNote repoNotes
+  writeAllSuggestions repoSuggestions

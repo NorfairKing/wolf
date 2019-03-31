@@ -1,6 +1,6 @@
 module Wolf.Data.Gen
-    ( subNoteIndex
-    ) where
+  ( subNoteIndex
+  ) where
 
 import Wolf.Data.Entry.Types.Gen ()
 import Wolf.Data.Export.Types.Gen ()

@@ -1,10 +1,10 @@
 {-# LANGUAGE FlexibleContexts #-}
 
 module Wolf.Data.Note
-    ( readNote
-    , writeNote
-    , Note(..)
-    ) where
+  ( readNote
+  , writeNote
+  , Note(..)
+  ) where
 
 import Import
 
@@ -16,7 +16,7 @@ import Wolf.Data.Types
 
 -- | Retrieve a given note, if it exists
 readNote ::
-       (MonadIO m, MonadReader DataSettings m) => NoteUuid -> m (Maybe Note)
+     (MonadIO m, MonadReader DataSettings m) => NoteUuid -> m (Maybe Note)
 readNote noteUuid = noteFile noteUuid >>= readJSONWithMaybe
 
 -- | Write a given note.
@@ -25,5 +25,5 @@ readNote noteUuid = noteFile noteUuid >>= readJSONWithMaybe
 -- the uuid references are correct in the appropriate indices.
 writeNote :: (MonadIO m, MonadReader DataSettings m) => NoteUuid -> Note -> m ()
 writeNote noteUuid note = do
-    nf <- noteFile noteUuid
-    writeJSON nf note
+  nf <- noteFile noteUuid
+  writeJSON nf note

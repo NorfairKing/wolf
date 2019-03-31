@@ -1,8 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Wolf.EntrySpec
-    ( spec
-    ) where
+  ( spec
+  ) where
 
 import TestImport
 import TestUtils
@@ -17,12 +17,12 @@ import Wolf.Data.Gen ()
 
 spec :: Spec
 spec =
-    describe "entry" $
-    withSandbox $
-    it "fails if no wolf repo has been initialised" $ \sb ->
-        once $
-        forAllValid $ \person ->
-            runReaderT
-                (entry person)
-                Settings {setDataSets = DataSettings {dataSetWolfDir = sb}} `shouldThrow`
-            (\e -> e == ExitFailure 1)
+  describe "entry" $
+  withSandbox $
+  it "fails if no wolf repo has been initialised" $ \sb ->
+    once $
+    forAllValid $ \person ->
+      runReaderT
+        (entry person)
+        Settings {setDataSets = DataSettings {dataSetWolfDir = sb}} `shouldThrow`
+      (\e -> e == ExitFailure 1)

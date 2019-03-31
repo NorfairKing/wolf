@@ -1,6 +1,6 @@
 module Wolf.InitSpec
-    ( spec
-    ) where
+  ( spec
+  ) where
 
 import TestImport
 

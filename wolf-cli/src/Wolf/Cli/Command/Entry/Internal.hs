@@ -10,9 +10,9 @@ import Wolf.Data
 
 parseFirstnameLastname :: Alias -> Maybe (Text, Text)
 parseFirstnameLastname s =
-    case T.words $ aliasText s of
-        [fn, ln] -> Just (fn, ln)
-        _ -> Nothing
+  case T.words $ aliasText s of
+    [fn, ln] -> Just (fn, ln)
+    _ -> Nothing
 
 stripWhitespace :: String -> String
 stripWhitespace = reverse . dropWhite . reverse . dropWhite
@@ -20,9 +20,7 @@ stripWhitespace = reverse . dropWhite . reverse . dropWhite
     dropWhite = dropWhile (\c -> c == ' ' || c == '\t')
 
 tmpPersonEntryFile ::
-       (MonadReader DataSettings m, MonadIO m)
-    => PersonUuid
-    -> m (Path Abs File)
+     (MonadReader DataSettings m, MonadIO m) => PersonUuid -> m (Path Abs File)
 tmpPersonEntryFile personUuid = do
-    td <- liftIO getTempDir
-    liftIO $ resolveFile td $ T.unpack (uuidText personUuid) ++ "-entry.yaml"
+  td <- liftIO getTempDir
+  liftIO $ resolveFile td $ T.unpack (uuidText personUuid) ++ "-entry.yaml"

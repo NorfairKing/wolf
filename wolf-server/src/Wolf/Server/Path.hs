@@ -3,13 +3,13 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 
 module Wolf.Server.Path
-    ( dataDir
-    , accountsFile
-    , accountsDir
-    , accountDir
-    , accountDataDir
-    , accountDataFile
-    ) where
+  ( dataDir
+  , accountsFile
+  , accountsDir
+  , accountDir
+  , accountDataDir
+  , accountDataFile
+  ) where
 
 import Import
 
@@ -26,21 +26,17 @@ accountsDir :: MonadReader WolfServerEnv m => m (Path Abs Dir)
 accountsDir = (</> $(mkRelDir "accounts")) <$> dataDir
 
 accountDir ::
-       (MonadIO m, MonadReader WolfServerEnv m)
-    => AccountUUID
-    -> m (Path Abs Dir)
+     (MonadIO m, MonadReader WolfServerEnv m) => AccountUUID -> m (Path Abs Dir)
 accountDir uuid = do
-    ad <- accountsDir
-    liftIO $ resolveDir ad $ uuidString uuid
+  ad <- accountsDir
+  liftIO $ resolveDir ad $ uuidString uuid
 
 accountDataDir ::
-       (MonadIO m, MonadReader WolfServerEnv m)
-    => AccountUUID
-    -> m (Path Abs Dir)
+     (MonadIO m, MonadReader WolfServerEnv m) => AccountUUID -> m (Path Abs Dir)
 accountDataDir uuid = (</> $(mkRelDir "data")) <$> accountDir uuid
 
 accountDataFile ::
-       (MonadIO m, MonadReader WolfServerEnv m)
-    => AccountUUID
-    -> m (Path Abs File)
+     (MonadIO m, MonadReader WolfServerEnv m)
+  => AccountUUID
+  -> m (Path Abs File)
 accountDataFile uuid = (</> $(mkRelFile "account.json")) <$> accountDir uuid

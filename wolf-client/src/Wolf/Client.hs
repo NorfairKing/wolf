@@ -2,20 +2,20 @@
 {-# LANGUAGE TypeOperators #-}
 
 module Wolf.Client
-    ( Register(..)
-    , AccountUUID
-    , clientPostRegister
-    , PersonUuid
-    , PersonEntry
-    , Text
-    , clientGetPersonEntry
-    , clientPostNewPerson
-    , clientGetPersonByAlias
-    , SetPersonAlias(..)
-    , clientPostSetPersonAlias
-    , PersonQuery
-    , clientGetPersonQuery
-    ) where
+  ( Register(..)
+  , AccountUUID
+  , clientPostRegister
+  , PersonUuid
+  , PersonEntry
+  , Text
+  , clientGetPersonEntry
+  , clientPostNewPerson
+  , clientGetPersonByAlias
+  , SetPersonAlias(..)
+  , clientPostSetPersonAlias
+  , PersonQuery
+  , clientGetPersonQuery
+  ) where
 
 import Data.Text
 
@@ -34,7 +34,7 @@ clientGetPersonByAlias :: BasicAuthData -> Alias -> ClientM PersonUuid
 clientPostSetPersonAlias :: BasicAuthData -> SetPersonAlias -> ClientM ()
 clientGetPersonQuery :: BasicAuthData -> PersonQuery -> ClientM [PersonUuid]
 clientGetPersonEntry :<|> clientPostNewPerson :<|> clientGetPersonByAlias :<|> clientPostSetPersonAlias :<|> clientGetPersonQuery =
-    personClient
+  personClient
 
 accountClient :: Client ClientM AccountAPI
 personClient :: Client ClientM PersonAPI

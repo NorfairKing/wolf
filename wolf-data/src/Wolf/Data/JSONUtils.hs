@@ -1,10 +1,10 @@
 module Wolf.Data.JSONUtils
-    ( readJSONWithDefault
-    , readJSONWithMaybe
-    , writeJSON
-    , FromJSON
-    , ToJSON
-    ) where
+  ( readJSONWithDefault
+  , readJSONWithMaybe
+  , writeJSON
+  , FromJSON
+  , ToJSON
+  ) where
 
 import Import
 
@@ -16,18 +16,14 @@ import qualified Data.ByteString.Lazy as LB
 -- error in parsing.
 readJSON :: (MonadIO m, FromJSON a) => Path Abs File -> m a
 readJSON path = do
-    contents <- liftIO $ LB.readFile $ toFilePath path
-    case JSON.eitherDecode contents of
-        Left decodeErr ->
-            liftIO $
-            die $
-            unwords
-                [ "Failed to read JSON file:"
-                , toFilePath path
-                , "with err"
-                , decodeErr
-                ]
-        Right res -> pure res
+  contents <- liftIO $ LB.readFile $ toFilePath path
+  case JSON.eitherDecode contents of
+    Left decodeErr ->
+      liftIO $
+      die $
+      unwords
+        ["Failed to read JSON file:", toFilePath path, "with err", decodeErr]
+    Right res -> pure res
 
 -- | Read a JSON file, return a default file if the file is missing.
 readJSONWithDefault :: (MonadIO m, FromJSON a) => a -> Path Abs File -> m a
@@ -40,6 +36,6 @@ readJSONWithMaybe path = liftIO $ forgivingAbsence $ readJSON path
 -- | Write a JSON file, create the appropriate directories if necessary
 writeJSON :: (MonadIO m, ToJSON a) => Path Abs File -> a -> m ()
 writeJSON path value =
-    liftIO $ do
-        ensureDir $ parent path
-        LB.writeFile (toFilePath path) (JSON.encodePretty value)
+  liftIO $ do
+    ensureDir $ parent path
+    LB.writeFile (toFilePath path) (JSON.encodePretty value)

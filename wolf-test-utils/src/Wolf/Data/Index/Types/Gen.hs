@@ -11,9 +11,9 @@ import Wolf.Data.People.Types.Gen ()
 instance GenUnchecked Alias
 
 instance GenValid Alias where
-    genValid = Alias <$> genValid
+  genValid = Alias <$> genValid
 
 instance GenUnchecked Index
 
 instance GenValid Index where
-    genValid = Index <$> genValid
+  genValid = Index <$> genValid

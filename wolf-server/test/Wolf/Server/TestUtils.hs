@@ -3,13 +3,13 @@
 {-# LANGUAGE DataKinds #-}
 
 module Wolf.Server.TestUtils
-    ( withEnv
-    , withTestSandbox
-    , withWolfServer
-    , runClient
-    , runClientOrError
-    , withValidNewUser
-    ) where
+  ( withEnv
+  , withTestSandbox
+  , withWolfServer
+  , runClient
+  , runClientOrError
+  , withValidNewUser
+  ) where
 
 import TestImport
 
@@ -46,70 +46,68 @@ withTestSandbox = around withSandbox
   where
     withSandbox :: ActionWith WolfServerEnv -> IO ()
     withSandbox func = do
-        env <- testServerEnv
-        ignoringAbsence $ removeDirRecur $ wseDataDir env
-        func env
+      env <- testServerEnv
+      ignoringAbsence $ removeDirRecur $ wseDataDir env
+      func env
 
 withWolfServer :: SpecWith ClientEnv -> Spec
 withWolfServer specFunc = do
-    let setupMan :: IO HTTP.Manager
-        setupMan = HTTP.newManager HTTP.defaultManagerSettings
-    let withApp :: (ClientEnv -> IO ()) -> HTTP.Manager -> IO ()
-        withApp func man = do
-            env <- testServerEnv
-            ignoringAbsence $ removeDirRecur $ wseDataDir env
-            let getServer = pure $ makeWolfServer env
-            withServantServerAndContext wolfAPI (authContext env) getServer $ \burl ->
-                func $ ClientEnv man burl Nothing
-    beforeAll setupMan $ aroundWith withApp specFunc
+  let setupMan :: IO HTTP.Manager
+      setupMan = HTTP.newManager HTTP.defaultManagerSettings
+  let withApp :: (ClientEnv -> IO ()) -> HTTP.Manager -> IO ()
+      withApp func man = do
+        env <- testServerEnv
+        ignoringAbsence $ removeDirRecur $ wseDataDir env
+        let getServer = pure $ makeWolfServer env
+        withServantServerAndContext wolfAPI (authContext env) getServer $ \burl ->
+          func $ ClientEnv man burl Nothing
+  beforeAll setupMan $ aroundWith withApp specFunc
 
 -- | Like 'withServantServer', but allows passing in a 'Context' to the
 -- application.
 withServantServerAndContext ::
-       HasServer a ctx
-    => Proxy a
-    -> Context ctx
-    -> IO (Server a)
-    -> (BaseUrl -> IO r)
-    -> IO r
+     HasServer a ctx
+  => Proxy a
+  -> Context ctx
+  -> IO (Server a)
+  -> (BaseUrl -> IO r)
+  -> IO r
 withServantServerAndContext api ctx server t =
-    withApplication (serveWithContext api ctx <$> server) $ \port ->
-        t (BaseUrl Http "localhost" port "")
+  withApplication (serveWithContext api ctx <$> server) $ \port ->
+    t (BaseUrl Http "localhost" port "")
 
 runClient :: ClientEnv -> ClientM a -> IO (Either ServantError a)
 runClient = flip runClientM
 
 runClientOrError :: ClientEnv -> ClientM a -> IO a
 runClientOrError cenv func = do
-    errOrRes <- runClient cenv func
-    case errOrRes of
-        Left err -> do
-            expectationFailure $ show err
-            undefined -- Won't get here anyway ^
-        Right res -> pure res
+  errOrRes <- runClient cenv func
+  case errOrRes of
+    Left err -> do
+      expectationFailure $ show err
+      undefined -- Won't get here anyway ^
+    Right res -> pure res
 
 withValidNewUser :: ClientEnv -> (BasicAuthData -> IO ()) -> Property
 withValidNewUser cenv func =
-    forAllValid $ \register -> do
-        errOrUuid <- runClient cenv $ clientPostRegister register
-        case errOrUuid of
-            Left err ->
-                let snf =
-                        expectationFailure $
-                        "Registration should not fail with error: " <> show err
-                 in case err of
-                        FailureResponse r ->
-                            if statusCode (responseStatusCode r) == 409
-                                then pure () -- Username already exists, just stop here then.
-                                else snf
-                        _ -> snf
-            Right _ -> do
-                let basicAuthData =
-                        BasicAuthData
-                            { basicAuthUsername =
-                                  TE.encodeUtf8 $
-                                  usernameText $ registerUsername register
-                            , basicAuthPassword =
-                                  TE.encodeUtf8 $ registerPassword register
-                            }
-                func basicAuthData
+  forAllValid $ \register -> do
+    errOrUuid <- runClient cenv $ clientPostRegister register
+    case errOrUuid of
+      Left err ->
+        let snf =
+              expectationFailure $
+              "Registration should not fail with error: " <> show err
+         in case err of
+              FailureResponse r ->
+                if statusCode (responseStatusCode r) == 409
+                  then pure () -- Username already exists, just stop here then.
+                  else snf
+              _ -> snf
+      Right _ -> do
+        let basicAuthData =
+              BasicAuthData
+                { basicAuthUsername =
+                    TE.encodeUtf8 $ usernameText $ registerUsername register
+                , basicAuthPassword = TE.encodeUtf8 $ registerPassword register
+                }
+        func basicAuthData

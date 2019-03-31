@@ -9,5 +9,5 @@ import Wolf.Google.Suggest
 
 wolfGoogle :: IO ()
 wolfGoogle = do
-    (DispatchSuggest ds, Settings) <- getInstructions
-    runReaderT suggest ds
+  (DispatchSuggest ds, Settings) <- getInstructions
+  runReaderT suggest ds

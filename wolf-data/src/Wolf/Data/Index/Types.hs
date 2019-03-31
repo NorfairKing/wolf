@@ -3,14 +3,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Wolf.Data.Index.Types
-    ( Alias(..)
-    , alias
-    , aliasString
-    , Index(..)
-    , newIndex
-    , lookupInIndex
-    , addIndexEntry
-    ) where
+  ( Alias(..)
+  , alias
+  , aliasString
+  , Index(..)
+  , newIndex
+  , lookupInIndex
+  , addIndexEntry
+  ) where
 
 import Import
 
@@ -21,18 +21,20 @@ import qualified Data.Text as T
 
 import Wolf.Data.People.Types
 
-newtype Alias = Alias
+newtype Alias =
+  Alias
     { aliasText :: Text
-    } deriving ( Show
-               , Eq
-               , Hashable
-               , Ord
-               , Generic
-               , FromJSONKey
-               , ToJSONKey
-               , FromJSON
-               , ToJSON
-               )
+    }
+  deriving ( Show
+           , Eq
+           , Hashable
+           , Ord
+           , Generic
+           , FromJSONKey
+           , ToJSONKey
+           , FromJSON
+           , ToJSON
+           )
 
 alias :: Text -> Alias
 alias = Alias
@@ -41,27 +43,29 @@ aliasString :: Alias -> String
 aliasString = T.unpack . aliasText
 
 instance IsString Alias where
-    fromString = Alias . T.pack
+  fromString = Alias . T.pack
 
 instance Validity Alias
 
 instance NFData Alias
 
-newtype Index = Index
+newtype Index =
+  Index
     { indexMap :: Map Alias PersonUuid
-    } deriving (Show, Eq, Ord, Generic)
+    }
+  deriving (Show, Eq, Ord, Generic)
 
 instance Validity Index
 
 instance NFData Index
 
 instance FromJSON Index where
-    parseJSON v =
-        withObject "Index" (\o -> Index <$> o .: "indexMap") v <|>
-        (Index <$> parseJSON v)
+  parseJSON v =
+    withObject "Index" (\o -> Index <$> o .: "indexMap") v <|>
+    (Index <$> parseJSON v)
 
 instance ToJSON Index where
-    toJSON (Index m) = toJSON m
+  toJSON (Index m) = toJSON m
 
 newIndex :: Index
 newIndex = Index {indexMap = M.empty}
@@ -73,4 +77,4 @@ lookupInIndex person index = M.lookup person (indexMap index)
 -- | Add a 'PersonUuid' to the 'Index' at an alias
 addIndexEntry :: Alias -> PersonUuid -> Index -> Index
 addIndexEntry person uuid origIndex =
-    origIndex {indexMap = M.insert person uuid $ indexMap origIndex}
+  origIndex {indexMap = M.insert person uuid $ indexMap origIndex}

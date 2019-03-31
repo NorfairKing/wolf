@@ -22,36 +22,35 @@ import Wolf.Web.Server.Foundation
 
 getPeopleR :: Handler Html
 getPeopleR = do
-    pcs <- runData getAllPeopleCards
-    (nbPeople, nbNotes) <-
-        runData $
-        (,) <$> ((length . indexTuples) <$> getIndexWithDefault) <*>
-        ((S.size . noteIndexSet) <$> getNoteIndex)
-    withNavBar $ do
-        setTitle "Wolf People"
-        $(widgetFile "people")
+  pcs <- runData getAllPeopleCards
+  (nbPeople, nbNotes) <-
+    runData $
+    (,) <$> ((length . indexTuples) <$> getIndexWithDefault) <*>
+    ((S.size . noteIndexSet) <$> getNoteIndex)
+  withNavBar $ do
+    setTitle "Wolf People"
+    $(widgetFile "people")
 
 getAllPeopleCards :: ReaderT DataSettings IO WolfWidget
 getAllPeopleCards = do
-    pm <-
-        do ix <- getIndexWithDefault
-           M.traverseWithKey (\puuid as -> (,) as <$> getPersonEntry puuid) $
-               reverseIndex ix
-    pure $ peopleCards pm
+  pm <-
+    do ix <- getIndexWithDefault
+       M.traverseWithKey (\puuid as -> (,) as <$> getPersonEntry puuid) $
+         reverseIndex ix
+  pure $ peopleCards pm
 
 peopleCards :: Map PersonUuid (Set Alias, Maybe PersonEntry) -> WolfWidget
 peopleCards trips = do
-    let pcs = map snd $ sortOn fst $ M.elems $ M.mapWithKey personCard trips
-    $(widgetFile "people/items")
+  let pcs = map snd $ sortOn fst $ M.elems $ M.mapWithKey personCard trips
+  $(widgetFile "people/items")
 
 personCard :: PersonUuid -> (Set Alias, Maybe PersonEntry) -> (Text, WolfWidget)
 personCard uuid (aliases, mpe) =
-    let a =
-            case S.toList aliases of
-                [] -> "Unaliased person"
-                (a_:_) -> a_
-        displayName =
-            fromMaybe (aliasText a) $ (fromEntry <$> mpe) >>= renderName
-        mmet = metText <$> (mpe >>= fromEntry)
-        mgender = mpe >>= fromEntry
-     in (displayName, $(widgetFile "people/item"))
+  let a =
+        case S.toList aliases of
+          [] -> "Unaliased person"
+          (a_:_) -> a_
+      displayName = fromMaybe (aliasText a) $ (fromEntry <$> mpe) >>= renderName
+      mmet = metText <$> (mpe >>= fromEntry)
+      mgender = mpe >>= fromEntry
+   in (displayName, $(widgetFile "people/item"))

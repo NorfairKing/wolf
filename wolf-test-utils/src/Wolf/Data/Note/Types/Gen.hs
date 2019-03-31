@@ -11,4 +11,4 @@ import Wolf.Data.People.Types.Gen ()
 instance GenUnchecked Note
 
 instance GenValid Note where
-    genValid = Note <$> genValid <*> genValid <*> genValid
+  genValid = Note <$> genValid <*> genValid <*> genValid
