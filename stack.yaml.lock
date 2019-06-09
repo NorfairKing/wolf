@@ -33,12 +33,12 @@ packages:
     version: 0.0.0
     git: https://github.com/NorfairKing/wai-git-http
     pantry-tree:
-      size: 684
-      sha256: 4590ec5125b016663c11c835211aec548f93b0ac356491b4615b1c1f450f130f
-    commit: 6da3d87d9227e233d351e1df935a92171551e3ef
+      size: 739
+      sha256: 2577a1a677ff42b460b05b207f6edab7004a2d92d6235bb7d6839b1c4a2de68b
+    commit: a34695d908ed56f5ef09357d63c18553a8294e68
   original:
     git: https://github.com/NorfairKing/wai-git-http
-    commit: 6da3d87d9227e233d351e1df935a92171551e3ef
+    commit: a34695d908ed56f5ef09357d63c18553a8294e68
 - completed:
     subdir: typed-uuid
     cabal-file:

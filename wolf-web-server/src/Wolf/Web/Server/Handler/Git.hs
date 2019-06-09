@@ -39,7 +39,7 @@ gitApplication wse req resp = do
     Nothing -> authOnNoAuth authSets "git" req resp
     Just dd -> do
       let gitPath = toFilePath $ dd </> dotGit
-      rewriteMiddleware (cgiGitBackend gitPath) req resp
+      rewriteMiddleware (cgiGitBackend (wseGitExecutable wse) gitPath) req resp
 
 dotGit :: Path Rel Dir
 dotGit = $(mkRelDir ".git")

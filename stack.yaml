@@ -24,7 +24,7 @@ extra-deps:
 - sockaddr-0.0.0
 
 - git: https://github.com/NorfairKing/wai-git-http
-  commit: 6da3d87d9227e233d351e1df935a92171551e3ef
+  commit: a34695d908ed56f5ef09357d63c18553a8294e68
 
 - git: https://github.com/NorfairKing/typed-uuid.git
   commit: 155c9ec880ca1c12f7dd8a8468b3626de8164823

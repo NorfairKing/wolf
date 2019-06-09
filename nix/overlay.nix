@@ -34,8 +34,8 @@ final:
             waiGitHttpRepo = final.fetchFromGitHub {
               owner = "NorfairKing";
               repo = "wai-git-http";
-              rev = "6da3d87d9227e233d351e1df935a92171551e3ef";
-              sha256 = "11fi35zjn5n33m5pr3rpg2b4686sr7p62hbqczvv1c78fhq2l0gs";
+              rev = "a34695d908ed56f5ef09357d63c18553a8294e68";
+              sha256 = "1xa8c4lgmfr5hqpyry2v7i4b4f8xmpc20y9b3l9sa7ggg93alyjp";
             };
             # Turn off testing for now
             waiGitHttpPkg = dontCheck (super.callCabal2nix "wai-git-http" waiGitHttpRepo {});
