@@ -36,7 +36,7 @@ testSandbox :: MonadIO m => m (Path Abs Dir)
 testSandbox = liftIO $ resolveDir' "/tmp/test-sandbox"
 
 testServerEnv :: MonadIO m => m WolfServerEnv
-testServerEnv = WolfServerEnv <$> testSandbox
+testServerEnv = WolfServerEnv <$> testSandbox <*>pure Nothing
 
 withEnv :: WolfServerEnv -> ReaderT WolfServerEnv IO a -> IO a
 withEnv = flip runReaderT
@@ -66,12 +66,7 @@ withWolfServer specFunc = do
 -- | Like 'withServantServer', but allows passing in a 'Context' to the
 -- application.
 withServantServerAndContext ::
-     HasServer a ctx
-  => Proxy a
-  -> Context ctx
-  -> IO (Server a)
-  -> (BaseUrl -> IO r)
-  -> IO r
+     HasServer a ctx => Proxy a -> Context ctx -> IO (Server a) -> (BaseUrl -> IO r) -> IO r
 withServantServerAndContext api ctx server t =
   withApplication (serveWithContext api ctx <$> server) $ \port ->
     t (BaseUrl Http "localhost" port "")
@@ -94,9 +89,7 @@ withValidNewUser cenv func =
     errOrUuid <- runClient cenv $ clientPostRegister register
     case errOrUuid of
       Left err ->
-        let snf =
-              expectationFailure $
-              "Registration should not fail with error: " <> show err
+        let snf = expectationFailure $ "Registration should not fail with error: " <> show err
          in case err of
               FailureResponse r ->
                 if statusCode (responseStatusCode r) == 409
@@ -106,8 +99,7 @@ withValidNewUser cenv func =
       Right _ -> do
         let basicAuthData =
               BasicAuthData
-                { basicAuthUsername =
-                    TE.encodeUtf8 $ usernameText $ registerUsername register
+                { basicAuthUsername = TE.encodeUtf8 $ usernameText $ registerUsername register
                 , basicAuthPassword = TE.encodeUtf8 $ registerPassword register
                 }
         func basicAuthData

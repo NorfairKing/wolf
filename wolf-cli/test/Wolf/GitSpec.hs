@@ -21,5 +21,5 @@ spec =
     forAllValid $ \args ->
       runReaderT
         (git args)
-        Settings {setDataSets = DataSettings {dataSetWolfDir = sb}} `shouldThrow`
+        Settings {setDataSets = DataSettings {dataSetWolfDir = sb, dataSetGitExecutable = Nothing}} `shouldThrow`
       (\e -> e == ExitFailure 1)

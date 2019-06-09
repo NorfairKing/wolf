@@ -47,6 +47,9 @@ final:
               "genvalidity-typed-uuid"
             ] typedUuidPkg //
             {
+              # wolf = final.wolfPackages.wolf-cli; # Why is this necessary?
+              # genvalidity = final.haskell.lib.dontCheck super.genvalidity;
+              # genvalidity-property = final.haskell.lib.dontCheck super.genvalidity-property;
               wai-git-http = waiGitHttpPkg;
               cautious = final.haskell.lib.dontCheck (final.haskellPackages.callHackage "cautious" "0.3.0.0" {});
               cautious-gen = final.haskell.lib.dontCheck (final.haskellPackages.callHackage "cautious-gen" "0.0.0.0" {});

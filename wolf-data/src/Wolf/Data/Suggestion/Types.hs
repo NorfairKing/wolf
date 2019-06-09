@@ -181,7 +181,7 @@ data EntrySuggestion =
   EntrySuggestion
     { entrySuggestionEntry :: PersonEntry
     , entrySuggestionNewAliases :: [Alias]
-    , entrySuggestionLikelyRelevantPerson :: Maybe (PersonUuid, Double)
+    , entrySuggestionLikelyRelevantPerson :: Maybe (PersonUuid, Rational)
     }
   deriving (Show, Eq, Ord, Generic)
 

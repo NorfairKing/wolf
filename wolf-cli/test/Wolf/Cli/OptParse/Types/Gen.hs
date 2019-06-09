@@ -8,42 +8,42 @@ import Wolf.Cli.OptParse.Types
 
 import Wolf.Data.Gen ()
 
-instance GenUnchecked Command
+instance GenValid Command where
+  genValid = genValidStructurally
+  shrinkValid = shrinkValidStructurally
 
-instance GenValid Command
+instance GenValid SuggestionFlags where
+  genValid = genValidStructurally
+  shrinkValid = shrinkValidStructurally
 
-instance GenUnchecked SuggestionFlags
+instance GenValid Flags where
+  genValid = genValidStructurally
+  shrinkValid = shrinkValidStructurally
 
-instance GenValid SuggestionFlags
+instance GenValid DataFlags where
+  genValid = genValidStructurally
+  shrinkValid = shrinkValidStructurally
 
-instance GenUnchecked Flags
+instance GenValid Configuration where
+  genValid = genValidStructurally
+  shrinkValid = shrinkValidStructurally
 
-instance GenValid Flags
+instance GenValid Dispatch where
+  genValid = genValidStructurally
+  shrinkValid = shrinkValidStructurally
 
-instance GenUnchecked DataFlags
+instance GenValid PeriodDescription where
+  genValid = genValidStructurally
+  shrinkValid = shrinkValidStructurally
 
-instance GenValid DataFlags
+instance GenValid SuggestionSettings where
+  genValid = genValidStructurally
+  shrinkValid = shrinkValidStructurally
 
-instance GenUnchecked Configuration
+instance GenValid Settings where
+  genValid = genValidStructurally
+  shrinkValid = shrinkValidStructurally
 
-instance GenValid Configuration
-
-instance GenUnchecked Dispatch
-
-instance GenValid Dispatch
-
-instance GenUnchecked PeriodDescription
-
-instance GenValid PeriodDescription
-
-instance GenUnchecked SuggestionSettings
-
-instance GenValid SuggestionSettings
-
-instance GenUnchecked Settings
-
-instance GenValid Settings
-
-instance GenUnchecked ParserEnv
-
-instance GenValid ParserEnv
+instance GenValid ParserEnv where
+  genValid = genValidStructurally
+  shrinkValid = shrinkValidStructurally

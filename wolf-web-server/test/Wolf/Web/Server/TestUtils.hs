@@ -28,7 +28,7 @@ testSandbox :: IO (Path Abs Dir)
 testSandbox = resolveDir' "/tmp/wolf-web-server-test"
 
 wolfTestServerEnv :: IO WolfServerEnv
-wolfTestServerEnv = WolfServerEnv <$> testSandbox
+wolfTestServerEnv = WolfServerEnv <$> testSandbox <*> pure Nothing
 
 wolfWebServerPersonalSpec :: YesodSpec App -> Spec
 wolfWebServerPersonalSpec =
@@ -54,7 +54,7 @@ runTestDataShared ::
 runTestDataShared uuid func = do
   wse <- liftIO wolfTestServerEnv
   ad <- runReaderT (accountDataDir uuid) wse
-  let ds = DataSettings {dataSetWolfDir = ad}
+  let ds = DataSettings {dataSetWolfDir = ad, dataSetGitExecutable=Nothing}
   liftIO $ runReaderT func ds
 
 withFreshAccount ::

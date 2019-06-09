@@ -12,13 +12,13 @@ import Wolf.Data.Gen ()
 
 spec :: Spec
 spec = do
-  eqSpec @Repo
+  eqSpecOnValid @Repo
   genValidSpec @Repo
   jsonSpecOnValid @Repo
-  eqSpec @ExportProblem
+  eqSpecOnValid @ExportProblem
   genValidSpec @ExportProblem
-  eqSpec @ExportWarning
+  eqSpecOnValid @ExportWarning
   genValidSpec @ExportWarning
   monoidSpecOnValid @ExportWarning
-  eqSpec @ExportError
+  eqSpecOnValid @ExportError
   genValidSpec @ExportError

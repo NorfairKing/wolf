@@ -9,4 +9,5 @@ import Wolf.Data.Types
 instance GenUnchecked DataSettings
 
 instance GenValid DataSettings where
-  genValid = DataSettings <$> genValid
+  genValid = genValidStructurally
+  shrinkValid = shrinkValidStructurally

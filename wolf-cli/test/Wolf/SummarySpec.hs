@@ -21,7 +21,8 @@ spec = do
       forAllValid $ \person ->
         runReaderT
           (summary person)
-          Settings {setDataSets = DataSettings {dataSetWolfDir = sb}} `shouldThrow`
+          Settings
+            {setDataSets = DataSettings {dataSetWolfDir = sb, dataSetGitExecutable = Nothing}} `shouldThrow`
         (\e -> e == ExitFailure 1)
   describe "summaryReport" $
     it "produces valid summary reports" $

@@ -16,12 +16,12 @@ spec =
     describe "readPersonNote" $ do
       it "gets 'Nothing' if the given note does not exist" $ \gen ->
         forAll gen $ \sets ->
-          forAllUnchecked $ \personNoteUuid -> do
+          forAllValid $ \personNoteUuid -> do
             mpn <- runReaderT (readNote personNoteUuid) sets
             mpn `shouldBe` Nothing
       it "reads the note that was just written" $ \gen ->
         forAll gen $ \sets ->
-          forAllUnchecked $ \personNoteUuid ->
+          forAllValid $ \personNoteUuid ->
             forAllValid $ \personNote -> do
               pn <-
                 flip runReaderT sets $ do
@@ -31,7 +31,6 @@ spec =
     describe "writePersonNote" $
       it "does not crash" $ \gen ->
         forAll gen $ \sets ->
-          forAllUnchecked $ \personNoteUuid ->
-            forAllUnchecked $ \personNote ->
-              runReaderT (writeNote personNoteUuid personNote) sets `shouldReturn`
-              ()
+          forAllValid $ \personNoteUuid ->
+            forAllValid $ \personNote ->
+              runReaderT (writeNote personNoteUuid personNote) sets `shouldReturn` ()

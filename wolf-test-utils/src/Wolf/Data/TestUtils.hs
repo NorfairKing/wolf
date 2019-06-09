@@ -27,7 +27,7 @@ withDataSetsGen = beforeAll mkGen
       sbd <- resolveTestSandbox
       pure $ do
         rd <- genValid
-        pure DataSettings {dataSetWolfDir = sbd </> rd}
+        pure DataSettings {dataSetWolfDir = sbd </> rd, dataSetGitExecutable = Nothing}
 
 ensureClearRepository :: (MonadIO m, MonadReader DataSettings m) => m ()
 ensureClearRepository = do

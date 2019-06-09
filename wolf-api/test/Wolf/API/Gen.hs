@@ -8,10 +8,10 @@ import Wolf.API
 
 import Wolf.Data.Gen ()
 
-instance GenUnchecked SetPersonAlias
+instance GenValid SetPersonAlias where
+  genValid = genValidStructurally
+  shrinkValid = shrinkValidStructurally
 
-instance GenValid SetPersonAlias
-
-instance GenUnchecked PersonQuery
-
-instance GenValid PersonQuery
+instance GenValid PersonQuery where
+  genValid = genValidStructurally
+  shrinkValid = shrinkValidStructurally

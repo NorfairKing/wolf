@@ -24,5 +24,5 @@ spec =
     forAllValid $ \person ->
       runReaderT
         (entry person)
-        Settings {setDataSets = DataSettings {dataSetWolfDir = sb}} `shouldThrow`
+        Settings {setDataSets = DataSettings {dataSetWolfDir = sb, dataSetGitExecutable = Nothing}} `shouldThrow`
       (\e -> e == ExitFailure 1)

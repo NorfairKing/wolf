@@ -10,5 +10,6 @@ in pkgsv {
     [ validity-overlay
       (import ./nix/overlay.nix)
     ];
-  config.allowUnfree = true;
+    config.allowUnfree = true;
+    config.allowBroken = true;
 }

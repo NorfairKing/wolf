@@ -10,36 +10,31 @@ import Wolf.API
 
 import Wolf.Data.Gen ()
 
-instance GenUnchecked Username
-
 instance GenValid Username where
   genValid =
     sized $ \n -> do
-      t <-
-        resize n $ T.pack <$> genListOf (genValid `suchThat` validUsernameChar)
+      t <- resize n $ T.pack <$> genListOf (genValid `suchThat` validUsernameChar)
       case username t of
         Nothing -> resize n genValid
         Just un -> pure un
+  shrinkValid = shrinkValidStructurally
 
-instance GenUnchecked PasswordHash
-
-instance GenValid PasswordHash
-
-instance GenUnchecked Account
+instance GenValid PasswordHash where
+  genValid = genValidStructurally
+  shrinkValid = shrinkValidStructurally
 
 instance GenValid Account where
-  genValid = Account <$> genValid <*> genValid <*> genValid
-
-instance GenUnchecked Register
+  genValid = genValidStructurally
+  shrinkValid = shrinkValidStructurally
 
 instance GenValid Register where
-  genValid = Register <$> genValid <*> genValid
-
-instance GenUnchecked SetPersonAlias
+  genValid = genValidStructurally
+  shrinkValid = shrinkValidStructurally
 
 instance GenValid SetPersonAlias where
-  genValid = SetPersonAlias <$> genValid <*> genValid
+  genValid = genValidStructurally
+  shrinkValid = shrinkValidStructurally
 
-instance GenUnchecked PersonQuery
-
-instance GenValid PersonQuery
+instance GenValid PersonQuery where
+  genValid = genValidStructurally
+  shrinkValid = shrinkValidStructurally

@@ -13,17 +13,14 @@ import Wolf.Data.Gen ()
 spec :: Spec
 spec = do
   describe "personEntry" $
-    it "only generates valid PersonEntry's" $ producesValid personEntry
+    it "only generates valid PersonEntry's" $ producesValidsOnValids personEntry
   describe "personEntryProperties" $
-    it "only generates valid properties" $
-    producesValidsOnValids personEntryProperties
+    it "only generates valid properties" $ producesValidsOnValids personEntryProperties
   describe "newPersonEntry" $ it "is a valid entry" $ isValid newPersonEntry
   describe "entryContents" $
-    it "produces valid text for any entry" $
-    producesValidsOnValids entryContents
+    it "produces valid text for any entry" $ producesValidsOnValids entryContents
   describe "entryContentsBS" $ do
-    it "produces valid bytestring for any entry" $
-      producesValidsOnValids entryContentsBS
+    it "produces valid bytestring for any entry" $ producesValidsOnValids entryContentsBS
     it "always produces bytestrings in UTF8 encoding" $
       forAllValid $ \pe ->
         case TE.decodeUtf8' $ entryContentsBS pe of
@@ -39,16 +36,13 @@ spec = do
         forAllValid $ \now ->
           case updatePersonEntry now pe (entryContentsBS pe) of
             UpdateUnchanged -> pure ()
-            r ->
-              expectationFailure $
-              "Should have been UpdateUnchanged, was: " ++ show r
+            r -> expectationFailure $ "Should have been UpdateUnchanged, was: " ++ show r
     it "does not result in UpdateUnchanged if anything changed" $
       forAllValid $ \now ->
         forAllValid $ \peOld ->
           forAll (genValid `suchThat` (not . sameProperties peOld)) $ \peNew ->
             case updatePersonEntry now peOld (entryContentsBS peNew) of
-              UpdateUnchanged ->
-                expectationFailure "Should not have been UpdateUnchanged."
+              UpdateUnchanged -> expectationFailure "Should not have been UpdateUnchanged."
               _ -> pure ()
     it "keeps all the new keys in the right order" $
       forAllValid $ \now ->
@@ -63,6 +57,4 @@ spec = do
                       PMap ls2' -> map fst ls2' `shouldBe` map fst ls2
                       _ -> expectationFailure "Should have resulted in a map."
                   UpdateUnchanged -> pure () -- Fine
-                  r ->
-                    expectationFailure $
-                    "Should have been UpdateSuccess, was: " ++ show r
+                  r -> expectationFailure $ "Should have been UpdateSuccess, was: " ++ show r

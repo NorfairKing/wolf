@@ -12,6 +12,6 @@ import Wolf.Data.Gen ()
 
 spec :: Spec
 spec = do
-  eqSpec @PersonUuid
+  eqSpecOnValid @PersonUuid
   genValidSpec @PersonUuid
   jsonSpec @PersonUuid

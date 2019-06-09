@@ -12,42 +12,34 @@ import Wolf.Data.Entry.Types.Gen ()
 import Wolf.Data.Index.Types.Gen ()
 import Wolf.Data.People.Types.Gen ()
 
-instance GenUnchecked (SuggestionIndex a)
-
 instance GenValid (SuggestionIndex a) where
   genValid = genValidStructurallyWithoutExtraChecking
-
-instance GenUnchecked SuggestionType
+  shrinkValid = shrinkValidStructurallyWithoutExtraFiltering
 
 instance GenValid SuggestionType where
   genValid = genValidStructurallyWithoutExtraChecking
-
-instance GenUnchecked (SuggestionHash a)
+  shrinkValid = shrinkValidStructurallyWithoutExtraFiltering
 
 instance GenValid (SuggestionHash a) where
   genValid = genValidStructurallyWithoutExtraChecking
-
-instance GenUnchecked a => GenUnchecked (Suggestion a)
+  shrinkValid = shrinkValidStructurallyWithoutExtraFiltering
 
 instance GenValid a => GenValid (Suggestion a) where
   genValid = genValidStructurallyWithoutExtraChecking
-
-instance GenUnchecked AliasSuggestion
+  shrinkValid = shrinkValidStructurallyWithoutExtraFiltering
 
 instance GenValid AliasSuggestion where
   genValid = genValidStructurallyWithoutExtraChecking
-
-instance GenUnchecked EntrySuggestion
+  shrinkValid = shrinkValidStructurallyWithoutExtraFiltering
 
 instance GenValid EntrySuggestion where
   genValid = genValidStructurallyWithoutExtraChecking
-
-instance GenUnchecked SuggestionRepo
+  shrinkValid = shrinkValidStructurallyWithoutExtraFiltering
 
 instance GenValid SuggestionRepo where
   genValid = genValidStructurallyWithoutExtraChecking
-
-instance GenUnchecked a => GenUnchecked (SuggestionTypeRepo a)
+  shrinkValid = shrinkValidStructurallyWithoutExtraFiltering
 
 instance (GenValid a, Hashable a) => GenValid (SuggestionTypeRepo a) where
   genValid = genValidStructurally
+  shrinkValid = shrinkValidStructurally

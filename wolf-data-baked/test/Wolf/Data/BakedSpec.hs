@@ -13,9 +13,9 @@ import Wolf.Data.Gen ()
 
 spec :: Spec
 spec = do
-  eqSpec @Met
+  eqSpecOnValid @Met
   genValidSpec @Met
-  eqSpec @Gender
+  eqSpecOnValid @Gender
   genValidSpec @Gender
-  eqSpec @Name
+  eqSpecOnValid @Name
   genValidSpec @Name

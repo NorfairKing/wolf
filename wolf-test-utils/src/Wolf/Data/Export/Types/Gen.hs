@@ -21,9 +21,8 @@ import Wolf.Data.NoteIndex.Types.Gen
 import Wolf.Data.People.Types.Gen ()
 import Wolf.Data.Suggestion.Types.Gen ()
 
-instance GenUnchecked Repo
-
 instance GenValid Repo where
+  shrinkValid = shrinkValidStructurally
   genValid = do
     repoInitData <- genValid
         -- Any list of persons
@@ -60,10 +59,8 @@ instance GenValid Repo where
           else pure Nothing
         -- For each noteuuid, make a note.
     repoNotesWithWrongPeople <-
-      fmap M.fromList $
-      forM noteUuids $ \nu -> (,) nu . removeRelevantPeople <$> genValid
-    let repoNotes =
-          foldl' updateNotes repoNotesWithWrongPeople (M.toList repoNoteIndices)
+      fmap M.fromList $ forM noteUuids $ \nu -> (,) nu . removeRelevantPeople <$> genValid
+    let repoNotes = foldl' updateNotes repoNotesWithWrongPeople (M.toList repoNoteIndices)
     repoSuggestions <- genValid
     pure Repo {..}
 
@@ -75,13 +72,9 @@ updateNotes noteMap (pu, ni) =
   let noteUuids = S.toList $ noteIndexSet ni
    in foldl' (addRelevantPerson pu) noteMap noteUuids
 
-addRelevantPerson ::
-     PersonUuid -> Map NoteUuid Note -> NoteUuid -> Map NoteUuid Note
+addRelevantPerson :: PersonUuid -> Map NoteUuid Note -> NoteUuid -> Map NoteUuid Note
 addRelevantPerson pu noteMap nu =
-  M.adjust
-    (\note -> note {noteRelevantPeople = S.insert pu $ noteRelevantPeople note})
-    nu
-    noteMap
+  M.adjust (\note -> note {noteRelevantPeople = S.insert pu $ noteRelevantPeople note}) nu noteMap
 
 instance GenUnchecked ExportProblem
 

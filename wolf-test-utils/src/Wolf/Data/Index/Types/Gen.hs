@@ -8,12 +8,10 @@ import Wolf.Data.Index.Types
 
 import Wolf.Data.People.Types.Gen ()
 
-instance GenUnchecked Alias
-
 instance GenValid Alias where
-  genValid = Alias <$> genValid
-
-instance GenUnchecked Index
+  genValid = genValidStructurallyWithoutExtraChecking
+  shrinkValid = shrinkValidStructurallyWithoutExtraFiltering
 
 instance GenValid Index where
-  genValid = Index <$> genValid
+  genValid = genValidStructurallyWithoutExtraChecking
+  shrinkValid = shrinkValidStructurallyWithoutExtraFiltering
