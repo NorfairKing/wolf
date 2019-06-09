@@ -23,6 +23,7 @@ combineToInstructions :: Command -> Flags -> Configuration -> IO Instructions
 combineToInstructions (CommandServe ServeFlags {..}) Flags Configuration = do
   serveSetDataDir <- resolveDir' $ fromMaybe "." serveFlagDataDir
   let serveSetPort = fromMaybe defaultPort serveFlagPort
+  let serveSetGitExecutable =serveFlagGitExecutable
   pure (DispatchServe ServeSettings {..}, Settings)
 
 defaultPort :: Int
@@ -65,16 +66,13 @@ parseCommandServe = info parser modifier
     parser =
       CommandServe <$>
       (ServeFlags <$>
-       option
-         (Just <$> auto)
-         (mconcat [long "port", value Nothing, help "the port to serve on"]) <*>
+       option (Just <$> auto) (mconcat [long "port", value Nothing, help "the port to serve on"]) <*>
        option
          (Just <$> str)
-         (mconcat
-            [ long "data-dir"
-            , value Nothing
-            , help "the data directory to store data in"
-            ]))
+         (mconcat [long "data-dir", value Nothing, help "the data directory to store data in"]) <*>
+       option
+         (Just <$> str)
+         (mconcat [long "git-executable", value Nothing, help "the git exeutable to use"]))
     modifier = fullDesc <> progDesc "Serve."
 
 parseFlags :: Parser Flags

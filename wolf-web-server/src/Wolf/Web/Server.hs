@@ -27,7 +27,7 @@ wolfWebServer = do
 
 makeWolfServerEnv :: ServeSettings -> WolfServerEnv
 makeWolfServerEnv ServeSettings {..} =
-  WolfServerEnv {wseDataDir = serveSetDataDir}
+  WolfServerEnv {wseDataDir = serveSetDataDir, wseGitExecutable = serveSetGitExecutable}
 
 runWolfWebServer :: ServeSettings -> IO ()
 runWolfWebServer ss@ServeSettings {..} = do

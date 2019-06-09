@@ -25,11 +25,12 @@ makeGitCommit message = do
 runGit :: (MonadReader DataSettings m, MonadIO m) => [String] -> m ()
 runGit args = do
   wd <- wolfDir
-  runGitIn wd args
+  mge <- asks dataSetGitExecutable
+  runGitIn mge wd args
 
-runGitIn :: MonadIO m => Path Abs Dir -> [String] -> m ()
-runGitIn wd args = do
-  let gitcmd = "git"
+runGitIn :: MonadIO m => Maybe FilePath -> Path Abs Dir -> [String] -> m ()
+runGitIn mge wd args = do
+  let gitcmd = fromMaybe "git" mge
   let cmd = unwords $ gitcmd : args
   let cp =
         (proc gitcmd args)
@@ -44,6 +45,5 @@ runGitIn wd args = do
       (_, _, _, ph) <- createProcess cp
       waitForProcess ph
   case ec of
-    ExitFailure code ->
-      liftIO $ die $ unwords [cmd, "failed with exit code", show code]
+    ExitFailure code -> liftIO $ die $ unwords [cmd, "failed with exit code", show code]
     ExitSuccess -> pure ()

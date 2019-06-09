@@ -21,7 +21,7 @@ import Wolf.Server.Types
 
 serve :: ServeSettings -> Settings -> IO ()
 serve ServeSettings {..} Settings = do
-  let env = WolfServerEnv {wseDataDir = serveSetDataDir}
+  let env = WolfServerEnv {wseDataDir = serveSetDataDir, wseGitExecutable = serveSetGitExecutable}
   Warp.run serveSetPort $ wolfApp env
 
 wolfApp :: WolfServerEnv -> Wai.Application

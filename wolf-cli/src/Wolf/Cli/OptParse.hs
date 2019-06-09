@@ -45,10 +45,8 @@ combineToInstructions cmd Flags {..} Configuration = do
       CommandRandomPerson -> pure DispatchRandomPerson
       CommandSuggestion sfs ->
         case sfs of
-          CommandListSuggestions ->
-            pure $ DispatchSuggestion DispatchListSuggestions
-          CommandReviewSuggestion ->
-            pure $ DispatchSuggestion DispatchReviewSuggestion
+          CommandListSuggestions -> pure $ DispatchSuggestion DispatchListSuggestions
+          CommandReviewSuggestion -> pure $ DispatchSuggestion DispatchReviewSuggestion
       CommandExport -> pure DispatchExport
       CommandCleanup -> pure DispatchCleanup
   pure (disp, Settings {setDataSets = ds})
@@ -63,7 +61,7 @@ deriveDataSettings DataFlags {..} = do
     case dataFlagWolfDir of
       Nothing -> defaultWolfDir
       Just d -> resolveDir' d
-  pure DataSettings {dataSetWolfDir = wd}
+  pure DataSettings {dataSetWolfDir = wd, dataSetGitExecutable = dataFlagGitExecutable}
 
 getConfiguration :: Command -> Flags -> IO Configuration
 getConfiguration _ _ = pure Configuration
@@ -78,8 +76,11 @@ getArguments = do
 getParserEnv :: IO ParserEnv
 getParserEnv = do
   wd <- defaultWolfDir
-  i <- runReaderT getIndexWithDefault DataSettings {dataSetWolfDir = wd}
-    -- TODO possibly do something with the information that the index does not exist yet.
+  i <-
+    runReaderT
+      getIndexWithDefault
+      DataSettings {dataSetWolfDir = wd, dataSetGitExecutable = Nothing}
+  -- TODO possibly do something with the information that the index does not exist yet.
   pure ParserEnv {parserEnvDefaultWolfDir = wd, parserEnvIndex = i}
 
 runArgumentsParser :: ParserEnv -> [String] -> ParserResult Arguments
@@ -97,8 +98,7 @@ runArgumentsParser env = execParserPure prefs_ $ runReaderT argParser env
 
 argParser :: ReaderT ParserEnv ParserInfo Arguments
 argParser =
-  ReaderT $ \env ->
-    info (helper <*> runReaderT parseArgs env) (fullDesc <> progDesc "Wolf")
+  ReaderT $ \env -> info (helper <*> runReaderT parseArgs env) (fullDesc <> progDesc "Wolf")
 
 -- info :: Parser a -> InfoMod a -> ParserInfo a
 -- f :: ReaderT ParserEnv Parser a -> InfoMod a -> ReaderT ParserEnv ParserInfo a
@@ -203,8 +203,7 @@ parseCommandAlias :: ReaderT ParserEnv ParserInfo Command
 parseCommandAlias =
   ReaderT $ \env ->
     let parser =
-          CommandAlias <$>
-          argument (T.pack <$> str) (mconcat [metavar "NEW", help "The alias"]) <*>
+          CommandAlias <$> argument (T.pack <$> str) (mconcat [metavar "NEW", help "The alias"]) <*>
           argument
             (T.pack <$> str)
             (mconcat
@@ -212,8 +211,7 @@ parseCommandAlias =
                , help "What the alias will refer to"
                , completer $ listCompleter $ peopleMap env
                ])
-        modifier =
-          fullDesc <> progDesc "Alias one identifier to an other identifier."
+        modifier = fullDesc <> progDesc "Alias one identifier to an other identifier."
      in info parser modifier
 
 parseCommandReview :: ParserInfo Command
@@ -224,8 +222,7 @@ parseCommandReview =
   where
     periodDescriptionParser =
       optional $
-      flag' LastDay (mconcat [long "last-day"]) <|>
-      flag' LastWeek (mconcat [long "last-week"]) <|>
+      flag' LastDay (mconcat [long "last-day"]) <|> flag' LastWeek (mconcat [long "last-week"]) <|>
       flag' LastMonth (mconcat [long "last-month"])
 
 parseCommandRandomPerson :: ParserInfo Command
@@ -240,9 +237,7 @@ parseCommandSuggestion =
         fmap CommandSuggestion $
         hsubparser $
         mconcat
-          [ command "list" parseCommandSuggestionList
-          , command "review" parseCommandSuggestionReview
-          ]
+          [command "list" parseCommandSuggestionList, command "review" parseCommandSuggestionReview]
       modifier = fullDesc <> progDesc "Manipulate Suggestions."
    in info parser modifier
 
@@ -271,8 +266,7 @@ parseCommandCleanup =
    in info parser modifier
 
 peopleMap :: ParserEnv -> [String]
-peopleMap =
-  map (escapeSpaces . aliasString . fst) . M.toList . indexMap . parserEnvIndex
+peopleMap = map (escapeSpaces . aliasString . fst) . M.toList . indexMap . parserEnvIndex
   where
     escapeSpaces = concatMap go
       where
@@ -283,9 +277,7 @@ parseFlags :: ReaderT ParserEnv Parser Flags
 parseFlags = Flags <$> parseDataFlags
 
 parseDataFlags :: ReaderT ParserEnv Parser DataFlags
-parseDataFlags =
-  ReaderT $ \env ->
-    parseDataFlagsWithDefault $ Just $ parserEnvDefaultWolfDir env
+parseDataFlags = ReaderT $ \env -> parseDataFlagsWithDefault $ Just $ parserEnvDefaultWolfDir env
 
 parseDataFlags' :: Parser DataFlags
 parseDataFlags' = parseDataFlagsWithDefault Nothing
@@ -303,4 +295,8 @@ parseDataFlagsWithDefault mDefDir =
        , case mDefDir of
            Nothing -> mempty
            Just defDir -> showDefaultWith (const $ toFilePath defDir)
-       ])
+       ]) <*>
+  option
+    (Just <$> str)
+    (mconcat
+       [long "git-executable", metavar "FILE", help "the git executable to use", value Nothing])

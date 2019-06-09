@@ -224,7 +224,7 @@ runDataApp app func = do
   let wse = appDataSettings app
   uuid <- requireAuthId
   dd <- runReaderT (accountDataDir uuid) wse
-  let ds = DataSettings {dataSetWolfDir = dd}
+  let ds = DataSettings {dataSetWolfDir = dd, dataSetGitExecutable = wseGitExecutable wse}
   liftIO $ runReaderT func ds
 
 runData :: ReaderT DataSettings IO a -> Handler a

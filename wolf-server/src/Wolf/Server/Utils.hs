@@ -14,9 +14,9 @@ import Wolf.Server.Types
 runDataForAccount :: Account -> ReaderT DataSettings IO a -> WolfHandler a
 runDataForAccount acc = runDataForAccountUUID (accountUUID acc)
 
-runDataForAccountUUID ::
-     AccountUUID -> ReaderT DataSettings IO a -> WolfHandler a
+runDataForAccountUUID :: AccountUUID -> ReaderT DataSettings IO a -> WolfHandler a
 runDataForAccountUUID uuid func = do
   dd <- accountDataDir uuid
-  let ds = DataSettings {dataSetWolfDir = dd}
+  mge <- asks wseGitExecutable
+  let ds = DataSettings {dataSetWolfDir = dd, dataSetGitExecutable = mge}
   liftIO $ runReaderT func ds

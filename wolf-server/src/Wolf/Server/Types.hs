@@ -11,8 +11,9 @@ import Servant
 
 type WolfHandler = ReaderT WolfServerEnv Handler
 
-newtype WolfServerEnv =
+data WolfServerEnv =
   WolfServerEnv
     { wseDataDir :: Path Abs Dir
+    , wseGitExecutable :: Maybe FilePath
     }
   deriving (Show, Eq, Generic)

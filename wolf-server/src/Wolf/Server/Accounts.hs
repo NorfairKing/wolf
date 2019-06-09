@@ -31,9 +31,7 @@ data RegisterError
   deriving (Show, Eq)
 
 registerAccount ::
-     (MonadIO m, MonadReader WolfServerEnv m)
-  => Register
-  -> m (Either RegisterError AccountUUID)
+     (MonadIO m, MonadReader WolfServerEnv m) => Register -> m (Either RegisterError AccountUUID)
 registerAccount Register {..} = do
   mh <- liftIO $ hashPassword registerPassword
   case mh of
@@ -45,46 +43,35 @@ registerAccount Register {..} = do
         Just uuid -> do
           let acc =
                 Account
-                  { accountUUID = uuid
-                  , accountUsername = registerUsername
-                  , accountPasswordHash = ph
-                  }
+                  {accountUUID = uuid, accountUsername = registerUsername, accountPasswordHash = ph}
           storeAccount acc
           add <- accountDataDir $ accountUUID acc
           ensureDir add
-          setupWolfGit (usernameString registerUsername) add
+          mge <- asks wseGitExecutable
+          setupWolfGit mge (usernameString registerUsername) add
           pure $ Right uuid
 
-setupWolfGit :: MonadIO m => String -> Path Abs Dir -> m ()
-setupWolfGit name add = do
-  runGitIn add ["init"]
-  runGitIn add ["config", "http.receivepack", "true"]
-  runGitIn add ["config", "receive.denyCurrentBranch", "updateInstead"]
-  runGitIn add ["config", "user.name", show $ unwords [name, "via wolf-server"]]
-  runGitIn
-    add
-    ["config", "user.email", show $ unwords [name, "via wolf-server"]]
+setupWolfGit :: MonadIO m => Maybe FilePath -> String -> Path Abs Dir -> m ()
+setupWolfGit mge name add = do
+  runGitIn mge add ["init"]
+  runGitIn mge add ["config", "http.receivepack", "true"]
+  runGitIn mge add ["config", "receive.denyCurrentBranch", "updateInstead"]
+  runGitIn mge add ["config", "user.name", show $ unwords [name, "via wolf-server"]]
+  runGitIn mge add ["config", "user.email", show $ unwords [name, "via wolf-server"]]
 
 -- | Retrieve global accounts data
-getAccounts ::
-     (MonadIO m, MonadReader WolfServerEnv m) => m (Map Username AccountUUID)
+getAccounts :: (MonadIO m, MonadReader WolfServerEnv m) => m (Map Username AccountUUID)
 getAccounts = do
   af <- accountsFile
   readJSONWithDefault M.empty af
 
 -- | Store global accounts data
-storeAccounts ::
-     (MonadIO m, MonadReader WolfServerEnv m)
-  => Map Username AccountUUID
-  -> m ()
+storeAccounts :: (MonadIO m, MonadReader WolfServerEnv m) => Map Username AccountUUID -> m ()
 storeAccounts accs = do
   af <- accountsFile
   writeJSON af accs
 
-lookupAccountUUID ::
-     (MonadIO m, MonadReader WolfServerEnv m)
-  => Username
-  -> m (Maybe AccountUUID)
+lookupAccountUUID :: (MonadIO m, MonadReader WolfServerEnv m) => Username -> m (Maybe AccountUUID)
 lookupAccountUUID un = do
   as <- getAccounts
   pure $ M.lookup un as
@@ -94,10 +81,7 @@ lookupAccountUUID un = do
 -- If the username already exists, this returns 'Nothing'.
 -- If the username does not exist yet, this returns 'Just' with a new 'AccountUUID'.
 -- This also adds the new 'AccountUUID' to the global accounts file.
-tryToAddNewAccount ::
-     (MonadIO m, MonadReader WolfServerEnv m)
-  => Username
-  -> m (Maybe AccountUUID)
+tryToAddNewAccount :: (MonadIO m, MonadReader WolfServerEnv m) => Username -> m (Maybe AccountUUID)
 tryToAddNewAccount un = do
   as <- getAccounts
   case M.lookup un as of
@@ -108,10 +92,7 @@ tryToAddNewAccount un = do
       pure $ Just uuid
 
 -- | Retrieve account data
-getAccount ::
-     (MonadIO m, MonadReader WolfServerEnv m)
-  => AccountUUID
-  -> m (Maybe Account)
+getAccount :: (MonadIO m, MonadReader WolfServerEnv m) => AccountUUID -> m (Maybe Account)
 getAccount uuid = do
   adf <- accountDataFile uuid
   readJSONWithMaybe adf

@@ -41,9 +41,10 @@ newtype Flags =
 
 instance Validity Flags
 
-newtype DataFlags =
+data DataFlags =
   DataFlags
     { dataFlagWolfDir :: Maybe FilePath
+    , dataFlagGitExecutable :: Maybe FilePath
     }
   deriving (Show, Eq, Generic)
 

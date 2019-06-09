@@ -14,6 +14,7 @@ data ServeFlags =
   ServeFlags
     { serveFlagPort :: Maybe Int
     , serveFlagDataDir :: Maybe FilePath
+    , serveFlagGitExecutable :: Maybe FilePath
     }
   deriving (Show, Eq)
 
@@ -33,6 +34,7 @@ data ServeSettings =
   ServeSettings
     { serveSetPort :: Int
     , serveSetDataDir :: Path Abs Dir
+    , serveSetGitExecutable :: Maybe FilePath
     }
   deriving (Show, Eq)
 
